@@ -1,0 +1,17 @@
+{
+	"configurations": [
+		{
+			"name": "Windows",
+			"includePath": [
+				"${workspaceFolder}/include"
+			],
+			"browse": {
+				"path": [
+					"${workspaceFolder}/src",
+					"${workspaceFolder}/include"
+				]
+			}
+		}
+	],
+	"version": 4
+}
