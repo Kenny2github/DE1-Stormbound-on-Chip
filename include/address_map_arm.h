@@ -1,5 +1,5 @@
 #ifndef BOARD
-/* This files provides address values that exist in the system */
+/* This file provides address values that exist in the system */
 
 #define BOARD                 "DE1-SoC"
 
