@@ -19,8 +19,8 @@
 #define IRQ_PARALLEL_PORT1	11	// Parallel port (11)
 #define IRQ_PARALLEL_PORT2	12	// Parallel port (12)
 #define IRQ_AUDIO			78	// Audio (8 kHz)
-#define IRQ_PS2_7			79	// PS/2 keyboard or mouse (79)
-#define IRQ_PS2_8			89	// PS/2 keyboard or mouse (89)
+#define IRQ_PS2				79	// PS/2 keyboard or mouse
+#define IRQ_PS2_DUAL		89	// PS/2 dual keyboard and/or mouse
 
 /**** Exported functions ****/
 
