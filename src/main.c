@@ -1,5 +1,6 @@
 #include "address_map_arm.h"
 #include "interrupts.h"
+#include "mouse.h"
 
 int seg7[] = {0x3f, 0x06, 0x5b, 0x4f, 0x66, 0x6d, 0x7d, 0x07, 0x7f, 0x67, 0x063f};
 
@@ -25,6 +26,7 @@ static void pushbutton_ISR(void) {
 
 int main(void) {
 	config_interrupt(IRQ_KEY, &config_KEYs, &pushbutton_ISR);
+	enable_mouse();
 	config_interrupts();
 
 	while (1); // wait for interrupts
