@@ -102,11 +102,11 @@ static void handle_mouse_interrupt(void) {
 
 		// Not yet in 3-byte-packet streaming-data-reporting mode
 		if (status != REPORTING) {
-			if (packet[1] == SELF_TEST_PASSED && packet[2] == 0x00) {
+			if (packet[1] == (char)SELF_TEST_PASSED && packet[2] == (char)0x00) {
 				// Request to enter data reporting mode
 				*PS2_ptr = ENABLE_DATA_REPORTING;
 				status = AWAITING_ACK;
-			} else if (status == AWAITING_ACK && packet[2] == ACKNOWLEDGE) {
+			} else if (status == AWAITING_ACK && packet[2] == (char)ACKNOWLEDGE) {
 				// Above request was acknowledged
 				status = REPORTING;
 			}
