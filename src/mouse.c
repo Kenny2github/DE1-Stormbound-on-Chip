@@ -53,7 +53,7 @@ enum mouse_reporting_status {
  * @brief Enable interrupts on the PS/2 port.
  */
 static void enable_mouse_interrupts(void) {
-	int* PS2_ptr = (int*)PS2_BASE;
+	volatile int* PS2_ptr = (int*)PS2_BASE;
 	// Write 1 to RE bit of control register
 	*(PS2_ptr + 1) = 1;
 }
