@@ -16,6 +16,9 @@
 
 #define DEBUG_PRINT
 
+// Mouse sensitivity constant. Used to slow down mouse movement if needed.
+#define MOUSE_SENSITIVITY 0.125
+
 struct mouse_state_t mouse_state;
 
 /**
@@ -133,8 +136,8 @@ static void handle_mouse_interrupt(void) {
 		signed short dx = dpos.x;
 		signed short dy = dpos.y;
 		// update mouse x position
-		mouse_state.x += dx;
-		mouse_state.y += dy;
+		mouse_state.x += dx * MOUSE_SENSITIVITY;
+		mouse_state.y += dy * MOUSE_SENSITIVITY;
 		if (mouse_state.x < 0) mouse_state.x = 0;
 		if (mouse_state.y < 0) mouse_state.y = 0;
 		if (mouse_state.x >= SCREEN_W) mouse_state.x = SCREEN_W - 1;
@@ -142,7 +145,7 @@ static void handle_mouse_interrupt(void) {
 
 #ifdef DEBUG_PRINT
 		printf(
-			"Mouse x: %u, y: %u, dx: %hd, dy: %hd, L: %u, M: %u, R: %u\n",
+			"Mouse x: %f, y: %f, dx: %hd, dy: %hd, L: %u, M: %u, R: %u\n",
 			mouse_state.x, mouse_state.y, dx, dy, mouse_state.left_clicked,
 			mouse_state.middle_clicked, mouse_state.right_clicked
 		);
