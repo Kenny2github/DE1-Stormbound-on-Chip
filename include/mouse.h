@@ -11,9 +11,9 @@
  */
 struct mouse_state_t {
 	// The current mouse x position (right is positive)
-	unsigned int x;
+	signed int x;
 	// The current mouse y position (down is positive)
-	unsigned int y;
+	signed int y;
 	// Whether the left mouse button is currently clicked
 	unsigned int left_clicked : 1;
 	// Whether the middle mouse button is currently clicked
