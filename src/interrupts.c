@@ -100,7 +100,7 @@ static void enable_interrupt(int N, int CPU_target) {
 	 */
 	reg_offset = N & 0xFFFFFFFC;
 	index = N & 0x3;
-	address = MPCORE_GIC_DIST + ICDIPTR + index;
+	address = MPCORE_GIC_DIST + ICDIPTR + reg_offset + index;
 	// Now that we know the register address and value,
 	// write to (only) the appropriate byte.
 	*(char*)address = (char)CPU_target;
