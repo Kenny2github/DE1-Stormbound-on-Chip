@@ -17,7 +17,8 @@ with open("combined.c", "a") as combined_file:
     for filename in sys.argv[1:]:
         with open(filename, "r") as c_file:
             contents = c_file.read()
-        contents = INCLUDE_RE.sub(read_file, contents)
+        while re.search(INCLUDE_RE, contents):
+            contents = INCLUDE_RE.sub(read_file, contents)
         combined_file.write(contents)
 
 os.system('type combined.c | clip')
