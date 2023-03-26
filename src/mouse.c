@@ -13,8 +13,9 @@
 #include "interrupts.h"
 #include "mouse.h"
 #include "vga.h"
+#include "events.h"
 
-#define DEBUG_PRINT
+// #define DEBUG_PRINT
 
 // Mouse sensitivity constant. Used to slow down mouse movement if needed.
 #define MOUSE_SENSITIVITY 0.125
@@ -99,6 +100,62 @@ static void update_mouse_state(char packet[3]) {
 }
 
 /**
+ * @brief Post (a) mouse event(s) to the event queue.
+ *
+ * @param prev_state The previous state to compare.
+ * Used to decide whether to post events.
+ */
+static void post_mouse_events(struct mouse_state_t prev_state) {
+	struct event_t event;
+
+	// Mouse movement event
+	struct e_mouse_move movement;
+	int moved = prev_state.x != mouse_state.x || prev_state.y != mouse_state.y;
+	// The below will set the values to zero if the condition is false,
+	// which obviates the need for a conditional check
+	movement.x = mouse_state.x * moved;
+	movement.y = mouse_state.y * moved;
+	// Post mouse movement events before button down/up events,
+	// if both happen simultaneously. This simulates moving the mouse
+	// to a location before clicking it.
+	if (movement.x != 0 || movement.y != 0) {
+		// Actually post the movement event to the queue
+		event.type = E_MOUSE_MOVE;
+		event.data.mouse_move = movement;
+		event_queue_push(event, "mouse move");
+	}
+
+	// Mouse button event
+	struct e_mouse_button button_down = {0, 0, 0}, button_up = {0, 0, 0};
+	// N.B. for the following button assignments,
+	// for some reason (a ? b : c).attr = x; is not allowed
+	// but (a ? &b : &c)->attr = x; is. I do not know why.
+	// I use this pattern to reduce condition checks.
+	(mouse_state.left_clicked ? &button_down : &button_up)->left
+		= prev_state.left_clicked != mouse_state.left_clicked;
+	(mouse_state.middle_clicked ? &button_down : &button_up)->middle
+		= prev_state.middle_clicked != mouse_state.middle_clicked;
+	(mouse_state.right_clicked ? &button_down : &button_up)->right
+		= prev_state.right_clicked != mouse_state.right_clicked;
+	// Post button up events before button down events,
+	// if both happen simultaneously. This simulates releasing
+	// the mouse button before pressing another.
+	// This order makes more sense than the reverse in most scenarios.
+	if (button_up.left || button_up.middle || button_up.right) {
+		// Actually post the button-up event to the queue
+		event.type = E_MOUSE_BUTTON_UP;
+		event.data.mouse_button_up = button_up;
+		event_queue_push(event, "mouse button up");
+	}
+	if (button_down.left || button_down.middle || button_down.right) {
+		// Actually post the button-down event to the queue
+		event.type = E_MOUSE_BUTTON_DOWN;
+		event.data.mouse_button_down = button_down;
+		event_queue_push(event, "mouse button down");
+	}
+}
+
+/**
  * @brief Handle an interrupt from the PS/2 port.
  *
  * This operates on a state machine with transition diagram as follows:
@@ -149,6 +206,8 @@ static void handle_mouse_interrupt(void) {
 			} else if (status == AWAITING_ACK && packet[2] == (char)ACKNOWLEDGE) {
 				// Above request was acknowledged
 				status = REPORTING;
+				struct event_t event = {E_MOUSE_ENABLED, {.mouse_enabled = {}}};
+				event_queue_push(event, "mouse enabled");
 			}
 			continue;
 		}
@@ -158,7 +217,9 @@ static void handle_mouse_interrupt(void) {
 		// Don't process incomplete packet
 		if (packet_completion != 0) continue;
 
+		struct mouse_state_t prev_state = mouse_state;
 		update_mouse_state(packet);
+		post_mouse_events(prev_state);
 	}
 }
 

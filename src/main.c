@@ -1,6 +1,8 @@
+#include <stdio.h>
 #include "address_map_arm.h"
 #include "interrupts.h"
 #include "mouse.h"
+#include "events.h"
 
 int seg7[] = {0x3f, 0x06, 0x5b, 0x4f, 0x66, 0x6d, 0x7d, 0x07, 0x7f, 0x67, 0x063f};
 
@@ -24,10 +26,35 @@ static void pushbutton_ISR(void) {
 	*HEX30_ptr = HEX_bits;
 }
 
+static void handle_event(struct event_t event) {
+	switch (event.type) {
+	case E_MOUSE_ENABLED:
+		printf("Mouse plugged in\n");
+		break;
+	case E_MOUSE_BUTTON_DOWN:
+		if (event.data.mouse_button_down.left) printf("Left button pressed\n");
+		if (event.data.mouse_button_down.middle) printf("Middle button pressed\n");
+		if (event.data.mouse_button_down.right) printf("Right button pressed\n");
+		break;
+	case E_MOUSE_BUTTON_UP:
+		if (event.data.mouse_button_up.left) printf("Left button released\n");
+		if (event.data.mouse_button_up.middle) printf("Middle button released\n");
+		if (event.data.mouse_button_up.right) printf("Right button released\n");
+		break;
+	case E_MOUSE_MOVE:
+		printf("Mouse moved to (%f, %f)\n", event.data.mouse_move.x, event.data.mouse_move.y);
+		break;
+	}
+}
+
 int main(void) {
 	config_interrupt(IRQ_KEY, &config_KEYs, &pushbutton_ISR);
 	enable_mouse();
 	config_interrupts();
 
-	while (1); // wait for interrupts
+	while (1) {
+		while (!event_queue_empty()) {
+			handle_event(event_queue_pop());
+		}
+	}
 }
