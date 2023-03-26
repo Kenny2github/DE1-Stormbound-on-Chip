@@ -62,6 +62,43 @@ static void enable_mouse_interrupts(void) {
 }
 
 /**
+ * @brief Update mouse state from a PS/2 mouse state report packet.
+ *
+ * @param packet PS/2 mouse state report packet
+ */
+static void update_mouse_state(char packet[3]) {
+	// Update mouse buttons
+	mouse_state.left_clicked = packet[0] & 0b001;
+	mouse_state.right_clicked = (packet[0] & 0b010) >> 1;
+	mouse_state.middle_clicked = (packet[0] & 0b100) >> 2;
+	// construct 9-bit signed numbers
+	struct {
+		signed short x : 9;
+		signed short y : 9;
+	} dpos;
+	dpos.x = (((signed short)packet[0] & 0x10) << 4) | (signed short)packet[1];
+	dpos.y = (((signed short)packet[0] & 0x20) << 3) | (signed short)packet[2];
+	// sign-extend 9 bits to 16
+	signed short dx = dpos.x;
+	signed short dy = dpos.y;
+	// update mouse x position
+	mouse_state.x += dx * MOUSE_SENSITIVITY;
+	mouse_state.y += dy * MOUSE_SENSITIVITY;
+	if (mouse_state.x < 0) mouse_state.x = 0;
+	else if (mouse_state.x >= SCREEN_W) mouse_state.x = SCREEN_W - 1;
+	if (mouse_state.y < 0) mouse_state.y = 0;
+	else if (mouse_state.y >= SCREEN_H) mouse_state.y = SCREEN_H - 1;
+
+#ifdef DEBUG_PRINT
+	printf(
+		"Mouse x: %f, y: %f, dx: %hd, dy: %hd, L: %u, M: %u, R: %u\n",
+		mouse_state.x, mouse_state.y, dx, dy, mouse_state.left_clicked,
+		mouse_state.middle_clicked, mouse_state.right_clicked
+	);
+#endif
+}
+
+/**
  * @brief Handle an interrupt from the PS/2 port.
  *
  * This operates on a state machine with transition diagram as follows:
@@ -121,35 +158,7 @@ static void handle_mouse_interrupt(void) {
 		// Don't process incomplete packet
 		if (packet_completion != 0) continue;
 
-		// Update mouse state
-		mouse_state.left_clicked = packet[0] & 0b001;
-		mouse_state.right_clicked = (packet[0] & 0b010) >> 1;
-		mouse_state.middle_clicked = (packet[0] & 0b100) >> 2;
-		// construct 9-bit signed numbers
-		struct {
-			signed short x : 9;
-			signed short y : 9;
-		} dpos;
-		dpos.x = (((signed short)packet[0] & 0x10) << 4) | (signed short)packet[1];
-		dpos.y = (((signed short)packet[0] & 0x20) << 3) | (signed short)packet[2];
-		// sign-extend 9 bits to 16
-		signed short dx = dpos.x;
-		signed short dy = dpos.y;
-		// update mouse x position
-		mouse_state.x += dx * MOUSE_SENSITIVITY;
-		mouse_state.y += dy * MOUSE_SENSITIVITY;
-		if (mouse_state.x < 0) mouse_state.x = 0;
-		if (mouse_state.y < 0) mouse_state.y = 0;
-		if (mouse_state.x >= SCREEN_W) mouse_state.x = SCREEN_W - 1;
-		if (mouse_state.y >= SCREEN_H) mouse_state.y = SCREEN_H - 1;
-
-#ifdef DEBUG_PRINT
-		printf(
-			"Mouse x: %f, y: %f, dx: %hd, dy: %hd, L: %u, M: %u, R: %u\n",
-			mouse_state.x, mouse_state.y, dx, dy, mouse_state.left_clicked,
-			mouse_state.middle_clicked, mouse_state.right_clicked
-		);
-#endif
+		update_mouse_state(packet);
 	}
 }
 
