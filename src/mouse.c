@@ -123,11 +123,16 @@ static void handle_mouse_interrupt(void) {
 		mouse_state.right_clicked = (packet[0] & 0b010) >> 1;
 		mouse_state.middle_clicked = (packet[0] & 0b100) >> 2;
 		// construct 9-bit signed numbers
-		signed short dx = (((short)packet[0] & 0b010000) << 4) | (short)packet[1];
-		signed short dy = (((short)packet[0] & 0b100000) << 4) | (short)packet[2];
+		struct {
+			signed short x : 9;
+			signed short y : 9;
+		} dpos;
+		dpos.x = (((signed short)packet[0] & 0x10) << 4) | (signed short)packet[1];
+		dpos.y = (((signed short)packet[0] & 0x20) << 3) | (signed short)packet[2];
 		// sign-extend 9 bits to 16
-		dx = dx << 7 >> 7;
-		dy = dy << 7 >> 7;
+		signed short dx = dpos.x;
+		signed short dy = dpos.y;
+		// update mouse x position
 		mouse_state.x += dx;
 		mouse_state.y += dy;
 		if (mouse_state.x < 0) mouse_state.x = 0;
@@ -137,8 +142,8 @@ static void handle_mouse_interrupt(void) {
 
 #ifdef DEBUG_PRINT
 		printf(
-			"Mouse x: %d, y: %d, L: %d, M: %d, R: %d\n",
-			mouse_state.x, mouse_state.y, mouse_state.left_clicked,
+			"Mouse x: %u, y: %u, dx: %hd, dy: %hd, L: %u, M: %u, R: %u\n",
+			mouse_state.x, mouse_state.y, dx, dy, mouse_state.left_clicked,
 			mouse_state.middle_clicked, mouse_state.right_clicked
 		);
 #endif
