@@ -13,10 +13,10 @@
 /**** Event type data structures ****/
 
 /**
- * @brief Data structure for a mouse being plugged in.
+ * @brief Empty Data structure.
  * This is empty - all that's needed is the event type.
  */
-struct e_mouse_enabled {};
+struct e_empty {};
 
 /**
  * @brief Data structure for a mouse movement event.
@@ -52,6 +52,7 @@ enum event_type {
 	E_MOUSE_MOVE,
 	E_MOUSE_BUTTON_DOWN,
 	E_MOUSE_BUTTON_UP,
+	E_TIMER
 };
 
 /**
@@ -59,10 +60,11 @@ enum event_type {
  * This stores the actual data of the event.
  */
 union event_type_t {
-	struct e_mouse_enabled mouse_enabled;
+	struct e_empty mouse_enabled;
 	struct e_mouse_move mouse_move;
 	struct e_mouse_button mouse_button_down;
 	struct e_mouse_button mouse_button_up;
+	struct e_empty timer;
 };
 
 #endif
