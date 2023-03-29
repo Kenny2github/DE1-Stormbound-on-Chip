@@ -2,9 +2,11 @@
 #include "address_map_arm.h"
 #include "interrupts.h"
 #include "mouse.h"
+#include "timer.h"
 #include "events.h"
 
 int seg7[] = {0x3f, 0x06, 0x5b, 0x4f, 0x66, 0x6d, 0x7d, 0x07, 0x7f, 0x67, 0x063f};
+int time_left;
 
 static void config_KEYs(void) {
 	volatile int* KEY_ptr = (int*)KEY_BASE;
@@ -27,6 +29,7 @@ static void pushbutton_ISR(void) {
 }
 
 static void handle_event(struct event_t event) {
+	volatile int* LEDR_ptr = (int*) LEDR_BASE;
 	switch (event.type) {
 	case E_MOUSE_ENABLED:
 		printf("Mouse plugged in\n");
@@ -44,12 +47,30 @@ static void handle_event(struct event_t event) {
 	case E_MOUSE_MOVE:
 		printf("Mouse moved to (%f, %f)\n", event.data.mouse_move.x, event.data.mouse_move.y);
 		break;
+	case E_TIMER_ENABLE:
+		time_left = 10;
+		printf("Timer enabled, time left = %d\n", time_left);
+		*LEDR_ptr = (1 << time_left) - 1;
+		break;
+	case E_TIMER_RELOAD:
+		if(!(--time_left)) {
+			disable_timer();
+			printf("timer disabled\n");			
+			// put this somewhere else later, this is just for testing
+			enable_timer_interrupt();
+			
+		} else {
+			printf("timer counted down, time left = %d\n", time_left);
+		}
+		*LEDR_ptr = (1 << time_left) - 1;
 	}
 }
 
 int main(void) {
 	config_interrupt(IRQ_KEY, &config_KEYs, &pushbutton_ISR);
 	enable_mouse();
+	enable_timer();
+	enable_timer_interrupt();
 	config_interrupts();
 
 	while (1) {
