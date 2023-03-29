@@ -185,7 +185,7 @@ void config_interrupts(void) {
 	config_GIC();
 	// Configure interrupts on the I/O side
 	for (int i = 0; i < num_interrupts; ++i) {
-		interrupt_handlers[i].enable();
+		if (interrupt_handlers[i].enable != NULL) interrupt_handlers[i].enable();
 	}
 	enable_A9_interrupts();
 }
