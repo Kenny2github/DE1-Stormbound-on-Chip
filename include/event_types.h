@@ -52,7 +52,8 @@ enum event_type {
 	E_MOUSE_MOVE,
 	E_MOUSE_BUTTON_DOWN,
 	E_MOUSE_BUTTON_UP,
-	E_TIMER
+	E_TIMER_ENABLE,
+	E_TIMER_RELOAD
 };
 
 /**
@@ -64,7 +65,8 @@ union event_type_t {
 	struct e_mouse_move mouse_move;
 	struct e_mouse_button mouse_button_down;
 	struct e_mouse_button mouse_button_up;
-	struct e_empty timer;
+	struct e_empty timer_enable;
+	struct e_empty timer_reload;
 };
 
 #endif
