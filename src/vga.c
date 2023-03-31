@@ -12,13 +12,13 @@ static void wait_for_vsync(void) {
 }
 
 /* draw line_colored pixel at (x, y) */
-void plot_pixel(int x, int y, uint16_t line_color)
+static void plot_pixel(int x, int y, uint16_t line_color)
 {
     *(uint16_t *)(pixel_buffer_start + (y << 10) + (x << 1)) = line_color;
 }
 
 /* reset screen to all black */
-void clear_screen(void) {
+static void clear_screen(void) {
 	for (int x = 0; x < SCREEN_W; ++x) {
 		for (int y = 0; y < SCREEN_H; ++y) {
 			plot_pixel(x, y, 0x0);
@@ -41,4 +41,19 @@ void configure_vga(void) {
     *(pixel_ctrl_ptr + 1) = 0xC0000000;
     pixel_buffer_start = *(pixel_ctrl_ptr + 1); // we draw on the back buffer
     clear_screen(); // pixel_buffer_start points to the pixel buffer
+}
+
+void draw_img_map(int x, int y, int height, int width, int img_map[height][width]) {
+	for (int h = 0; h < height; ++h) {
+		// stop function if at bottom edge of screen
+		if (h == SCREEN_H) return;
+		for (int w = 0; w < width; ++w) {
+			// stop for loop if at right edge of screen
+			if (w == SCREEN_H) break;
+			// if not transparent, fill pixel
+			if (img_map[h][w] < 0x10000) {
+				plot_pixel(x + w, y + h, img_map[h][w] % 0x10000);
+			}
+		}
+	}
 }
