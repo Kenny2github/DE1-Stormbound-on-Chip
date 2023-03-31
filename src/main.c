@@ -4,6 +4,8 @@
 #include "mouse.h"
 #include "timer.h"
 #include "events.h"
+#include "vga.h"
+#include "game_state.h"
 
 int seg7[] = {0x3f, 0x06, 0x5b, 0x4f, 0x66, 0x6d, 0x7d, 0x07, 0x7f, 0x67, 0x063f};
 int time_left;
@@ -67,6 +69,7 @@ static void handle_event(struct event_t event) {
 }
 
 int main(void) {
+	configure_vga();
 	config_interrupt(IRQ_KEY, &config_KEYs, &pushbutton_ISR);
 	enable_mouse();
 	enable_timer();
