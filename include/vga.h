@@ -12,6 +12,7 @@
 
 /* VGA colors */
 #define BLACK 0x0000
+#define BACKGROUND 0x00C7
 
 /**** Exported functions ****/
 

@@ -5,7 +5,7 @@
 #include "timer.h"
 #include "events.h"
 #include "vga.h"
-#include "states.h"
+#include "game.h"
 
 int seg7[] = {0x3f, 0x06, 0x5b, 0x4f, 0x66, 0x6d, 0x7d, 0x07, 0x7f, 0x67, 0x063f};
 int time_left;
@@ -76,10 +76,15 @@ int main(void) {
 	enable_timer_interrupt();
 	config_interrupts();
 
+	init_game();
+
 	while (1) {
 		while (!event_queue_empty()) {
 			handle_event(event_queue_pop());
 		}
+
+		run_game();
+		
 		wait_for_vsync();
 	}
 }
