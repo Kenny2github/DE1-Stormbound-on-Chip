@@ -17,9 +17,14 @@
 /**** Exported functions ****/
 
 /**
- * @brief Wait for vsync, then swap front and back buffers
+ * @brief Wait for vsync to occur by polling S bit
  */
 void wait_for_vsync(void);
+
+/**
+ * @brief Update back buffer, usually after waiting for vsync
+ */
+void update_back_buffer(void);
 
 /**
  * @brief Configure VGA.

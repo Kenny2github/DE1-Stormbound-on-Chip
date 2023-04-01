@@ -5,10 +5,14 @@
 volatile int pixel_buffer_start;
 
 void wait_for_vsync(void) {
-	volatile int * pixel_ctrl_ptr = (int *)PIXEL_BUF_CTRL_BASE;
+	volatile int* pixel_ctrl_ptr = (int *)PIXEL_BUF_CTRL_BASE;
 	*pixel_ctrl_ptr = 1; // write 1 to buffer
 	while (*(pixel_ctrl_ptr + 3) & 1); // wait for S to become 0
-	pixel_buffer_start = *(pixel_ctrl_ptr + 1); // new back buffer
+}
+
+void update_back_buffer(void) {
+	volatile int* pixel_ctrl_ptr = (int *)PIXEL_BUF_CTRL_BASE;
+	pixel_buffer_start = *(pixel_ctrl_ptr + 1);
 }
 
 /* draw line_colored pixel at (x, y) */

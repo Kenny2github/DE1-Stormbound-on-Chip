@@ -84,7 +84,8 @@ int main(void) {
 		}
 
 		run_game();
-		
+
 		wait_for_vsync();
+		update_back_buffer();
 	}
 }
