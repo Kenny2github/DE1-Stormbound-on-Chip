@@ -46,14 +46,38 @@ void configure_vga(void) {
 void draw_img_map(int x, int y, int height, int width, int img_map[height][width]) {
 	for (int h = 0; h < height; ++h) {
 		// stop function if at bottom edge of screen
-		if (h == SCREEN_H) return;
+		if (y + h == SCREEN_H) return;
 		for (int w = 0; w < width; ++w) {
 			// stop for loop if at right edge of screen
-			if (w == SCREEN_H) break;
+			if (x + w == SCREEN_W) break;
 			// if not transparent, fill pixel
 			if (img_map[h][w] < 0x10000) {
 				plot_pixel(x + w, y + h, img_map[h][w] % 0x10000);
 			}
+		}
+	}
+}
+
+void draw_RLE_img_map(int x, int y, int width, int rle_img_map[]) {
+	int h = 0, w = 0;
+	int size = sizeof(rle_img_map)/sizeof(rle_img_map[0]);
+	for (int i = 0; i < size; i += 2) {
+		// if not transparent, fill some consecutive pixels
+		if (rle_img_map[i + 1] < 0x10000) {
+			for (int j = 0; j < rle_img_map[0]; ++j) {
+				plot_pixel(x + w, y + h, rle_img_map[i + 1] % 0x10000);
+				if (++w == width || x + w == SCREEN_W) {
+					// skip pixels if at right edge of screen
+					if (x + w == SCREEN_W) j += width - w;
+
+					w = 0;
+					++h;
+
+					// stop function if at bottom edge of screen
+					if (y + h == SCREEN_H) return;
+				}
+			}
+			
 		}
 	}
 }
