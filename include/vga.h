@@ -16,6 +16,11 @@
 /**** Exported functions ****/
 
 /**
+ * @brief Wait for vsync, then swap front and back buffers
+ */
+void wait_for_vsync(void);
+
+/**
  * @brief Configure VGA.
  * Clears the screens for both front and back buffers 
 */

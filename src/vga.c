@@ -4,8 +4,7 @@
 
 volatile int pixel_buffer_start;
 
-/* wait for vsync, then swap front and back buffers */
-static void wait_for_vsync(void) {
+void wait_for_vsync(void) {
 	volatile int * pixel_ctrl_ptr = (int *)PIXEL_BUF_CTRL_BASE;
 	*pixel_ctrl_ptr = 1; // write 1 to buffer
 	while (*(pixel_ctrl_ptr + 3) & 1); // wait for S to become 0
