@@ -56,9 +56,8 @@ void draw_img_map(int x, int y, int height, int width, int img_map[height][width
 	}
 }
 
-void draw_RLE_img_map(int x, int y, int width, int rle_img_map[]) {
+void draw_RLE_img_map(int x, int y, int width, int size, int rle_img_map[]) {
 	int h = 0, w = 0;
-	int size = sizeof(rle_img_map)/sizeof(rle_img_map[0]);
 	for (int i = 0; i < size; i += 2) {
 		// if not transparent, fill some consecutive pixels
 		if (rle_img_map[i + 1] < 0x10000) {

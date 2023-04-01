@@ -30,7 +30,6 @@ void configure_vga(void);
  * @brief Fill entire screen with a single color
  * @param color Color to fill screen with
  */
-*/
 void fill_screen(uint16_t color);
 
 /**
@@ -50,6 +49,6 @@ void draw_img_map(int x, int y, int height, int width, int img_map[height][width
  * @param width Width of the image
  * @param rle_img_map The 2D array mapping of the image to be drawn in RLE
  */
-void draw_RLE_img_map(int x, int y, int width, int rle_img_map[])
+void draw_RLE_img_map(int x, int y, int width, int size, int rle_img_map[]);
 
 #endif
