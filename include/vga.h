@@ -6,8 +6,12 @@
 
 /**** Constants ****/
 
+/* Screen size */
 #define SCREEN_W 320
 #define SCREEN_H 240
+
+/* VGA colors */
+#define BLACK 0x0000
 
 /**** Exported functions ****/
 
@@ -16,6 +20,13 @@
  * Clears the screens for both front and back buffers 
 */
 void configure_vga(void);
+
+/**
+ * @brief Fill entire screen with a single color
+ * @param color Color to fill screen with
+ */
+*/
+void fill_screen(uint16_t color);
 
 /**
  * @brief Draw non-RLE image map on VGA screen

@@ -17,11 +17,10 @@ static void plot_pixel(int x, int y, uint16_t line_color)
     *(uint16_t *)(pixel_buffer_start + (y << 10) + (x << 1)) = line_color;
 }
 
-/* reset screen to all black */
-static void clear_screen(void) {
+void fill_screen(uint16_t color) {
 	for (int x = 0; x < SCREEN_W; ++x) {
 		for (int y = 0; y < SCREEN_H; ++y) {
-			plot_pixel(x, y, 0x0);
+			plot_pixel(x, y, color);
 		}
 	}
 }
@@ -36,11 +35,11 @@ void configure_vga(void) {
     wait_for_vsync();
     /* initialize a pointer to the pixel buffer, used by drawing functions */
     pixel_buffer_start = *pixel_ctrl_ptr;
-    clear_screen(); // pixel_buffer_start points to the pixel buffer
+    fill_screen(BLACK); // pixel_buffer_start points to the pixel buffer
     /* set back pixel buffer to start of SDRAM memory */
     *(pixel_ctrl_ptr + 1) = 0xC0000000;
     pixel_buffer_start = *(pixel_ctrl_ptr + 1); // we draw on the back buffer
-    clear_screen(); // pixel_buffer_start points to the pixel buffer
+    fill_screen(BLACK); // pixel_buffer_start points to the pixel buffer
 }
 
 void draw_img_map(int x, int y, int height, int width, int img_map[height][width]) {
