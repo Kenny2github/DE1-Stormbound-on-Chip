@@ -80,5 +80,6 @@ int main(void) {
 		while (!event_queue_empty()) {
 			handle_event(event_queue_pop());
 		}
+		wait_for_vsync();
 	}
 }
