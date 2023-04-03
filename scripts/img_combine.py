@@ -17,7 +17,7 @@ with open(Path('include') / 'assets.h', 'w') as hfile:
         print(f"""
 // {filename}
 extern struct image {var_name};
-extern uint16_t* {data_var_name};
+extern uint16_t {data_var_name}[];
 """.lstrip(), file=hfile)
 
     print('#endif', file=hfile)

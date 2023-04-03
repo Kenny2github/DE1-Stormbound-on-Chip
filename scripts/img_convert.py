@@ -62,7 +62,7 @@ with Image.open(sys.argv[1]) as im, open(sys.argv[2], 'w') as cfile:
 
 struct image {var_name} = {{ {mode}, {width}, {height}, {data_var_name} }};
 """.lstrip(), file=cfile)
-    cfile.write(f'uint16_t {data_var_name} = {{')
+    cfile.write(f'uint16_t {data_var_name}[] = {{')
     for count, word in zip(cycle(range(9)), data):
         if count == 0:
             cfile.write('\n\t')
