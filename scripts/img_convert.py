@@ -1,9 +1,10 @@
 import sys
-import re
 from typing import Optional, Literal
 from pathlib import Path
 from itertools import cycle
 from PIL import Image
+
+from var_name import var_names
 
 TRANSPARENT = 0x4947 # arbitrary unlikely-used color
 
@@ -45,8 +46,7 @@ with Image.open(sys.argv[1]) as im, open(sys.argv[2], 'w') as cfile:
 
     # assets/xyz.123!1.png => xyz_123_1(_data)
     filename = Path(sys.argv[1]).name
-    var_name = re.sub(r'[^a-zA-Z0-9_]', '_', filename.rsplit('.', 1)[0])
-    data_var_name = var_name + '_data'
+    var_name, data_var_name = var_names(filename)
     width = im.width
     if mode == "VGA":
         height = im.height

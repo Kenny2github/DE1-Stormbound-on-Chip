@@ -1,5 +1,6 @@
-import re
 from pathlib import Path
+
+from var_name import var_names
 
 with open(Path('include') / 'assets.h', 'w') as hfile:
     print("""
@@ -12,8 +13,7 @@ with open(Path('include') / 'assets.h', 'w') as hfile:
     for file in Path('assets').glob('*'):
         # assets/xyz.123!1.png => xyz_123_1(_data)
         filename = file.name
-        var_name = re.sub(r'[^a-zA-Z0-9_]', '_', filename.rsplit('.', 1)[0])
-        data_var_name = var_name + '_data'
+        var_name, data_var_name = var_names(filename)
         print(f"""
 // {filename}
 extern struct image {var_name};
