@@ -104,7 +104,7 @@ void draw_RLE_img_map(int x, int y, int width, int size, int rle_img_map[]) {
 					if (y + h == SCREEN_H) return;
 				}
 			}
-			
+
 		}
 	}
 }

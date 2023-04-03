@@ -5,7 +5,7 @@
 
 void enable_timer_interrupt(void) {
 	volatile int* timer_ptr = (int*)MPCORE_PRIV_TIMER;
-	// set countdown to be from 1.8B cycles 
+	// set countdown to be from 1.8B cycles
 	// on the timer (200MHz) it is 9 seconds
 	*(timer_ptr) = 200E6 * 9;
 	// enable interrupts, auto-reload and countdown
@@ -16,7 +16,7 @@ void enable_timer_interrupt(void) {
 
 /**
  * @brief Handles an interrupt from the A9 private timer
- * 
+ *
  */
 static void handle_timer_interrupt(void) {
 	volatile int* timer_ptr = (int*)MPCORE_PRIV_TIMER;

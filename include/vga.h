@@ -32,7 +32,7 @@ void update_back_buffer(void);
 
 /**
  * @brief Configure VGA.
- * Clears the screens for both front and back buffers 
+ * Clears the screens for both front and back buffers
  */
 void configure_vga(void);
 
@@ -69,7 +69,7 @@ void draw_RLE_img_map(int x, int y, int width, int size, int rle_img_map[]);
 
 /**
  * @brief Writes a string on VGA screen usign left-align
- * 
+ *
  * @param x x-char-coordinate of where the string starts
  * @param y y-char-coordinate of where the string starts
  * @param str String to be written

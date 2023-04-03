@@ -57,10 +57,10 @@ static void handle_event(struct event_t event) {
 	case E_TIMER_RELOAD:
 		if(!(--time_left)) {
 			disable_timer();
-			printf("timer disabled\n");			
+			printf("timer disabled\n");
 			// put this somewhere else later, this is just for testing
 			enable_timer_interrupt();
-			
+
 		} else {
 			printf("timer counted down, time left = %d\n", time_left);
 		}

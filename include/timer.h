@@ -7,7 +7,7 @@
 /**** Exported functions ****/
 
 /**
- * @brief Enable interrupts for A9 private timer 
+ * @brief Enable interrupts for A9 private timer
  */
 void enable_timer_interrupt(void);
 
