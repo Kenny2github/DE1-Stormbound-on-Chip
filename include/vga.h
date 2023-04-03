@@ -9,6 +9,8 @@
 /* Screen size */
 #define SCREEN_W 320
 #define SCREEN_H 240
+#define SCREEN_CHAR_W 80
+#define SCREEN_CHAR_H 60
 
 /* VGA colors */
 #define BLACK 0x0000
@@ -37,6 +39,11 @@ void configure_vga(void);
  * @param color Color to fill screen with
  */
 void fill_screen(uint16_t color);
+
+/**
+ * @brief Clear all characters on the screen
+*/
+void clear_char_screen();
 
 /**
  * @brief Draw non-RLE image map on VGA screen
