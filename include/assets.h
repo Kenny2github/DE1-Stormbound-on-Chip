@@ -3,4 +3,7 @@
 
 #include "image_data.h"
 
+extern struct image stormbound;
+extern uint16_t* stormbound_data;
+
 #endif
