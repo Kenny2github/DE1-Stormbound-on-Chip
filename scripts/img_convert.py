@@ -36,8 +36,8 @@ with Image.open(sys.argv[1]) as im, open(sys.argv[2], 'w') as cfile:
     data = list(map(rgb_to_vga, im.getdata()))
     data_rle = rle(data)
     mode: Literal["VGA", "VGA_RLE"]
+    print('  RLE', len(data_rle), 'vs raw', len(data))
     if len(data_rle) < len(data):
-        print('RLE', len(data_rle), 'vs raw', len(data))
         mode = "VGA_RLE"
         data = data_rle
     else:
