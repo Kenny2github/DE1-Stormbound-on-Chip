@@ -4,7 +4,7 @@
 #include "assets.h"
 #include "image_data.h"
 
-struct image stormbound = { VGA_RLE, 192, 18, stormbound_data };
+struct image stormbound = { VGA_RLE, 192, 1396, stormbound_data };
 
 uint16_t stormbound_data = {
 	0x0014, 0x4947, 0x000a, 0xae9e, 0x0006, 0x4947, 0x000e, 0xae9e, 0x0006, 

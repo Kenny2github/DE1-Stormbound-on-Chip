@@ -8,14 +8,29 @@
 
 /**** Image data data structures ****/
 
+/**
+ * @brief Enum of possible image encodings.
+ */
 enum image_encoding {
 	VGA,
 	VGA_RLE,
 };
 
+/**
+ * @brief Data structure encapsulating image data.
+ * Includes encoding and size metadata in addition to the data.
+ */
 struct image {
+	// The encoding of the image data
 	enum image_encoding encoding;
-	int width, height;
+	// The width (in pixels) of the image
+	int width;
+	// For VGA encoding: the height (in pixels) of the image
+	// For VGA_RLE encoding: the length (in count) of the image data
+	int height;
+	// Pointer to a global array of data for the image.
+	// 320x240=76800 which is more than uint16 can hold in the RLE case
+	// but we assume no real image is one color for the entire screen size.
 	uint16_t* data;
 };
 

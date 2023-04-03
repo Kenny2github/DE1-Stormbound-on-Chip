@@ -47,6 +47,11 @@ with Image.open(sys.argv[1]) as im, open(sys.argv[2], 'w') as cfile:
     filename = Path(sys.argv[1]).name
     var_name = re.sub(r'[^a-zA-Z0-9_]', '_', filename.rsplit('.', 1)[0])
     data_var_name = var_name + '_data'
+    width = im.width
+    if mode == "VGA":
+        height = im.height
+    else:
+        height = len(data)
 
     print(f"""
 /**
@@ -55,7 +60,7 @@ with Image.open(sys.argv[1]) as im, open(sys.argv[2], 'w') as cfile:
 #include "assets.h"
 #include "image_data.h"
 
-struct image {var_name} = {{ {mode}, {im.width}, {im.height}, {data_var_name} }};
+struct image {var_name} = {{ {mode}, {width}, {height}, {data_var_name} }};
 """.lstrip(), file=cfile)
     cfile.write(f'uint16_t {data_var_name} = {{')
     for count, word in zip(cycle(range(9)), data):
