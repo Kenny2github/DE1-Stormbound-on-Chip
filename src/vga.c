@@ -3,9 +3,6 @@
 #include "address_map_arm.h"
 #include "vga.h"
 
-// Arbitrary sentinel value for transparent pixel
-#define TRANSPARENT 0x4947
-
 volatile int pixel_buffer_start;
 volatile int char_buffer_start;
 

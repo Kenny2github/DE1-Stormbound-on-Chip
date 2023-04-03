@@ -18,6 +18,7 @@
 /* VGA colors */
 #define BLACK 0x0000
 #define BACKGROUND 0x00C7
+#define TRANSPARENT 0x4947	// Arbitrary sentinel value for transparent pixel
 
 /**** Exported functions ****/
 
