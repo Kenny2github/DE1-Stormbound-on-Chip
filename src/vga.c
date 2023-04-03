@@ -1,4 +1,5 @@
 #include <stdint.h>
+#include <string.h>
 #include "address_map_arm.h"
 #include "vga.h"
 
@@ -105,5 +106,20 @@ void draw_RLE_img_map(int x, int y, int width, int size, int rle_img_map[]) {
 			}
 			
 		}
+	}
+}
+
+void write_string(int x, int y, char* str) {
+	int len = strlen(str);
+	int curr_x = x, curr_y = y;
+
+	for (int i = 0; i < len; ++i) {
+		// line break
+		if (str[i] == '\n' || curr_x == SCREEN_CHAR_W) {
+			curr_x = x;
+			if (++curr_y == SCREEN_CHAR_H) return;
+			if (str[i] == '\n') continue;
+		}
+		draw_character(curr_x++, curr_y, str[i]);
 	}
 }
