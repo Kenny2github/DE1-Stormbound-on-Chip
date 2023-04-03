@@ -4,7 +4,7 @@
 #ifndef IMAGE_DATA_H
 #define IMAGE_DATA_H
 
-#include "stdint.h"
+#include <stdint.h>
 
 /**** Image data data structures ****/
 

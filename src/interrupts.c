@@ -5,6 +5,7 @@
  * Adapted from "Using the ARM Generic Interrupt Controller",
  * copyright Intel 2018.
  */
+#include <stdlib.h>
 #include "interrupts.h"
 #include "address_map_arm.h"
 
