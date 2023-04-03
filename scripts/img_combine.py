@@ -15,6 +15,7 @@ with open(Path('include') / 'assets.h', 'w') as hfile:
         var_name = re.sub(r'[^a-zA-Z0-9_]', '_', filename.rsplit('.', 1)[0])
         data_var_name = var_name + '_data'
         print(f"""
+// {filename}
 extern struct image {var_name};
 extern uint16_t* {data_var_name};
 """.lstrip(), file=hfile)
