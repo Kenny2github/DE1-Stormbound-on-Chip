@@ -29,7 +29,7 @@ combined.c: $(SRC_FILES)
 	python3 scripts/combine.py $^
 
 assets: $(IMG_C_FILES)
-	python3 scripts/img_combine.py
+	python3 scripts/assets_combine.py
 
 src/assets/%.c: assets/%
 	python3 scripts/img_convert.py $< $@

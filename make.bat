@@ -24,7 +24,7 @@ for %%f in (assets\*.png assets\*.jpg assets\*.bmp) do (
 )
 
 echo Combining into include\assets.h
-py scripts\img_combine.py
+py scripts\assets_combine.py
 
 goto :eof
 
