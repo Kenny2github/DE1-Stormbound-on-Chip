@@ -23,6 +23,11 @@ for %%f in (assets\*.png assets\*.jpg assets\*.bmp) do (
 	py scripts\img_convert.py "assets\%%~nxf" "src\assets\%%~nxf.c"
 )
 
+for %%f in (assets\*.txt) do (
+	echo Converting "assets\%%~nxf" to "src\assets\%%~nxf.c"
+	py scripts\txt_convert.py "assets\%%~nxf" "src\assets\%%~nxf.c"
+)
+
 echo Combining into include\assets.h
 py scripts\assets_combine.py
 

@@ -14,6 +14,14 @@ with open(Path('include') / 'assets.h', 'w') as hfile:
         # assets/xyz.123!1.png => xyz_123_1(_data)
         filename = file.name
         var_name, data_var_name = var_names(filename)
+
+        if filename.endswith('.txt'): # handle text files specially
+            print(f"""
+// {filename}
+extern char {data_var_name}[];
+""".lstrip(), file=hfile)
+            continue
+
         print(f"""
 // {filename}
 extern struct image {var_name};

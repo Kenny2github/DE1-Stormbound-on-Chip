@@ -22,14 +22,18 @@ ASSET_DIR = assets
 
 SRC_FILES=$(call rwildcard, $(SRC_DIR), *.c)
 IMG_FILES=$(call rwildcard, $(ASSET_DIR), *.png *.jpg *.bmp)
-IMG_C_FILES=$(patsubst assets/%, src/assets/%.c, $(IMG_FILES))
+TXT_FILES=$(call rwildcard, $(ASSET_DIR), *.txt)
+ASSET_C_FILES=$(patsubst assets/%, src/assets/%.c, $(IMG_FILES) $(TXT_FILES))
 
 combined.c: $(SRC_FILES)
 	rm combined.c
 	python3 scripts/combine.py $^
 
-assets: $(IMG_C_FILES)
+assets: $(ASSET_C_FILES)
 	python3 scripts/assets_combine.py
+
+src/assets/%.txt.c: assets/%.txt
+	python3 scripts/txt_convert.py $< $@
 
 src/assets/%.c: assets/%
 	python3 scripts/img_convert.py $< $@
