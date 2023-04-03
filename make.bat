@@ -9,7 +9,7 @@ goto :error
 :combined.c
 
 if exist combined.c del combined.c
-for /R %%f in (src\*.c) do (
+for /R "src" %%f in (*.c) do (
 	echo Combining %%~nxf
 	py scripts\combine.py "%%f"
 )
