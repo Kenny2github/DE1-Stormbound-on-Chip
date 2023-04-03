@@ -5,6 +5,7 @@
 #define VGA_H
 
 #include <stdint.h>
+#include "image_data.h"
 
 /**** Constants ****/
 
@@ -48,24 +49,13 @@ void fill_screen(uint16_t color);
 void clear_char_screen();
 
 /**
- * @brief Draw non-RLE image map on VGA screen
+ * @brief Draw an image on VGA screen
+ *
  * @param x x-coordinate of where the image is to be drawn
  * @param y y-coordinate of where the image is to be drawn
- * @param height Height of the image
- * @param width Width of the image
- * @param img_map The 2D array mapping of the image to be drawn
+ * @param img The image data to draw
  */
-void draw_img_map(int x, int y, int height, int width, int img_map[height][width]);
-
-/**
- * @brief Draw RLE image map on VGA screen
- * @param x x-coordinate of where the image is to be drawn
- * @param y y-coordinate of where the image is to be drawn
- * @param width Width of the image
- * @param rle_img_map The 2D array mapping of the image to be drawn in RLE
- */
-void draw_RLE_img_map(int x, int y, int width, int size, int rle_img_map[]);
-
+void draw_img_map(int x, int y, struct image img);
 
 /**
  * @brief Writes a string on VGA screen usign left-align

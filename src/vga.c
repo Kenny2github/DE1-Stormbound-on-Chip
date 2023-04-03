@@ -3,6 +3,9 @@
 #include "address_map_arm.h"
 #include "vga.h"
 
+// Arbitrary sentinel value for transparent pixel
+#define TRANSPARENT 0x4947
+
 volatile int pixel_buffer_start;
 volatile int char_buffer_start;
 
@@ -71,40 +74,52 @@ void configure_vga(void) {
 	clear_char_screen();
 }
 
-void draw_img_map(int x, int y, int height, int width, int img_map[height][width]) {
-	for (int h = 0; h < height; ++h) {
-		// stop function if at bottom edge of screen
-		if (y + h == SCREEN_H) return;
-		for (int w = 0; w < width; ++w) {
-			// stop for loop if at right edge of screen
-			if (x + w == SCREEN_W) break;
-			// if not transparent, fill pixel
-			if (img_map[h][w] < 0x10000) {
-				plot_pixel(x + w, y + h, img_map[h][w] % 0x10000);
+static void draw_RLE_img_map(int x, int y, struct image img) {
+	int size = img.height;
+	int h = 0, w = 0;
+	for (int i = 0; i < size; i += 2) {
+		for (int j = 0; j < img.data[i]; ++j) {
+			if (
+				img.data[i + 1] != TRANSPARENT
+				// other end of bounds guaranteed by
+				// code after this if-statement
+				&& 0 <= x + w && 0 <= y + h
+			) {
+				plot_pixel(x + w, y + h, img.data[i + 1]);
 			}
+			if (x + (++w) >= SCREEN_W) {
+				// skip pixels too far right
+				j += img.width - w;
+				w = 0;
+				++h;
+			} else if (w >= img.width) {
+				// move to next line
+				w = 0;
+				++h;
+			}
+			// don't bother drawing beyond bottom of screen
+			if (y + h >= SCREEN_H) return;
 		}
 	}
 }
 
-void draw_RLE_img_map(int x, int y, int width, int size, int rle_img_map[]) {
-	int h = 0, w = 0;
-	for (int i = 0; i < size; i += 2) {
-		// if not transparent, fill some consecutive pixels
-		if (rle_img_map[i + 1] < 0x10000) {
-			for (int j = 0; j < rle_img_map[0]; ++j) {
-				plot_pixel(x + w, y + h, rle_img_map[i + 1] % 0x10000);
-				if (++w == width || x + w == SCREEN_W) {
-					// skip pixels if at right edge of screen
-					if (x + w == SCREEN_W) j += width - w;
+void draw_img_map(int x, int y, struct image img) {
+	if (img.encoding == VGA_RLE) {
+		draw_RLE_img_map(x, y, img);
+		return;
+	}
+	uint16_t (*data)[img.width] = (uint16_t (*)[img.width])img.data;
+	for (int h = y < 0 ? -y : 0; h < img.height; ++h) {
+		// stop function if at bottom edge of screen
+		if (y + h >= SCREEN_H) return;
 
-					w = 0;
-					++h;
-
-					// stop function if at bottom edge of screen
-					if (y + h == SCREEN_H) return;
-				}
+		for (int w = x < 0 ? -x : 0; w < img.width; ++w) {
+			// stop for loop if at right edge of screen
+			if (x + w >= SCREEN_W) break;
+			// if not transparent, fill pixel
+			if (data[h][w] != TRANSPARENT) {
+				plot_pixel(x + w, y + h, data[h][w]);
 			}
-
 		}
 	}
 }

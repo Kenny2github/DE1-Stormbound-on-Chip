@@ -1,3 +1,4 @@
+#include "assets.h"
 #include "game.h"
 #include "states.h"
 #include "vga.h"
@@ -14,6 +15,7 @@ void init_game() {
 void run_game() {
 	if (game_state == TITLE) {
 		fill_screen(BACKGROUND);
+		draw_img_map(0, 100, stormbound);
 		write_string(0, 0, "What the fuck did you just fucking say about me, you little bitch? I'll have\n"
 						   "you know I graduated top of my class in the Navy Seals, and I've been involved\n"
 						   "in numerous secret raids on Al-Quaeda, and I have over 300 confirmed kills. I\n"
