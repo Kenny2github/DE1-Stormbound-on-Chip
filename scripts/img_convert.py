@@ -5,7 +5,7 @@ from pathlib import Path
 from itertools import cycle
 from PIL import Image
 
-TRANSPARENT = 0xbffc # RGB #C0FFEE in VGA format
+TRANSPARENT = 0x4947 # arbitrary unlikely-used color
 
 def rle(data: list[int]) -> list[int]:
     result: list[int] = []
