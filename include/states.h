@@ -37,4 +37,9 @@ enum player_state {
 	P2
 };
 
+/**
+ * @brief States of current game
+ */
+extern int game_state, turn_state, move_state, player_state;
+
 #endif
