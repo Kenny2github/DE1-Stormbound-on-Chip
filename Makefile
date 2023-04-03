@@ -18,9 +18,18 @@ rfiledirs=$(sort $(dir $(call rwildcard, $1, $2)))
 
 BUILD = build
 SRC_DIR = src
+ASSET_DIR = assets
 
 SRC_FILES=$(call rwildcard, $(SRC_DIR), *.c)
+IMG_FILES=$(call rwildcard, $(ASSET_DIR), *.png *.jpg *.bmp)
+IMG_C_FILES=$(patsubst assets/%, src/assets/%.c, $(IMG_FILES))
 
 combined.c: $(SRC_FILES)
 	rm combined.c
-	python3 combine.py $^
+	python3 scripts/combine.py $^
+
+assets: $(IMG_C_FILES)
+	python3 scripts/img_combine.py
+
+src/assets/%.c: assets/%
+	python3 scripts/img_convert.py $< $@
