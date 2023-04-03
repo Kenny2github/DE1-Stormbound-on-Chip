@@ -18,7 +18,7 @@ goto :eof
 
 :assets
 
-for %%f in (assets\*) do (
+for %%f in (assets\*.png assets\*.jpg assets\*.bmp) do (
 	echo Converting "assets\%%~nxf" to "src\assets\%%~nxf.c"
 	py scripts\img_convert.py "assets\%%~nxf" "src\assets\%%~nxf.c"
 )
