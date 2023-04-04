@@ -39,6 +39,9 @@ extern struct image heroic_soldiers;
 // icicle_burst.png
 extern struct image icicle_burst;
 
+// instructions.txt
+extern char instructions_data[];
+
 // lawless_herd.png
 extern struct image lawless_herd;
 
@@ -50,9 +53,6 @@ extern struct image moments_peace;
 
 // moonlit_aerie.png
 extern struct image moonlit_aerie;
-
-// navy_seals.txt
-extern char navy_seals_data[];
 
 // shady_ghoul.png
 extern struct image shady_ghoul;

@@ -1,0 +1,21 @@
+                                  INSTRUCTIONS
+                     Before play, build a deck of 10 cards.
+    Player 1 starts with 3 mana and goes first; Player 2 starts with 4 mana.
+ Initial turn mana increments each turn; Player 1 has 4 mana on their 2nd turn.
+    Each card costs a certain amount of mana to play. Unused mana is wasted.
+
+On turn start:                               | After turn start:
+1. Buildings' abilities take effect.         | 1. Play cards. Spells take effect
+2. Troops move forward one square, if        |    immediately, and "on play"
+   there is space for them to move into.     |    abilities are triggered.
+3. Troops that move into enemies attack them,| 2. Troops with nonzero movement
+   triggering any "on attack" abilities.     |    move. They will prefer to move
+4. The entity with greater strength survives |    into enemy troops and attack.
+   with its strength reduced by the other's, | 3. End turn.
+   triggering any "on damage" abilities.     +----------------------------------
+5. The entity with less strength dies, triggering any "on death" abilities.
+6. Surviving friendly troops trigger "after attack" abilities.
+
+Cards display 3 numbers: mana[, strength[, movement]] - for example, below are:
+          Felflares            |   Emerald Towers   | Summon Militia
+3 mana, 2 strength, 0 movement | 4 mana, 4 strength |     1 mana

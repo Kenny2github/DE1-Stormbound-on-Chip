@@ -12,11 +12,16 @@ void init_game() {
 	move_state = CARD_EFFECT;
 }
 
+static void draw_intro(void) {
+	fill_screen(BACKGROUND);
+	draw_img_map((SCREEN_W - stormbound.width) / 2, 5, stormbound);
+	write_string(0, 6, instructions_data);
+	draw_rectangle(mouse_state.x, mouse_state.y, 2, 2, WHITE);
+}
+
 void run_game() {
 	if (game_state == TITLE) {
-		fill_screen(BACKGROUND);
-		draw_img_map((SCREEN_W - stormbound.width) / 2, 5, stormbound);
-		draw_img_map(10, SCREEN_H - 10 - 60, heroic_soldiers);
+		draw_intro();
 		if (mouse_state.left_clicked) {
 			game_state = DECK;
 			player_state = P1;
