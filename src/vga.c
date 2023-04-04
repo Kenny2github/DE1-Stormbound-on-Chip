@@ -28,9 +28,13 @@ void plot_pixel(int x, int y, uint16_t color) {
 }
 
 void fill_screen(uint16_t color) {
-	for (int x = 0; x < SCREEN_W; ++x) {
-		for (int y = 0; y < SCREEN_H; ++y) {
-			plot_pixel(x, y, color);
+	draw_rectangle(0, 0, SCREEN_W, SCREEN_H, color);
+}
+
+void draw_rectangle(int x, int y, int w, int h, uint16_t color) {
+	for (int xi = x; xi < x + w; ++xi) {
+		for (int yi = y; yi < y + h; ++yi) {
+			plot_pixel(xi, yi, color);
 		}
 	}
 }

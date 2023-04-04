@@ -19,6 +19,7 @@
 #define BLACK 0x0000
 #define BACKGROUND 0x00C7
 #define TRANSPARENT 0x4947	// Arbitrary sentinel value for transparent pixel
+#define WHITE 0xFFFF
 
 /**** Exported functions ****/
 
@@ -43,6 +44,17 @@ void configure_vga(void);
  * @param color Color to fill screen with
  */
 void fill_screen(uint16_t color);
+
+/**
+ * @brief Draw a rectangle.
+ *
+ * @param x The x-position of the top-left corner.
+ * @param y The y-position of the top-left corner.
+ * @param w The width of the rectangle.
+ * @param h The height of the rectangle.
+ * @param color The color to fill the rectangle with.
+ */
+void draw_rectangle(int x, int y, int w, int h, uint16_t color);
 
 /**
  * @brief Clear all characters on the screen
