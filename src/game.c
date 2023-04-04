@@ -14,8 +14,15 @@ void init_game() {
 
 static void draw_intro(void) {
 	fill_screen(BACKGROUND);
+	// draw logo
 	draw_img_map((SCREEN_W - stormbound.width) / 2, 5, stormbound);
+	// write instructions
 	write_string(0, 6, instructions_data);
+	// draw example cards
+	draw_img_map(38, 120, felflares);
+	draw_img_map(148, 120, emerald_towers);
+	draw_img_map(248, 120, summon_militia);
+	// draw mouse
 	draw_rectangle(mouse_state.x, mouse_state.y, 2, 2, WHITE);
 }
 

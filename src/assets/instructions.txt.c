@@ -23,6 +23,7 @@ char instructions_data[] =
 	"6. Surviving friendly troops trigger \"after attack\" abilities.\n"
 	"\n"
 	"Cards display 3 numbers: mana[, strength[, movement]] - for example, below are:\n"
-	"          Felflares            |   Emerald Towers   | Summon Militia\n"
-	"3 mana, 2 strength, 0 movement | 4 mana, 4 strength |     1 mana"
+	"\n"
+	"          Felflares            |   Emerald Towers   |       Summon Militia\n"
+	"3 mana, 2 strength, 0 movement | 4 mana, 4 strength |           1 mana"
 ;
