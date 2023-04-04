@@ -53,18 +53,22 @@ with Image.open(sys.argv[1]) as im, open(sys.argv[2], 'w') as cfile:
     else:
         height = len(data)
 
-    print(f"""
+    cfile.write(f"""
 /**
  * Data for {filename}
  */
 #include "assets.h"
-#include "image_data.h"
 
-struct image {var_name} = {{ {mode}, {width}, {height}, {data_var_name} }};
-""".lstrip(), file=cfile)
-    cfile.write(f'uint16_t {data_var_name}[] = {{')
-    for count, word in zip(cycle(range(9)), data):
+static uint16_t {data_var_name}[] = {{
+""".strip())
+    # max 9 items per line
+    for count, (i, word) in zip(cycle(range(9)), enumerate(data)):
         if count == 0:
             cfile.write('\n\t')
-        cfile.write(f'{word:#06x}, ')
+        cfile.write(f'{word:#06x},')
+        if count != 8 and i != len(data) - 1:
+            cfile.write(' ')
     print('\n};', file=cfile)
+    print(f"""
+struct image {var_name} = {{ {mode}, {width}, {height}, {data_var_name} }};
+""".rstrip(), file=cfile)
