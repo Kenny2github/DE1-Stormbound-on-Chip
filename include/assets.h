@@ -51,6 +51,9 @@ extern struct image icicle_burst;
 // instructions.txt
 extern char instructions_data[];
 
+// ironclad_box.png
+extern struct image ironclad_box;
+
 // lawless_herd.png
 extern struct image lawless_herd;
 
@@ -69,8 +72,14 @@ extern struct image moments_peace;
 // moonlit_aerie.png
 extern struct image moonlit_aerie;
 
+// neutral_box.png
+extern struct image neutral_box;
+
 // operators.png
 extern struct image operators;
+
+// shadowfen_box.png
+extern struct image shadowfen_box;
 
 // shady_ghoul.png
 extern struct image shady_ghoul;
@@ -84,6 +93,9 @@ extern struct image stormbound;
 // summon_militia.png
 extern struct image summon_militia;
 
+// swarm_box.png
+extern struct image swarm_box;
+
 // tode_the_elevated.png
 extern struct image tode_the_elevated;
 
@@ -95,6 +107,9 @@ extern struct image venomfall_spire;
 
 // victors_of_the_melee.png
 extern struct image victors_of_the_melee;
+
+// winter_box.png
+extern struct image winter_box;
 
 // wisp_cloud.png
 extern struct image wisp_cloud;
