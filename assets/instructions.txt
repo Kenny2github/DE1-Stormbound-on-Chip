@@ -16,7 +16,7 @@ On turn start:                               | After turn start:
 5. The entity with less strength dies, triggering any "on death" abilities.
 6. Surviving friendly troops trigger "after attack" abilities.
 
-Cards display 3 numbers: mana[, strength[, movement]] - for example, below are:
+Cards display up to 3 numbers: mana, strength, movement; for example, below are:
 
           Felflares            |   Emerald Towers   |       Summon Militia
 3 mana, 2 strength, 0 movement | 4 mana, 4 strength |           1 mana

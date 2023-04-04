@@ -22,7 +22,7 @@ char instructions_data[] =
 	"5. The entity with less strength dies, triggering any \"on death\" abilities.\n"
 	"6. Surviving friendly troops trigger \"after attack\" abilities.\n"
 	"\n"
-	"Cards display 3 numbers: mana[, strength[, movement]] - for example, below are:\n"
+	"Cards display up to 3 numbers: mana, strength, movement; for example, below are:\n"
 	"\n"
 	"          Felflares            |   Emerald Towers   |       Summon Militia\n"
 	"3 mana, 2 strength, 0 movement | 4 mana, 4 strength |           1 mana"
