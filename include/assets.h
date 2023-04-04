@@ -3,8 +3,14 @@
 
 #include "image_data.h"
 
+// agents_in_charge.png
+extern struct image agents_in_charge;
+
 // blade_storm.png
 extern struct image blade_storm;
+
+// copperskin_ranger.png
+extern struct image copperskin_ranger;
 
 // dangerous_suitors.png
 extern struct image dangerous_suitors;
@@ -14,6 +20,9 @@ extern struct image dark_harvest;
 
 // doppelbocks.png
 extern struct image doppelbocks;
+
+// dr_mia.png
+extern struct image dr_mia;
 
 // emerald_towers.png
 extern struct image emerald_towers;
@@ -48,20 +57,41 @@ extern struct image lawless_herd;
 // ludic_matriarchs.png
 extern struct image ludic_matriarchs;
 
+// marked_as_prey.png
+extern struct image marked_as_prey;
+
+// mech_workshop.png
+extern struct image mech_workshop;
+
 // moments_peace.png
 extern struct image moments_peace;
 
 // moonlit_aerie.png
 extern struct image moonlit_aerie;
 
+// operators.png
+extern struct image operators;
+
 // shady_ghoul.png
 extern struct image shady_ghoul;
+
+// soulcrushers.png
+extern struct image soulcrushers;
 
 // stormbound.png
 extern struct image stormbound;
 
 // summon_militia.png
 extern struct image summon_militia;
+
+// tode_the_elevated.png
+extern struct image tode_the_elevated;
+
+// upgrade_point.png
+extern struct image upgrade_point;
+
+// venomfall_spire.png
+extern struct image venomfall_spire;
 
 // victors_of_the_melee.png
 extern struct image victors_of_the_melee;
