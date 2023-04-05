@@ -56,6 +56,7 @@ void init_game() {
 }
 
 static void draw_intro(void) {
+	fill_screen(BACKGROUND);
 	// draw logo
 	draw_img_map((SCREEN_W - stormbound.width) / 2, 5, stormbound);
 	// write instructions
