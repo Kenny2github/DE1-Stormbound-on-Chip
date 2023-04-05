@@ -1,6 +1,22 @@
 #ifndef GAME_H
 #define GAME_H
 
+#include "image_data.h"
+
+struct card {
+	char name[20];
+	int type;
+	struct image* img;
+};
+
+enum card_type {
+	NEUTRAL,
+	SWARM,
+	WINTER,
+	IRONCLAD,
+	SHADOWFEN
+};
+
 /**
  * @brief Initialize game states
  */

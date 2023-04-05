@@ -64,14 +64,14 @@ void configure_vga(void) {
     /* initialize a pointer to the pixel and char buffer, used by drawing functions */
     pixel_buffer_start = *pixel_ctrl_ptr;
 	char_buffer_start = *char_ctrl_ptr;
-    fill_screen(BLACK); // pixel_buffer_start points to the pixel buffer
+    fill_screen(BACKGROUND); // pixel_buffer_start points to the pixel buffer
 	clear_char_screen();
     /* set back pixel buffer + char buffer to start of SDRAM memory */
     *(pixel_ctrl_ptr + 1) = SDRAM_BASE;
 	*(char_ctrl_ptr + 1) = SDRAM_BASE + (FPGA_ONCHIP_END - FPGA_ONCHIP_BASE) + 1;
     pixel_buffer_start = *(pixel_ctrl_ptr + 1); // we draw on the back buffer
 	char_buffer_start = *(char_ctrl_ptr + 1);
-    fill_screen(BLACK); // pixel_buffer_start points to the pixel buffer
+    fill_screen(BACKGROUND); // pixel_buffer_start points to the pixel buffer
 	clear_char_screen();
 }
 
