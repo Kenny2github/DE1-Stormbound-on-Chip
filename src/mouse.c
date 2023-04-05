@@ -84,7 +84,11 @@ static void update_mouse_state(char packet[3]) {
 	signed short dy = dpos.y;
 	// update mouse x position
 	mouse_state.x += dx * MOUSE_SENSITIVITY;
+#ifdef CPULATOR
 	mouse_state.y += dy * MOUSE_SENSITIVITY;
+#else
+	mouse_state.y -= dy * MOUSE_SENSITIVITY;
+#endif
 	if (mouse_state.x < 0) mouse_state.x = 0;
 	else if (mouse_state.x >= SCREEN_W) mouse_state.x = SCREEN_W - 1;
 	if (mouse_state.y < 0) mouse_state.y = 0;
