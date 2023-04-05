@@ -181,4 +181,4 @@ static uint16_t fleshmenders_data[] = {
 	0x0002, 0x4947,
 };
 
-struct image fleshmenders = { VGA_RLE, 41, 1568, fleshmenders_data };
+struct image fleshmenders = { VGA_RLE, 41, 61, 1568, fleshmenders_data };

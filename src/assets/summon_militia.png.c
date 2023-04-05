@@ -157,4 +157,4 @@ static uint16_t summon_militia_data[] = {
 	0x0002, 0x5aeb, 0x0003, 0x4947, 0x0025, 0x5aeb, 0x0002, 0x4947,
 };
 
-struct image summon_militia = { VGA_RLE, 41, 1358, summon_militia_data };
+struct image summon_militia = { VGA_RLE, 41, 61, 1358, summon_militia_data };

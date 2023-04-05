@@ -25,9 +25,10 @@ struct image {
 	enum image_encoding encoding;
 	// The width (in pixels) of the image
 	int width;
-	// For VGA encoding: the height (in pixels) of the image
-	// For VGA_RLE encoding: the length (in count) of the image data
+	// The height (in pixels) of the image
 	int height;
+	// The length of the data
+	int length;
 	// Pointer to a global array of data for the image.
 	// 320x240=76800 which is more than uint16 can hold in the RLE case
 	// but we assume no real image is one color for the entire screen size.

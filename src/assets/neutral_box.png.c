@@ -28,4 +28,4 @@ static uint16_t neutral_box_data[] = {
 	0x4947,
 };
 
-struct image neutral_box = { VGA_RLE, 80, 190, neutral_box_data };
+struct image neutral_box = { VGA_RLE, 80, 24, 190, neutral_box_data };

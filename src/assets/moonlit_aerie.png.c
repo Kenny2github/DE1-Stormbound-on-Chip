@@ -174,4 +174,4 @@ static uint16_t moonlit_aerie_data[] = {
 	0x4947, 0x0025, 0x59c4, 0x0002, 0x4947,
 };
 
-struct image moonlit_aerie = { VGA_RLE, 41, 1508, moonlit_aerie_data };
+struct image moonlit_aerie = { VGA_RLE, 41, 61, 1508, moonlit_aerie_data };

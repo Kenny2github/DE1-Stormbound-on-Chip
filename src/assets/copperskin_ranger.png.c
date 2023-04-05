@@ -160,4 +160,4 @@ static uint16_t copperskin_ranger_data[] = {
 	0x4947,
 };
 
-struct image copperskin_ranger = { VGA_RLE, 41, 1378, copperskin_ranger_data };
+struct image copperskin_ranger = { VGA_RLE, 41, 61, 1378, copperskin_ranger_data };

@@ -146,4 +146,4 @@ static uint16_t icicle_burst_data[] = {
 	0x6433, 0x0002, 0x324b, 0x0003, 0x4947, 0x0025, 0x324b, 0x0002, 0x4947,
 };
 
-struct image icicle_burst = { VGA_RLE, 41, 1260, icicle_burst_data };
+struct image icicle_burst = { VGA_RLE, 41, 61, 1260, icicle_burst_data };

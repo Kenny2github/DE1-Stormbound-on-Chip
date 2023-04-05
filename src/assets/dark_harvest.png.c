@@ -160,4 +160,4 @@ static uint16_t dark_harvest_data[] = {
 	0x7a86, 0x0002, 0x59c4, 0x0003, 0x4947, 0x0025, 0x59c4, 0x0002, 0x4947,
 };
 
-struct image dark_harvest = { VGA_RLE, 41, 1386, dark_harvest_data };
+struct image dark_harvest = { VGA_RLE, 41, 61, 1386, dark_harvest_data };

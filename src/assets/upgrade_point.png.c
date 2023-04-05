@@ -173,4 +173,4 @@ static uint16_t upgrade_point_data[] = {
 	0x0025, 0x4103, 0x0002, 0x4947,
 };
 
-struct image upgrade_point = { VGA_RLE, 41, 1498, upgrade_point_data };
+struct image upgrade_point = { VGA_RLE, 41, 61, 1498, upgrade_point_data };

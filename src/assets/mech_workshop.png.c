@@ -154,4 +154,4 @@ static uint16_t mech_workshop_data[] = {
 	0x4103, 0x0003, 0x4947, 0x0025, 0x4103, 0x0002, 0x4947,
 };
 
-struct image mech_workshop = { VGA_RLE, 41, 1330, mech_workshop_data };
+struct image mech_workshop = { VGA_RLE, 41, 61, 1330, mech_workshop_data };

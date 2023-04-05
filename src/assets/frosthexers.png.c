@@ -177,4 +177,4 @@ static uint16_t frosthexers_data[] = {
 	0x0003, 0x4947, 0x0025, 0x324b, 0x0002, 0x4947,
 };
 
-struct image frosthexers = { VGA_RLE, 41, 1536, frosthexers_data };
+struct image frosthexers = { VGA_RLE, 41, 61, 1536, frosthexers_data };

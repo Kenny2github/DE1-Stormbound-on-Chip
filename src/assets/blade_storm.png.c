@@ -138,4 +138,4 @@ static uint16_t blade_storm_data[] = {
 	0x8430, 0x0002, 0x5aeb, 0x0003, 0x4947, 0x0025, 0x5aeb, 0x0002, 0x4947,
 };
 
-struct image blade_storm = { VGA_RLE, 41, 1188, blade_storm_data };
+struct image blade_storm = { VGA_RLE, 41, 61, 1188, blade_storm_data };

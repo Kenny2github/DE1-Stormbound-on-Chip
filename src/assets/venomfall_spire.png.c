@@ -169,4 +169,4 @@ static uint16_t venomfall_spire_data[] = {
 	0x0003, 0x4947, 0x0025, 0x0164, 0x0002, 0x4947,
 };
 
-struct image venomfall_spire = { VGA_RLE, 41, 1464, venomfall_spire_data };
+struct image venomfall_spire = { VGA_RLE, 41, 61, 1464, venomfall_spire_data };

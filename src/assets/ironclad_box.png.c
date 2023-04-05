@@ -28,4 +28,4 @@ static uint16_t ironclad_box_data[] = {
 	0x4947,
 };
 
-struct image ironclad_box = { VGA_RLE, 80, 190, ironclad_box_data };
+struct image ironclad_box = { VGA_RLE, 80, 24, 190, ironclad_box_data };

@@ -144,4 +144,4 @@ static uint16_t emerald_towers_data[] = {
 	0x4947, 0x0025, 0x5aeb, 0x0002, 0x4947,
 };
 
-struct image emerald_towers = { VGA_RLE, 41, 1238, emerald_towers_data };
+struct image emerald_towers = { VGA_RLE, 41, 61, 1238, emerald_towers_data };

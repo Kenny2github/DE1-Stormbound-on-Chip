@@ -162,4 +162,4 @@ static uint16_t soulcrushers_data[] = {
 	0x0a87, 0x0002, 0x0164, 0x0003, 0x4947, 0x0025, 0x0164, 0x0002, 0x4947,
 };
 
-struct image soulcrushers = { VGA_RLE, 41, 1404, soulcrushers_data };
+struct image soulcrushers = { VGA_RLE, 41, 61, 1404, soulcrushers_data };

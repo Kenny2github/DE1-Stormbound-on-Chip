@@ -157,4 +157,4 @@ static uint16_t shady_ghoul_data[] = {
 	0x0025, 0x59c4, 0x0002, 0x4947,
 };
 
-struct image shady_ghoul = { VGA_RLE, 41, 1354, shady_ghoul_data };
+struct image shady_ghoul = { VGA_RLE, 41, 61, 1354, shady_ghoul_data };

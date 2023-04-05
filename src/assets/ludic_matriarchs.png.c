@@ -164,4 +164,4 @@ static uint16_t ludic_matriarchs_data[] = {
 	0x5aeb, 0x0002, 0x4947,
 };
 
-struct image ludic_matriarchs = { VGA_RLE, 41, 1416, ludic_matriarchs_data };
+struct image ludic_matriarchs = { VGA_RLE, 41, 61, 1416, ludic_matriarchs_data };

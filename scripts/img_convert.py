@@ -48,10 +48,8 @@ with Image.open(sys.argv[1]) as im, open(sys.argv[2], 'w') as cfile:
     filename = Path(sys.argv[1]).name
     var_name, data_var_name = var_names(filename)
     width = im.width
-    if mode == "VGA":
-        height = im.height
-    else:
-        height = len(data)
+    height = im.height
+    length = len(data)
 
     cfile.write(f"""
 /**
@@ -70,5 +68,5 @@ static uint16_t {data_var_name}[] = {{
             cfile.write(' ')
     print('\n};', file=cfile)
     print(f"""
-struct image {var_name} = {{ {mode}, {width}, {height}, {data_var_name} }};
+struct image {var_name} = {{ {mode}, {width}, {height}, {length}, {data_var_name} }};
 """.rstrip(), file=cfile)

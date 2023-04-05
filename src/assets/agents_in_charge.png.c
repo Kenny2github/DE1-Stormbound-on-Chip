@@ -167,4 +167,4 @@ static uint16_t agents_in_charge_data[] = {
 	0x0002, 0x4947,
 };
 
-struct image agents_in_charge = { VGA_RLE, 41, 1442, agents_in_charge_data };
+struct image agents_in_charge = { VGA_RLE, 41, 61, 1442, agents_in_charge_data };

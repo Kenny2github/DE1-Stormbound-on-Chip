@@ -148,4 +148,4 @@ static uint16_t felflares_data[] = {
 	0x4947, 0x0025, 0x5aeb, 0x0002, 0x4947,
 };
 
-struct image felflares = { VGA_RLE, 41, 1274, felflares_data };
+struct image felflares = { VGA_RLE, 41, 61, 1274, felflares_data };

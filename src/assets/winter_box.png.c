@@ -28,4 +28,4 @@ static uint16_t winter_box_data[] = {
 	0x4947,
 };
 
-struct image winter_box = { VGA_RLE, 80, 190, winter_box_data };
+struct image winter_box = { VGA_RLE, 80, 24, 190, winter_box_data };

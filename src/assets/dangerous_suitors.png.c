@@ -173,4 +173,4 @@ static uint16_t dangerous_suitors_data[] = {
 	0x0002, 0x5aeb, 0x0003, 0x4947, 0x0025, 0x5aeb, 0x0002, 0x4947,
 };
 
-struct image dangerous_suitors = { VGA_RLE, 41, 1502, dangerous_suitors_data };
+struct image dangerous_suitors = { VGA_RLE, 41, 61, 1502, dangerous_suitors_data };
