@@ -8,7 +8,7 @@ goto :error
 
 :combined.c
 
-if exist combined.c del combined.c
+echo #define CPULATOR>combined.c
 for /R "src" %%f in (*.c) do (
 	echo Combining %%~nxf
 	py scripts\combine.py "%%f"

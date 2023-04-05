@@ -26,7 +26,7 @@ TXT_FILES=$(call rwildcard, $(ASSET_DIR), *.txt)
 ASSET_C_FILES=$(patsubst assets/%, src/assets/%.c, $(IMG_FILES) $(TXT_FILES))
 
 combined.c: $(SRC_FILES)
-	rm combined.c
+	echo '#define CPULATOR' > combined.c
 	python3 scripts/combine.py $^
 
 assets: $(ASSET_C_FILES)
