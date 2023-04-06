@@ -23,7 +23,7 @@ int event_queue_empty(void) {
 }
 
 struct event_t event_queue_pop(void) {
-	// N.B. done under the assumption that event_queue_empty().
+	// N.B. done under the assumption that !event_queue_empty().
 	struct event_t event = q_data[q_tail];
 	q_tail = (q_tail + 1) % EVENT_QUEUE_LEN;
 	return event;
