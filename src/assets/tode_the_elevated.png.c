@@ -193,4 +193,4 @@ static uint16_t tode_the_elevated_data[] = {
 	0x0002, 0x4947,
 };
 
-struct image tode_the_elevated = { VGA_RLE, 41, 1676, tode_the_elevated_data };
+struct image tode_the_elevated = { VGA_RLE, 41, 61, 1676, tode_the_elevated_data };

@@ -152,4 +152,4 @@ static uint16_t dr_mia_data[] = {
 	0x4947,
 };
 
-struct image dr_mia = { VGA_RLE, 41, 1306, dr_mia_data };
+struct image dr_mia = { VGA_RLE, 41, 61, 1306, dr_mia_data };

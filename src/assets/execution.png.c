@@ -114,4 +114,4 @@ static uint16_t execution_data[] = {
 	0x4947,
 };
 
-struct image execution = { VGA_RLE, 41, 964, execution_data };
+struct image execution = { VGA_RLE, 41, 61, 964, execution_data };

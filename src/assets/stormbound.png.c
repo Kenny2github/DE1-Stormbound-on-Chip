@@ -162,4 +162,4 @@ static uint16_t stormbound_data[] = {
 	0x4947,
 };
 
-struct image stormbound = { VGA_RLE, 192, 1396, stormbound_data };
+struct image stormbound = { VGA_RLE, 192, 18, 1396, stormbound_data };

@@ -154,4 +154,4 @@ static uint16_t heroic_soldiers_data[] = {
 	0x5aeb, 0x0002, 0x4947,
 };
 
-struct image heroic_soldiers = { VGA_RLE, 41, 1326, heroic_soldiers_data };
+struct image heroic_soldiers = { VGA_RLE, 41, 61, 1326, heroic_soldiers_data };

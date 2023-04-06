@@ -154,4 +154,4 @@ static uint16_t doppelbocks_data[] = {
 	0x7a86, 0x0002, 0x59c4, 0x0003, 0x4947, 0x0025, 0x59c4, 0x0002, 0x4947,
 };
 
-struct image doppelbocks = { VGA_RLE, 41, 1332, doppelbocks_data };
+struct image doppelbocks = { VGA_RLE, 41, 61, 1332, doppelbocks_data };

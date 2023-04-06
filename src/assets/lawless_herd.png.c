@@ -172,4 +172,4 @@ static uint16_t lawless_herd_data[] = {
 	0x8430, 0x0002, 0x5aeb, 0x0003, 0x4947, 0x0025, 0x5aeb, 0x0002, 0x4947,
 };
 
-struct image lawless_herd = { VGA_RLE, 41, 1494, lawless_herd_data };
+struct image lawless_herd = { VGA_RLE, 41, 61, 1494, lawless_herd_data };

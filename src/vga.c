@@ -76,7 +76,7 @@ void configure_vga(void) {
 }
 
 static void draw_RLE_img_map(int x, int y, struct image img) {
-	int size = img.height;
+	int size = img.length;
 	int h = 0, w = 0;
 	for (int i = 0; i < size; i += 2) {
 		for (int j = 0; j < img.data[i]; ++j) {

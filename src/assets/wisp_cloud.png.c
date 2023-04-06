@@ -152,4 +152,4 @@ static uint16_t wisp_cloud_data[] = {
 	0x4947,
 };
 
-struct image wisp_cloud = { VGA_RLE, 41, 1306, wisp_cloud_data };
+struct image wisp_cloud = { VGA_RLE, 41, 61, 1306, wisp_cloud_data };

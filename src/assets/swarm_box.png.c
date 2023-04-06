@@ -17,4 +17,4 @@ static uint16_t swarm_box_data[] = {
 	0x004c, 0xbbc9, 0x0002, 0x4947,
 };
 
-struct image swarm_box = { VGA_RLE, 80, 94, swarm_box_data };
+struct image swarm_box = { VGA_RLE, 80, 12, 94, swarm_box_data };

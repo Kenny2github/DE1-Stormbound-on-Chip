@@ -157,4 +157,4 @@ static uint16_t head_start_data[] = {
 	0x0025, 0x59c4, 0x0002, 0x4947,
 };
 
-struct image head_start = { VGA_RLE, 41, 1354, head_start_data };
+struct image head_start = { VGA_RLE, 41, 61, 1354, head_start_data };

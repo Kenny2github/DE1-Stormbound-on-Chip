@@ -158,4 +158,4 @@ static uint16_t victors_of_the_melee_data[] = {
 	0x5aeb, 0x0002, 0x4947,
 };
 
-struct image victors_of_the_melee = { VGA_RLE, 41, 1362, victors_of_the_melee_data };
+struct image victors_of_the_melee = { VGA_RLE, 41, 61, 1362, victors_of_the_melee_data };

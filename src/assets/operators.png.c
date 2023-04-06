@@ -152,4 +152,4 @@ static uint16_t operators_data[] = {
 	0x7a06, 0x0002, 0x4103, 0x0003, 0x4947, 0x0025, 0x4103, 0x0002, 0x4947,
 };
 
-struct image operators = { VGA_RLE, 41, 1314, operators_data };
+struct image operators = { VGA_RLE, 41, 61, 1314, operators_data };

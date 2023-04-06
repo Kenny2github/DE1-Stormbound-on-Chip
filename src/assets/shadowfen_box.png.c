@@ -17,4 +17,4 @@ static uint16_t shadowfen_box_data[] = {
 	0x004c, 0x4d52, 0x0002, 0x4947,
 };
 
-struct image shadowfen_box = { VGA_RLE, 80, 94, shadowfen_box_data };
+struct image shadowfen_box = { VGA_RLE, 80, 12, 94, shadowfen_box_data };

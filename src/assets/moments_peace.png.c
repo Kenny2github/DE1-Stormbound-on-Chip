@@ -173,4 +173,4 @@ static uint16_t moments_peace_data[] = {
 	0x0002, 0x324b, 0x0003, 0x4947, 0x0025, 0x324b, 0x0002, 0x4947,
 };
 
-struct image moments_peace = { VGA_RLE, 41, 1502, moments_peace_data };
+struct image moments_peace = { VGA_RLE, 41, 61, 1502, moments_peace_data };

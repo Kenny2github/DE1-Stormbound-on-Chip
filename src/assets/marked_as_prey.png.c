@@ -159,4 +159,4 @@ static uint16_t marked_as_prey_data[] = {
 	0x0025, 0x0164, 0x0002, 0x4947,
 };
 
-struct image marked_as_prey = { VGA_RLE, 41, 1372, marked_as_prey_data };
+struct image marked_as_prey = { VGA_RLE, 41, 61, 1372, marked_as_prey_data };
