@@ -72,6 +72,9 @@ extern struct image moments_peace;
 // moonlit_aerie.png
 extern struct image moonlit_aerie;
 
+// mouse.png
+extern struct image mouse;
+
 // neutral_box.png
 extern struct image neutral_box;
 
