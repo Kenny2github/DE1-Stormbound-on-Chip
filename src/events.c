@@ -8,7 +8,7 @@
 #include <stdlib.h>
 #include "events.h"
 
-#define EVENT_QUEUE_LEN 128
+#define EVENT_QUEUE_LEN 1024
 
 /**** Global variables ****/
 
