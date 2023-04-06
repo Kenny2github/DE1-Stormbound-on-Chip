@@ -9,6 +9,9 @@ extern struct image agents_in_charge;
 // blade_storm.png
 extern struct image blade_storm;
 
+// cardbuilding_done.png
+extern struct image cardbuilding_done;
+
 // copperskin_ranger.png
 extern struct image copperskin_ranger;
 
