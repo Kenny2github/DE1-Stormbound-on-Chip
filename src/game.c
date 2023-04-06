@@ -86,67 +86,84 @@ void run_game() {
 			}
 			break;
 		case DECK:
-			switch(player_state) {
-				case P1:
-					fill_screen(BACKGROUND);
-					clear_char_screen();
-					write_string(1, 1, "Cards:");
-					for (int i = 0; i < 30; ++i) {
-						if (in_deck[i]) continue;
-						draw_img_map((int)(i / 10) * 80, i % 10 * 12 + 12, *card_selection_box[cards[i].type]);
-						write_string((int)(i / 10) * 20 + (20 - strlen(cards[i].name)) / 2, i % 10 * 3 + 4, cards[i].name);
+			fill_screen(BACKGROUND);
+			clear_char_screen();
+			write_string(1, 1, "Cards:");
+			for (int i = 0; i < 30; ++i) {
+				if (in_deck[i]) continue;
+				draw_img_map((int)(i / 10) * 80, i % 10 * 12 + 12, *card_selection_box[cards[i].type]);
+				write_string((int)(i / 10) * 20 + (20 - strlen(cards[i].name)) / 2, i % 10 * 3 + 4, cards[i].name);
+			}
+			write_string(61, 1, (player_state == P1) ? "P1 deck:" : "P2 deck:");
+			for (int i = 0; i < card_num; ++i) {
+				draw_img_map(240, i * 12 + 12, *card_selection_box[cards[deck[player_state][i]].type]);
+				write_string(60 + (20 - strlen(cards[deck[player_state][i]].name)) / 2, i * 3 + 4, cards[deck[player_state][i]].name);
+			}
+			if (card_num == 10) draw_img_map(SCREEN_W - 61, 156, cardbuilding_done);
+			// draw mouse
+			draw_rectangle(mouse_state.x, mouse_state.y, 2, 2, WHITE);
+
+
+			if (mouse_state.left_clicked) {
+				if (card_num != 10
+				&& mouse_state.x >= 0 && mouse_state.x < 240
+				&& mouse_state.y >= 12 && mouse_state.y < 132) {
+
+					int idx = (int)(mouse_state.x / 80) * 10 + (int)((mouse_state.y - 12) / 12);
+					if (!(in_deck[idx])) {
+						in_deck[idx] = true;
+						deck[player_state][card_num++] = idx;
 					}
-					write_string(61, 1, "Your deck:");
-					for (int i = 0; i < card_num; ++i) {
-						draw_img_map(240, i * 12 + 12, *card_selection_box[cards[deck[player_state][i]].type]);
-						write_string(60 + (20 - strlen(cards[deck[player_state][i]].name)) / 2, i * 3 + 4, cards[deck[player_state][i]].name);
+
+				} else if (mouse_state.x >= 240 && mouse_state.x < SCREEN_W
+				&& mouse_state.y >= 12 && mouse_state.y < (card_num * 12 + 12)) {
+
+					int idx = (mouse_state.y - 12) / 12;
+					in_deck[deck[player_state][idx]] = false;
+					for (int i = idx; i < card_num - 1; ++i) {
+						deck[player_state][i] = deck[player_state][i + 1];
 					}
-					// draw mouse
-					draw_rectangle(mouse_state.x, mouse_state.y, 2, 2, WHITE);
+					--card_num;
+					
+				}
+			} else {
+				if (mouse_state.x >= 0 && mouse_state.x < 240
+				&& mouse_state.y >= 12 && mouse_state.y < 132) {
 
-
-					if (mouse_state.left_clicked) {
-						if (card_num != 10
-						&& mouse_state.x >= 0 && mouse_state.x < 240
-						&& mouse_state.y >= 12 && mouse_state.y < 132) {
-
-							int idx = (int)(mouse_state.x / 80) * 10 + (int)((mouse_state.y - 12) / 12);
-							if (!(in_deck[idx])) {
-								in_deck[idx] = true;
-								deck[player_state][card_num++] = idx;
-							}
-
-						} else if (mouse_state.x >= 240 && mouse_state.x < SCREEN_W
-						&& mouse_state.y >= 12 && mouse_state.y < (card_num * 12 + 12)) {
-
-							int idx = (mouse_state.y - 12) / 12;
-							in_deck[deck[player_state][idx]] = false;
-							for (int i = idx; i < card_num - 1; ++i) {
-								deck[player_state][i] = deck[player_state][i + 1];
-							}
-							--card_num;
-							
-						}
-					} else {
-						if (card_num != 10
-						&& mouse_state.x >= 0 && mouse_state.x < 240
-						&& mouse_state.y >= 12 && mouse_state.y < 132) {
-
-							int idx = (int)(mouse_state.x / 80) * 10 + (int)((mouse_state.y - 12) / 12);
-							if (!(in_deck[idx])) {
-								draw_img_map(40, 156, *cards[idx].img);
-							}
-							
-
-						} else if (mouse_state.x >= 240 && mouse_state.x < SCREEN_W
-						&& mouse_state.y >= 12 && mouse_state.y < (card_num * 12 + 12)) {
-
-							int idx = (mouse_state.y - 12) / 12;
-							draw_img_map(20, 156, *cards[deck[player_state][idx]].img);
-							
-						}
+					int idx = (int)(mouse_state.x / 80) * 10 + (int)((mouse_state.y - 12) / 12);
+					if (!(in_deck[idx])) {
+						draw_img_map(20, 156, *cards[idx].img);
 					}
 					
+
+				} else if (mouse_state.x >= 240 && mouse_state.x < SCREEN_W
+				&& mouse_state.y >= 12 && mouse_state.y < (card_num * 12 + 12)) {
+
+					int idx = (mouse_state.y - 12) / 12;
+					draw_img_map(20, 156, *cards[deck[player_state][idx]].img);
+					
+				}
 			}
+
+			
+			if (mouse_state.x >= SCREEN_W - 61 && mouse_state.x < SCREEN_W - 20
+			&& mouse_state.y >= 156 && mouse_state.y < 217 && mouse_state.left_clicked) {
+				switch(player_state) {
+					case P1:
+						player_state = P2;
+						card_num = 0;
+						for (int i = 0; i < 30; ++i) in_deck[i] = false;
+						break;
+					case P2:
+						player_state = P1;
+						game_state = TURN;
+						turn_state = PRETURN;
+				}
+			} 
+			break;
+
+		case TURN:
+			fill_screen(BACKGROUND);
+			clear_char_screen();
 	}
 }
