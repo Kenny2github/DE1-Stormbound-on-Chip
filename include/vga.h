@@ -40,6 +40,15 @@ void update_back_buffer(void);
 void configure_vga(void);
 
 /**
+ * @brief Write a pixel to the back buffer.
+ *
+ * @param x x-position of the pixel.
+ * @param y y-position of the pixel.
+ * @param color Color of the pixel.
+ */
+void plot_pixel(int x, int y, uint16_t color);
+
+/**
  * @brief Fill entire screen with a single color
  * @param color Color to fill screen with
  */

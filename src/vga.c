@@ -22,7 +22,6 @@ void update_back_buffer(void) {
 	char_buffer_start = *(char_ctrl_ptr + 1);
 }
 
-/* draw line_colored pixel at (x, y) */
 void plot_pixel(int x, int y, uint16_t color) {
     *(uint16_t *)(pixel_buffer_start + (y << 10) + (x << 1)) = color;
 }
