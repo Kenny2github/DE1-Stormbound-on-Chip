@@ -22,6 +22,9 @@ extern char {data_var_name}[];
 """.lstrip(), file=hfile)
             continue
 
+        if filename.endswith('.md'):
+            continue # don't include internal documentation
+
         print(f"""
 // {filename}
 extern struct image {var_name};
