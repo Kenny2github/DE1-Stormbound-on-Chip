@@ -3,7 +3,7 @@
  */
 #include "assets.h"
 
-static uint16_t stormbound_data[] = {
+static const uint16_t stormbound_data[] = {
 	0x0014, 0x4947, 0x000a, 0xae9e, 0x0006, 0x4947, 0x000e, 0xae9e, 0x0006,
 	0x4947, 0x000a, 0xae9e, 0x0006, 0x4947, 0x000c, 0xae9e, 0x0006, 0x4947,
 	0x0002, 0xae9e, 0x000a, 0x4947, 0x0002, 0xae9e, 0x0004, 0x4947, 0x000a,
@@ -162,4 +162,6 @@ static uint16_t stormbound_data[] = {
 	0x4947,
 };
 
-struct image stormbound = { VGA_RLE, 192, 18, 1396, stormbound_data };
+const struct image stormbound = {
+    VGA_RLE, 192, 18, 1396, stormbound_data
+};

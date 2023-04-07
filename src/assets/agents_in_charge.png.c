@@ -3,7 +3,7 @@
  */
 #include "assets.h"
 
-static uint16_t agents_in_charge_data[] = {
+static const uint16_t agents_in_charge_data[] = {
 	0x0002, 0x4947, 0x0025, 0x4103, 0x0003, 0x4947, 0x0002, 0x4103, 0x0023,
 	0x7a06, 0x0002, 0x4103, 0x0001, 0x4947, 0x0002, 0x4103, 0x0002, 0x7a06,
 	0x0021, 0xbb0a, 0x0002, 0x7a06, 0x0003, 0x4103, 0x0002, 0x7a06, 0x0002,
@@ -167,4 +167,6 @@ static uint16_t agents_in_charge_data[] = {
 	0x0002, 0x4947,
 };
 
-struct image agents_in_charge = { VGA_RLE, 41, 61, 1442, agents_in_charge_data };
+const struct image agents_in_charge = {
+    VGA_RLE, 41, 61, 1442, agents_in_charge_data
+};

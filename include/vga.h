@@ -77,6 +77,6 @@ void draw_img_map(int x, int y, struct image img);
  * @param y y-char-coordinate of where the string starts
  * @param str String to be written
  */
-void write_string(int x, int y, char* str);
+void write_string(int x, int y, const char* str);
 
 #endif

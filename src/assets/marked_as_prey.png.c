@@ -3,7 +3,7 @@
  */
 #include "assets.h"
 
-static uint16_t marked_as_prey_data[] = {
+static const uint16_t marked_as_prey_data[] = {
 	0x0002, 0x4947, 0x0025, 0x0164, 0x0003, 0x4947, 0x0002, 0x0164, 0x0023,
 	0x0a87, 0x0002, 0x0164, 0x0001, 0x4947, 0x0002, 0x0164, 0x0002, 0x0a87,
 	0x0021, 0x4d52, 0x0002, 0x0a87, 0x0003, 0x0164, 0x0002, 0x0a87, 0x0006,
@@ -159,4 +159,6 @@ static uint16_t marked_as_prey_data[] = {
 	0x0025, 0x0164, 0x0002, 0x4947,
 };
 
-struct image marked_as_prey = { VGA_RLE, 41, 61, 1372, marked_as_prey_data };
+const struct image marked_as_prey = {
+    VGA_RLE, 41, 61, 1372, marked_as_prey_data
+};

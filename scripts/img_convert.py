@@ -57,7 +57,7 @@ with Image.open(sys.argv[1]) as im, open(sys.argv[2], 'w') as cfile:
  */
 #include "assets.h"
 
-static uint16_t {data_var_name}[] = {{
+static const uint16_t {data_var_name}[] = {{
 """.strip())
     # max 9 items per line
     for count, (i, word) in zip(cycle(range(9)), enumerate(data)):
@@ -68,5 +68,7 @@ static uint16_t {data_var_name}[] = {{
             cfile.write(' ')
     print('\n};', file=cfile)
     print(f"""
-struct image {var_name} = {{ {mode}, {width}, {height}, {length}, {data_var_name} }};
+const struct image {var_name} = {{
+    {mode}, {width}, {height}, {length}, {data_var_name}
+}};
 """.rstrip(), file=cfile)

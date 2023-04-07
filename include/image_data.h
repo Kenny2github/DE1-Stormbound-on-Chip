@@ -32,7 +32,7 @@ struct image {
 	// Pointer to a global array of data for the image.
 	// 320x240=76800 which is more than uint16 can hold in the RLE case
 	// but we assume no real image is one color for the entire screen size.
-	uint16_t* data;
+	const uint16_t* data;
 };
 
 #endif

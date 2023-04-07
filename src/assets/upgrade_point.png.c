@@ -3,7 +3,7 @@
  */
 #include "assets.h"
 
-static uint16_t upgrade_point_data[] = {
+static const uint16_t upgrade_point_data[] = {
 	0x0002, 0x4947, 0x0025, 0x4103, 0x0003, 0x4947, 0x0002, 0x4103, 0x0023,
 	0x7a06, 0x0002, 0x4103, 0x0001, 0x4947, 0x0002, 0x4103, 0x0002, 0x7a06,
 	0x0021, 0xbb0a, 0x0002, 0x7a06, 0x0003, 0x4103, 0x0002, 0x7a06, 0x0004,
@@ -173,4 +173,6 @@ static uint16_t upgrade_point_data[] = {
 	0x0025, 0x4103, 0x0002, 0x4947,
 };
 
-struct image upgrade_point = { VGA_RLE, 41, 61, 1498, upgrade_point_data };
+const struct image upgrade_point = {
+    VGA_RLE, 41, 61, 1498, upgrade_point_data
+};

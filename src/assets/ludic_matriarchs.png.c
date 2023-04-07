@@ -3,7 +3,7 @@
  */
 #include "assets.h"
 
-static uint16_t ludic_matriarchs_data[] = {
+static const uint16_t ludic_matriarchs_data[] = {
 	0x0002, 0x4947, 0x0025, 0x5aeb, 0x0003, 0x4947, 0x0002, 0x5aeb, 0x0023,
 	0x8430, 0x0002, 0x5aeb, 0x0001, 0x4947, 0x0002, 0x5aeb, 0x0002, 0x8430,
 	0x0021, 0xce99, 0x0002, 0x8430, 0x0003, 0x5aeb, 0x0002, 0x8430, 0x0008,
@@ -164,4 +164,6 @@ static uint16_t ludic_matriarchs_data[] = {
 	0x5aeb, 0x0002, 0x4947,
 };
 
-struct image ludic_matriarchs = { VGA_RLE, 41, 61, 1416, ludic_matriarchs_data };
+const struct image ludic_matriarchs = {
+    VGA_RLE, 41, 61, 1416, ludic_matriarchs_data
+};

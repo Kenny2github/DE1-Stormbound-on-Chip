@@ -46,7 +46,7 @@ struct card cards[30] = {
 	{"Marked As Prey", SHADOWFEN, &marked_as_prey}
 };
 
-struct image* card_selection_box[5] = {
+const struct image* card_selection_box[5] = {
 	&neutral_box,
 	&swarm_box,
 	&winter_box,

@@ -3,7 +3,7 @@
  */
 #include "assets.h"
 
-static uint16_t tode_the_elevated_data[] = {
+static const uint16_t tode_the_elevated_data[] = {
 	0x0002, 0x4947, 0x0025, 0x0164, 0x0003, 0x4947, 0x0002, 0x0164, 0x0023,
 	0x0a87, 0x0002, 0x0164, 0x0001, 0x4947, 0x0002, 0x0164, 0x0002, 0x0a87,
 	0x0021, 0x4d52, 0x0002, 0x0a87, 0x0003, 0x0164, 0x0002, 0x0a87, 0x0003,
@@ -193,4 +193,6 @@ static uint16_t tode_the_elevated_data[] = {
 	0x0002, 0x4947,
 };
 
-struct image tode_the_elevated = { VGA_RLE, 41, 61, 1676, tode_the_elevated_data };
+const struct image tode_the_elevated = {
+    VGA_RLE, 41, 61, 1676, tode_the_elevated_data
+};

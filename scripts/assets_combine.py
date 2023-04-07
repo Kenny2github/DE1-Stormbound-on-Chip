@@ -18,7 +18,7 @@ with open(Path('include') / 'assets.h', 'w') as hfile:
         if filename.endswith('.txt'): # handle text files specially
             print(f"""
 // {filename}
-extern char {data_var_name}[];
+extern const char {data_var_name}[];
 """.lstrip(), file=hfile)
             continue
 
@@ -27,7 +27,7 @@ extern char {data_var_name}[];
 
         print(f"""
 // {filename}
-extern struct image {var_name};
+extern const struct image {var_name};
 """.lstrip(), file=hfile)
 
     print('#endif', file=hfile)

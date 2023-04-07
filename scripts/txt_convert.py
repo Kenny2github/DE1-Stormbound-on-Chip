@@ -17,7 +17,7 @@ with open(sys.argv[1]) as txt, open(sys.argv[2], 'w') as cfile:
  */
 #include "assets.h"
 
-char {data_var_name}[] =
+const char {data_var_name}[] =
 """.strip(), file=cfile)
     # strip trailing whitespace as it won't be rendered
     text = txt.read().rstrip().splitlines(keepends=True)

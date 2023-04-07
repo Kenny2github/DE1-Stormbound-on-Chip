@@ -6,7 +6,7 @@
 struct card {
 	char name[20];
 	int type;
-	struct image* img;
+	const struct image* img;
 };
 
 enum card_name {

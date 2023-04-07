@@ -3,7 +3,7 @@
  */
 #include "assets.h"
 
-char instructions_data[] =
+const char instructions_data[] =
 	"                                  INSTRUCTIONS\n"
 	"                     Before play, build a deck of 10 cards.\n"
 	"    Player 1 starts with 3 mana and goes first; Player 2 starts with 4 mana.\n"

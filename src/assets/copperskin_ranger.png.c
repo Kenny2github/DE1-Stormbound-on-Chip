@@ -3,7 +3,7 @@
  */
 #include "assets.h"
 
-static uint16_t copperskin_ranger_data[] = {
+static const uint16_t copperskin_ranger_data[] = {
 	0x0002, 0x4947, 0x0025, 0x0164, 0x0003, 0x4947, 0x0002, 0x0164, 0x0023,
 	0x0a87, 0x0002, 0x0164, 0x0001, 0x4947, 0x0002, 0x0164, 0x0002, 0x0a87,
 	0x0021, 0x4d52, 0x0002, 0x0a87, 0x0003, 0x0164, 0x0002, 0x0a87, 0x0004,
@@ -160,4 +160,6 @@ static uint16_t copperskin_ranger_data[] = {
 	0x4947,
 };
 
-struct image copperskin_ranger = { VGA_RLE, 41, 61, 1378, copperskin_ranger_data };
+const struct image copperskin_ranger = {
+    VGA_RLE, 41, 61, 1378, copperskin_ranger_data
+};

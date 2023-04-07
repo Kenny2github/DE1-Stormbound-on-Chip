@@ -3,7 +3,7 @@
  */
 #include "assets.h"
 
-static uint16_t victors_of_the_melee_data[] = {
+static const uint16_t victors_of_the_melee_data[] = {
 	0x0002, 0x4947, 0x0025, 0x5aeb, 0x0003, 0x4947, 0x0002, 0x5aeb, 0x0023,
 	0x8430, 0x0002, 0x5aeb, 0x0001, 0x4947, 0x0002, 0x5aeb, 0x0002, 0x8430,
 	0x0021, 0xce99, 0x0002, 0x8430, 0x0003, 0x5aeb, 0x0002, 0x8430, 0x0004,
@@ -158,4 +158,6 @@ static uint16_t victors_of_the_melee_data[] = {
 	0x5aeb, 0x0002, 0x4947,
 };
 
-struct image victors_of_the_melee = { VGA_RLE, 41, 61, 1362, victors_of_the_melee_data };
+const struct image victors_of_the_melee = {
+    VGA_RLE, 41, 61, 1362, victors_of_the_melee_data
+};
