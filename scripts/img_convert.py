@@ -33,7 +33,7 @@ def rgb_to_vga(rgba: tuple[int, int, int, int]) -> int:
     return (r << 11) | (g << 5) | b
 
 with Image.open(sys.argv[1]) as im, open(sys.argv[2], 'w') as cfile:
-    im.convert("RGBA")
+    im = im.convert("RGBA")
     data = list(map(rgb_to_vga, im.getdata()))
     data_rle = rle(data)
     mode: Literal["VGA", "VGA_RLE"]
