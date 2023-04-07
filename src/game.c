@@ -13,6 +13,8 @@ bool in_deck[30];
 int deck[2][10];
 int card_num;
 
+int game_board[4][5];
+
 struct card cards[30] = {
 	{"Lawless Herd", NEUTRAL, &lawless_herd},
 	{"Felflares", NEUTRAL, &felflares},
@@ -165,5 +167,6 @@ void run_game() {
 		case TURN:
 			fill_screen(BACKGROUND);
 			clear_char_screen();
+			draw_img_map(0, 0, board);
 	}
 }
