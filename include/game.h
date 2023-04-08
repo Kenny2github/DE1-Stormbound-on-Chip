@@ -5,7 +5,16 @@
 
 struct card {
 	char name[20];
+	int faction;
+	struct image* img;
+};
+
+struct troop {
+	int card_id;
 	int type;
+	int player;
+	int health;
+	int status;
 	struct image* img;
 };
 
@@ -52,10 +61,13 @@ enum card_name {
 	SOULCRUSHERS,
 	TODE_THE_ELEVATED,
 	VENOMFALL_SPIRE,
-	MARKED_AS_PREY
+	MARKED_AS_PREY,
+	DRAGON,
+	SATYR,
+	CONSTRUCT
 };
 
-enum card_type {
+enum card_faction {
 	NEUTRAL,
 	SWARM,
 	WINTER,
@@ -63,6 +75,10 @@ enum card_type {
 	SHADOWFEN
 };
 
+enum troop_type {
+	UNIT,
+	BUILDING
+};
 
 enum status_type {
 	NO_STATUS,

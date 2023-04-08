@@ -13,8 +13,10 @@ int game_state, turn_state, move_state, player_state;
 bool in_deck[30];
 int deck[2][10];
 int card_num;
+int row, col;
+int base_health[2];
 
-int game_board[4][5];
+struct troop* game_board[5][4];
 
 int health_change_num;
 struct health_change health_change_list[21];
@@ -22,6 +24,7 @@ struct health_change health_change_list[21];
 int status_change_num;
 struct status_change status_change_list[20];
 
+struct card cards[33] = {
 	{"Lawless Herd", NEUTRAL, &lawless_herd},
 	{"Felflares", NEUTRAL, &felflares},
 	{"Heroic Soldiers", NEUTRAL, &heroic_soldiers},
@@ -51,7 +54,10 @@ struct status_change status_change_list[20];
 	{"Soulcrushers", SHADOWFEN, &soulcrushers},
 	{"Tode the Elevated", SHADOWFEN, &tode_the_elevated},
 	{"Venomfall Spire", SHADOWFEN, &venomfall_spire},
-	{"Marked As Prey", SHADOWFEN, &marked_as_prey}
+	{"Marked As Prey", SHADOWFEN, &marked_as_prey},
+	{"Dragon", NEUTRAL, NULL},
+	{"Satyr", SWARM, NULL},
+	{"Construct", IRONCLAD, NULL},
 };
 
 struct image* card_selection_box[5] = {
