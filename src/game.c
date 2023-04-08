@@ -22,7 +22,8 @@ int game_state, turn_state, move_state, player_state;
 bool in_deck[30];
 int deck[2][10];
 int card_num;
-int cur_cards[3];
+bool cur_cards_played[4];
+int cur_card_selected;
 
 int row, col;
 int base_health[2];
@@ -487,6 +488,7 @@ void run_game() {
 								}
 								if ((col == -1 && player_state == P1) || (col == 5 && player_state == P2)) {
 									turn_state = SELECT_CARD;
+									for (int i = 0; i < 4; ++i) cur_cards_played[i] = false;
 									break;
 								}
 							}
@@ -502,6 +504,38 @@ void run_game() {
 						case CARD_MOVE_FORWARD:
 							move_forward();
 					}
+				
+				case SELECT_CARD:
+					for (int i = 0; i < 4; ++i) {
+						if (!(cur_cards_played[i])) {
+							draw_img_map(i * 46 + 10, 166, *cards[deck[player_state][i]].img);
+						}
+					}
+
+					if (mouse_state.left_clicked) {
+						if (mouse_state.y >= 166 && mouse_state.y < 227) {
+							for (int i = 0; i < 4; ++i) {
+								if (mouse_state.x >= i * 46 + 10 && mouse_state.x < i * 46 + 51) {
+									cur_card_selected = i;
+									turn_state = PLACE_CARD;
+									break;
+								}
+							}
+						}
+						// TODO: END TURN BUTTON
+					} else {
+						if (mouse_state.y >= 166 && mouse_state.y < 227) {
+							for (int i = 0; i < 4; ++i) {
+								if (mouse_state.x >= i * 46 + 10 && mouse_state.x < i * 46 + 51) {
+									// TODO: display stuff
+									continue;
+								}
+							}
+						}
+					}
+
+				case TURN_END:
+					;
 			}
 	}
 }
