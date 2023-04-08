@@ -3,17 +3,21 @@
 #include <string.h>
 #include "address_map_arm.h"
 #include "assets.h"
+#include "events.h"
 #include "image_data.h"
 #include "mouse.h"
 #include "timer.h"
 #include "game.h"
+#include "render.h"
 #include "states.h"
+#include "timer.h"
 #include "vga.h"
 #include "card_logic.h"
 #include "health_status.h"
 
 int game_state, turn_state, move_state, player_state;
 int cur_round;
+int time_left;
 
 bool in_deck[30];
 int deck[2][10];
@@ -70,34 +74,134 @@ static void update_front(void) {
 	front[player_state] = player_state == P1 ? 0 : 4;
 }
 
-void init_game() {
-	game_state = TITLE;
+/**** Static globals ****/
+
+static const struct surface intro_surfs[] = {
+	{64, 5, &stormbound},
+	{38, 120, &felflares},
+	{148, 120, &emerald_towers},
+	{248, 120, &summon_militia},
+};
+#define NUM_INTRO_SURFS (sizeof(intro_surfs) / sizeof(intro_surfs[0]))
+
+/**** Static functions ****/
+
+static void default_event_handlers(struct event_t event) {
+	volatile int* LEDR_ptr = (int*) LEDR_BASE;
+	switch (event.type) {
+	case E_MOUSE_ENABLED:
+		printf("Mouse plugged in\n");
+		break;
+	case E_MOUSE_BUTTON_DOWN:
+		if (event.data.mouse_button_down.left) printf("Left button pressed\n");
+		if (event.data.mouse_button_down.middle) printf("Middle button pressed\n");
+		if (event.data.mouse_button_down.right) printf("Right button pressed\n");
+		break;
+	case E_MOUSE_BUTTON_UP:
+		if (event.data.mouse_button_up.left) printf("Left button released\n");
+		if (event.data.mouse_button_up.middle) printf("Middle button released\n");
+		if (event.data.mouse_button_up.right) printf("Right button released\n");
+		break;
+	case E_MOUSE_MOVE:
+		break;
+	case E_TIMER_ENABLE:
+		time_left = 10;
+		printf("Timer enabled, time left = %d\n", time_left);
+		*LEDR_ptr = (1 << time_left) - 1;
+		break;
+	case E_TIMER_RELOAD:
+		if(!(--time_left)) {
+			disable_timer();
+			printf("timer disabled\n");
+			// put this somewhere else later, this is just for testing
+			enable_timer_interrupt();
+
+		} else {
+			printf("timer counted down, time left = %d\n", time_left);
+		}
+		*LEDR_ptr = (1 << time_left) - 1;
+	default: ;
+	}
 }
 
 static void draw_intro(void) {
 	fill_screen(BACKGROUND);
-	// draw logo
-	draw_img_map((SCREEN_W - stormbound.width) / 2, 5, stormbound);
 	// write instructions
 	write_string(0, 6, instructions_data);
-	// draw example cards
-	draw_img_map(38, 120, felflares);
-	draw_img_map(148, 120, emerald_towers);
-	draw_img_map(248, 120, summon_militia);
+	// draw logo and example cards
+	for (int i = 0; i < NUM_INTRO_SURFS; ++i) {
+		r_stack_push(intro_surfs[i]);
+	}
 	// draw mouse
-	draw_rectangle(mouse_state.x, mouse_state.y, 2, 2, WHITE);
+	push_image(mouse_state.x, mouse_state.y, &mouse);
+}
+
+// Update the title screen and handle state transitions
+static void run_title(void) {
+	bool mouse_moved = false;
+	while (!event_queue_empty()) {
+		struct event_t event = event_queue_pop();
+		default_event_handlers(event);
+
+		if (event.type == E_MOUSE_BUTTON_DOWN && event.data.mouse_button_down.left) {
+			// state transition on mouse click
+			game_state = DECK;
+			player_state = P1;
+			card_num = 0;
+			for (int i = 0; i < sizeof(in_deck) / sizeof(in_deck[0]); ++i) {
+				in_deck[i] = false;
+			}
+		}
+		if (event.type == E_MOUSE_MOVE) mouse_moved = true;
+	}
+	// rerender mouse if it has moved
+	if (mouse_moved) {
+		// clear old mouse positions
+		for (int i = NUM_MOUSE_STATES - 1; i > 0; --i) {
+			push_image(
+				saved_mouse_states[i].x,
+				saved_mouse_states[i].y,
+				&mouse_clear
+			);
+		}
+		// re-render affected surfaces
+		for (int i = 0; i < NUM_INTRO_SURFS; ++i) {
+			for (int j = 1; j < NUM_MOUSE_STATES; ++j) {
+				if (rects_collide(
+					// this surf's rect
+					intro_surfs[i].x, intro_surfs[i].y,
+					intro_surfs[i].data->width, intro_surfs[i].data->height,
+					// previous mouse surf's rect
+					saved_mouse_states[j].x, saved_mouse_states[j].y,
+					mouse_clear.width, mouse_clear.height
+				)) r_stack_push(intro_surfs[i]);
+			}
+		}
+	}
+	// render new mouse position
+	push_image(
+		saved_mouse_states[0].x,
+		saved_mouse_states[0].y,
+		&mouse
+	);
+}
+
+/**** Exported functions ****/
+
+void init_game() {
+	game_state = TITLE;
+	turn_state = PRETURN_BUILDING;
+	move_state = CARD_EFFECT;
+	draw_intro();
+	render_stack();
+	draw_intro();
+	render_stack();
 }
 
 void run_game() {
 	switch(game_state) {
 		case TITLE:
-			draw_intro();
-			if (mouse_state.left_clicked) {
-				game_state = DECK;
-				player_state = P1;
-				card_num = 0;
-				for (int i = 0; i < 30; ++i) in_deck[i] = false;
-			}
+			run_title();
 			break;
 
 
@@ -117,7 +221,7 @@ void run_game() {
 				draw_img_map(240, i * 12 + 12, *card_selection_box[card_data[deck[player_state][i]].faction]);
 				write_string(60 + (20 - strlen(card_data[deck[player_state][i]].name)) / 2, i * 3 + 4, card_data[deck[player_state][i]].name);
 			}
-			// draw button for if 
+			// draw button for if
 			if (card_num == 10) draw_img_map(SCREEN_W - 61, 156, cardbuilding_done);
 			// draw mouse
 			draw_rectangle(mouse_state.x, mouse_state.y, 2, 2, WHITE);
@@ -143,7 +247,7 @@ void run_game() {
 						deck[player_state][i] = deck[player_state][i + 1];
 					}
 					--card_num;
-					
+
 				}
 			} else {
 				// highlight card_data
@@ -155,7 +259,7 @@ void run_game() {
 						draw_img_map(20, 156, *card_data[idx].img);
 						write_string(28, 43, card_data[idx].desc);
 					}
-					
+
 
 				} else if (mouse_state.x >= 240 && mouse_state.x < SCREEN_W
 				 && mouse_state.y >= 12 && mouse_state.y < (card_num * 12 + 12)) {
@@ -163,7 +267,7 @@ void run_game() {
 					int idx = (mouse_state.y - 12) / 12;
 					draw_img_map(20, 156, *card_data[deck[player_state][idx]].img);
 					write_string(28, 43, card_data[deck[player_state][idx]].desc);
-					
+
 				}
 			}
 
@@ -199,7 +303,7 @@ void run_game() {
 						update_mana(3);
 						enable_timer_interrupt();
 				}
-			} 
+			}
 
 			break;
 
@@ -222,7 +326,7 @@ void run_game() {
 										++col;
 										row = 3;
 									}
-								} 
+								}
 								if ((col == -1 && player_state == P1) || (col == 5 && player_state == P2)) {
 									turn_state = PRETURN_UNIT;
 									row = (player_state == P1) ? 0 : 3;
@@ -242,9 +346,9 @@ void run_game() {
 						case CARD_MOVE_FORWARD:
 							move_state = CARD_EFFECT;
 					}
-					
+
 					break;
-				
+
 				case PRETURN_UNIT:
 					switch (move_state) {
 						case CARD_EFFECT:
@@ -279,7 +383,7 @@ void run_game() {
 					}
 
 					break;
-				
+
 				case SELECT_CARD:
 					// draw mouse
 					draw_rectangle(mouse_state.x, mouse_state.y, 2, 2, WHITE);
