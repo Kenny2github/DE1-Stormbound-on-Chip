@@ -75,6 +75,9 @@ extern const struct image moonlit_aerie;
 // mouse.png
 extern const struct image mouse;
 
+// mouse_clear.png
+extern const struct image mouse_clear;
+
 // neutral_box.png
 extern const struct image neutral_box;
 
