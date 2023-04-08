@@ -22,6 +22,10 @@ struct e_empty {};
  * @brief Data structure for a mouse movement event.
  */
 struct e_mouse_move {
+	// The old x-coordinate of the mouse.
+	float old_x;
+	// The old y-coordinate of the mouse.
+	float old_y;
 	// The new x-coordinate of the mouse.
 	float x;
 	// The new y-coordinate of the mouse.
