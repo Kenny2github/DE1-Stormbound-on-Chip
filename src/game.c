@@ -461,7 +461,7 @@ void run_game() {
 						case CARD_MOVE_FORWARD:
 							move_forward();
 							break;
+					}
 			}
-		}
 	}
 }
