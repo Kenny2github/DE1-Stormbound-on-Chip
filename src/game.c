@@ -15,12 +15,15 @@
 #define WC_DMG -4
 #define MW_SPAWN 1
 #define UP_HEAL 1
+#define TTE_HEAL 2
 
 int game_state, turn_state, move_state, player_state;
 
 bool in_deck[30];
 int deck[2][10];
 int card_num;
+int cur_cards[3];
+
 int row, col;
 int base_health[2];
 
@@ -255,6 +258,33 @@ static void move_forward(void) {
 				}
 				free(game_board[col + 1 - player_state * 2][row]);
 				game_board[col + 1 - player_state * 2][row] = NULL;
+				if (game_board[col][row] != NULL) {
+					if (game_board[col][row]->card_id == TODE_THE_ELEVATED) { // additional logic just for TTE. fuck TTE
+						int cur_rows[20], cur_cols[20], list_num = 0;
+						for (int i = 0; i < 5; ++i) {
+							int jump_col = i - 1 + player_state*2;
+							if (jump_col < 0 || jump_col > 4) continue;
+							for (int j = 0; j < 4; ++j) {
+								if (game_board[i][j] != NULL
+								&& game_board[i][j]->player != player_state
+								&& game_board[jump_col][j] == NULL) {
+									cur_rows[list_num] = j;
+									cur_cols[list_num++] = jump_col;
+								}
+							}	
+						} 
+						if (list_num > 0) {
+							int idx = rand_num(0, list_num - 1);
+							game_board[col][row]->health += TTE_HEAL;
+							game_board[cur_cols[idx]][cur_rows[idx]] = game_board[col][row];
+						} else {
+							game_board[col+1-player_state*2][row] = game_board[col][row];
+						}
+					} else {
+						game_board[col+1-player_state*2][row] = game_board[col][row];
+					}
+					game_board[col][row] = NULL;
+				}
 			} else {
 				game_board[col + 1 - player_state * 2][row]->health -= game_board[col][row]->health;
 				free(game_board[col][row]);
@@ -439,7 +469,6 @@ void run_game() {
 
 						case CARD_MOVE_FORWARD:
 							move_state = CARD_EFFECT;
-							break;
 					}
 					
 				
@@ -472,7 +501,6 @@ void run_game() {
 
 						case CARD_MOVE_FORWARD:
 							move_forward();
-							break;
 					}
 			}
 	}
