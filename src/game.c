@@ -269,8 +269,6 @@ static void change_statuses(void) {
 
 void init_game() {
 	game_state = TITLE;
-	turn_state = PRETURN;
-	move_state = CARD_EFFECT;
 }
 
 static void draw_intro(void) {
@@ -324,7 +322,7 @@ void run_game() {
 
 			if (mouse_state.left_clicked) {
 				if (card_num != 10
-				&& mouse_state.x >= 0 && mouse_state.x < 240
+				 && mouse_state.x >= 0 && mouse_state.x < 240
 				 && mouse_state.y >= 12 && mouse_state.y < 132) {	// clicked on available cards
 
 					int idx = (int)(mouse_state.x / 80) * 10 + (int)((mouse_state.y - 12) / 12);
@@ -347,7 +345,7 @@ void run_game() {
 			} else {
 				// highlight cards
 				if (mouse_state.x >= 0 && mouse_state.x < 240
-				&& mouse_state.y >= 12 && mouse_state.y < 132) {
+				 && mouse_state.y >= 12 && mouse_state.y < 132) {
 
 					int idx = (int)(mouse_state.x / 80) * 10 + (int)((mouse_state.y - 12) / 12);
 					if (!(in_deck[idx])) {
@@ -356,7 +354,7 @@ void run_game() {
 					
 
 				} else if (mouse_state.x >= 240 && mouse_state.x < SCREEN_W
-				&& mouse_state.y >= 12 && mouse_state.y < (card_num * 12 + 12)) {
+				 && mouse_state.y >= 12 && mouse_state.y < (card_num * 12 + 12)) {
 
 					int idx = (mouse_state.y - 12) / 12;
 					draw_img_map(20, 156, *cards[deck[player_state][idx]].img);
@@ -366,7 +364,7 @@ void run_game() {
 
 			/* done button */
 			if (mouse_state.x >= SCREEN_W - 61 && mouse_state.x < SCREEN_W - 20
-			&& mouse_state.y >= 156 && mouse_state.y < 217 && mouse_state.left_clicked) {
+			 && mouse_state.y >= 156 && mouse_state.y < 217 && mouse_state.left_clicked) {
 				switch(player_state) {
 					case P1: // go to next player
 						player_state = P2;
@@ -383,17 +381,87 @@ void run_game() {
 						for (int i = 0; i < 5; ++i) {
 							for (int j = 0; j < 4; ++j) {
 								game_board[i][j] = NULL;
-				}
-			} 
+							}
+						}
 						enable_timer_interrupt();
 				}
 			} 
 
 			break;
 
+
 		case TURN:
 			fill_screen(BACKGROUND);
 			clear_char_screen();
-			draw_img_map(0, 0, board);
+			write_string(1, 1, (player_state == P1) ? "P1 turn" : "P2 turn");
+			draw_img_map(0, 12, board);
+			switch(turn_state) {
+				case PRETURN_BUILDING:
+					switch (move_state) {
+						case CARD_EFFECT:
+							while (game_board[col][row] == NULL || game_board[col][row]->type != BUILDING) {
+								if (((player_state == P1) ? ++row : --row) == 4) {
+									if (player_state == P1) {
+										--col;
+										row = 0;
+									} else {
+										++col;
+										row = 3;
+									}
+								} 
+								if ((col == -1 && player_state == P1) || (col == 5 && player_state == P2)) {
+									turn_state = PRETURN_UNIT;
+									row = (player_state == P1) ? 0 : 3;
+									col = (player_state == P1) ? 4 : 0;
+									break;
+								}
+							}
+							if (turn_state == PRETURN_BUILDING) {
+								health_change_num = 0;
+								status_change_num = 0;
+								card_action();
+								change_healths();
+								change_statuses();
+							}
+							break;
+
+						case CARD_MOVE_FORWARD:
+							move_state = CARD_EFFECT;
+							break;
+					}
+					
+				
+				case PRETURN_UNIT:
+					switch (move_state) {
+						case CARD_EFFECT:
+							while (game_board[col][row] == NULL || game_board[col][row]->type != UNIT) {
+								if (((player_state == P1) ? ++row : --row) == 4) {
+									if (player_state == P1) {
+										--col;
+										row = 0;
+									} else {
+										++col;
+										row = 3;
+									}
+								}
+								if ((col == -1 && player_state == P1) || (col == 5 && player_state == P2)) {
+									turn_state = SELECT_CARD;
+									break;
+								}
+							}
+							if (turn_state == PRETURN_UNIT) {
+								health_change_num = 0;
+								status_change_num = 0;
+								card_action();
+								change_healths();
+								change_statuses();
+							}
+							break;
+
+						case CARD_MOVE_FORWARD:
+							move_forward();
+							break;
+			}
+		}
 	}
 }
