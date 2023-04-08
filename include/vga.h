@@ -40,6 +40,15 @@ void update_back_buffer(void);
 void configure_vga(void);
 
 /**
+ * @brief Write a pixel to the back buffer.
+ *
+ * @param x x-position of the pixel.
+ * @param y y-position of the pixel.
+ * @param color Color of the pixel.
+ */
+void plot_pixel(int x, int y, uint16_t color);
+
+/**
  * @brief Fill entire screen with a single color
  * @param color Color to fill screen with
  */
@@ -77,6 +86,6 @@ void draw_img_map(int x, int y, struct image img);
  * @param y y-char-coordinate of where the string starts
  * @param str String to be written
  */
-void write_string(int x, int y, char* str);
+void write_string(int x, int y, const char* str);
 
 #endif

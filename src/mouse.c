@@ -117,6 +117,8 @@ static void post_mouse_events(struct mouse_state_t prev_state) {
 	int moved = prev_state.x != mouse_state.x || prev_state.y != mouse_state.y;
 	// The below will set the values to zero if the condition is false,
 	// which obviates the need for a conditional check
+	movement.old_x = prev_state.x * moved;
+	movement.old_y = prev_state.y * moved;
 	movement.x = mouse_state.x * moved;
 	movement.y = mouse_state.y * moved;
 	// Post mouse movement events before button down/up events,

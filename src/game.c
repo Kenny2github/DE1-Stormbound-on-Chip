@@ -95,7 +95,7 @@ struct card cards[35] = {
 	{"Toad", SHADOWFEN, NULL, toad_desc_data, 0, 0, 0}
 };
 
-struct image* card_selection_box[5] = {
+const struct image* card_selection_box[5] = {
 	&neutral_box,
 	&swarm_box,
 	&winter_box,

@@ -3,7 +3,7 @@
  */
 #include "assets.h"
 
-static uint16_t cardbuilding_done_data[] = {
+static const uint16_t cardbuilding_done_data[] = {
 	0x0002, 0x4947, 0x0025, 0xffda, 0x0003, 0x4947, 0x0002, 0xffda, 0x0023,
 	0x2b1a, 0x0002, 0xffda, 0x0001, 0x4947, 0x0002, 0xffda, 0x0002, 0x2b1a,
 	0x0021, 0xffda, 0x0002, 0x2b1a, 0x0003, 0xffda, 0x0002, 0x2b1a, 0x0023,
@@ -87,4 +87,6 @@ static uint16_t cardbuilding_done_data[] = {
 	0x0003, 0x4947, 0x0025, 0xffda, 0x0002, 0x4947,
 };
 
-struct image cardbuilding_done = { VGA_RLE, 41, 61, 726, cardbuilding_done_data };
+const struct image cardbuilding_done = {
+    VGA_RLE, 41, 61, 726, cardbuilding_done_data
+};

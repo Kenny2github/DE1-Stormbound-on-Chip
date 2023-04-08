@@ -5,8 +5,9 @@
 
 struct card {
 	char name[20];
+	int type;
 	int faction;
-	struct image* img;
+	const struct image* img;
 	char* desc;
 	int cost;
 	int init_health;

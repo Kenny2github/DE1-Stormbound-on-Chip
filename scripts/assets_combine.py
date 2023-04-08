@@ -10,7 +10,7 @@ with open(Path('include') / 'assets.h', 'w') as hfile:
 #include "image_data.h"
 """.lstrip(), file=hfile)
 
-    for file in Path('assets').glob('*'):
+    for file in Path('assets').rglob('*'):
         # assets/xyz.123!1.png => xyz_123_1(_data)
         filename = file.name
         var_name, data_var_name = var_names(filename)
@@ -18,13 +18,16 @@ with open(Path('include') / 'assets.h', 'w') as hfile:
         if filename.endswith('.txt'): # handle text files specially
             print(f"""
 // {filename}
-extern char {data_var_name}[];
+extern const char {data_var_name}[];
 """.lstrip(), file=hfile)
             continue
 
+        if filename.endswith('.md'):
+            continue # don't include internal documentation
+
         print(f"""
 // {filename}
-extern struct image {var_name};
+extern const struct image {var_name};
 """.lstrip(), file=hfile)
 
     print('#endif', file=hfile)

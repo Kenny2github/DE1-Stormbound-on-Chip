@@ -18,14 +18,17 @@ goto :eof
 
 :assets
 
-for %%f in (assets\*.png assets\*.jpg assets\*.bmp) do (
-	echo Converting "assets\%%~nxf" to "src\assets\%%~nxf.c"
-	py scripts\img_convert.py "assets\%%~nxf" "src\assets\%%~nxf.c"
-)
+setlocal ENABLEDELAYEDEXPANSION
 
-for %%f in (assets\*.txt) do (
-	echo Converting "assets\%%~nxf" to "src\assets\%%~nxf.c"
-	py scripts\txt_convert.py "assets\%%~nxf" "src\assets\%%~nxf.c"
+for /R "assets" %%f in (*.png *.jpg *.bmp *.txt) do (
+	set "reldir=%%~dpf"
+	call set "reldir=%%reldir:%CD%\=%%"
+	if not exist "src\!reldir!" mkdir src\!reldir!
+	echo Converting "!reldir!\%%~nxf" to "src\!reldir!\%%~nxf.c"
+	if "%%~xf"==".txt" py scripts\txt_convert.py "!reldir!\%%~nxf" "src\!reldir!\%%~nxf.c"
+	if "%%~xf"==".png" py scripts\img_convert.py "!reldir!\%%~nxf" "src\!reldir!\%%~nxf.c"
+	if "%%~xf"==".jpg" py scripts\img_convert.py "!reldir!\%%~nxf" "src\!reldir!\%%~nxf.c"
+	if "%%~xf"==".bmp" py scripts\img_convert.py "!reldir!\%%~nxf" "src\!reldir!\%%~nxf.c"
 )
 
 echo Combining into include\assets.h
