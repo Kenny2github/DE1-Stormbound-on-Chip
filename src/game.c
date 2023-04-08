@@ -15,7 +15,12 @@ int card_num;
 
 int game_board[4][5];
 
-struct card cards[30] = {
+int health_change_num;
+struct health_change health_change_list[21];
+
+int status_change_num;
+struct status_change status_change_list[20];
+
 	{"Lawless Herd", NEUTRAL, &lawless_herd},
 	{"Felflares", NEUTRAL, &felflares},
 	{"Heroic Soldiers", NEUTRAL, &heroic_soldiers},
@@ -55,6 +60,17 @@ struct image* card_selection_box[5] = {
 	&ironclad_box,
 	&shadowfen_box
 };
+
+
+/* manage health change list */
+static void change_healths(void) {
+	return;
+}
+
+/* manage status change list */
+static void change_statuses(void) {
+	return;
+}
 
 void init_game() {
 	game_state = TITLE;

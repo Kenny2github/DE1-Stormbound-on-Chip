@@ -9,6 +9,19 @@ struct card {
 	struct image* img;
 };
 
+struct health_change {
+	int row;
+	int col;
+	int change;
+	int spawn_type;
+};
+
+struct status_change {
+	int row;
+	int col;
+	int change;
+};
+
 enum card_name {
 	LAWLESS_HERD,
 	FELFLARES,
@@ -48,6 +61,13 @@ enum card_type {
 	WINTER,
 	IRONCLAD,
 	SHADOWFEN
+};
+
+
+enum status_type {
+	NO_STATUS,
+	FROZEN,
+	POISONED
 };
 
 /**
