@@ -110,20 +110,25 @@ void run_game() {
 				for (int i = 0; i < 30; ++i) in_deck[i] = false;
 			}
 			break;
+
+
 		case DECK:
 			fill_screen(BACKGROUND);
 			clear_char_screen();
+			// draw current available cards
 			write_string(1, 1, "Cards:");
 			for (int i = 0; i < 30; ++i) {
 				if (in_deck[i]) continue;
-				draw_img_map((int)(i / 10) * 80, i % 10 * 12 + 12, *card_selection_box[cards[i].type]);
+				draw_img_map((int)(i / 10) * 80, i % 10 * 12 + 12, *card_selection_box[cards[i].faction]);
 				write_string((int)(i / 10) * 20 + (20 - strlen(cards[i].name)) / 2, i % 10 * 3 + 4, cards[i].name);
 			}
+			// draw current cards in deck
 			write_string(61, 1, (player_state == P1) ? "P1 deck:" : "P2 deck:");
 			for (int i = 0; i < card_num; ++i) {
-				draw_img_map(240, i * 12 + 12, *card_selection_box[cards[deck[player_state][i]].type]);
+				draw_img_map(240, i * 12 + 12, *card_selection_box[cards[deck[player_state][i]].faction]);
 				write_string(60 + (20 - strlen(cards[deck[player_state][i]].name)) / 2, i * 3 + 4, cards[deck[player_state][i]].name);
 			}
+			// draw button for if 
 			if (card_num == 10) draw_img_map(SCREEN_W - 61, 156, cardbuilding_done);
 			// draw mouse
 			draw_rectangle(mouse_state.x, mouse_state.y, 2, 2, WHITE);
@@ -132,26 +137,27 @@ void run_game() {
 			if (mouse_state.left_clicked) {
 				if (card_num != 10
 				&& mouse_state.x >= 0 && mouse_state.x < 240
-				&& mouse_state.y >= 12 && mouse_state.y < 132) {
+				 && mouse_state.y >= 12 && mouse_state.y < 132) {	// clicked on available cards
 
 					int idx = (int)(mouse_state.x / 80) * 10 + (int)((mouse_state.y - 12) / 12);
-					if (!(in_deck[idx])) {
+					if (!(in_deck[idx])) {	// move card to deck
 						in_deck[idx] = true;
 						deck[player_state][card_num++] = idx;
 					}
 
 				} else if (mouse_state.x >= 240 && mouse_state.x < SCREEN_W
-				&& mouse_state.y >= 12 && mouse_state.y < (card_num * 12 + 12)) {
+				 && mouse_state.y >= 12 && mouse_state.y < (card_num * 12 + 12)) {	// clicked on deck
 
 					int idx = (mouse_state.y - 12) / 12;
-					in_deck[deck[player_state][idx]] = false;
-					for (int i = idx; i < card_num - 1; ++i) {
+					in_deck[deck[player_state][idx]] = false; // remove card from deck
+					for (int i = idx; i < card_num - 1; ++i) {	// shift deck cards down
 						deck[player_state][i] = deck[player_state][i + 1];
 					}
 					--card_num;
 					
 				}
 			} else {
+				// highlight cards
 				if (mouse_state.x >= 0 && mouse_state.x < 240
 				&& mouse_state.y >= 12 && mouse_state.y < 132) {
 
@@ -170,23 +176,31 @@ void run_game() {
 				}
 			}
 
-			
+			/* done button */
 			if (mouse_state.x >= SCREEN_W - 61 && mouse_state.x < SCREEN_W - 20
 			&& mouse_state.y >= 156 && mouse_state.y < 217 && mouse_state.left_clicked) {
 				switch(player_state) {
-					case P1:
+					case P1: // go to next player
 						player_state = P2;
 						card_num = 0;
 						for (int i = 0; i < 30; ++i) in_deck[i] = false;
 						break;
-					case P2:
+					case P2: // go to turn state
 						player_state = P1;
 						game_state = TURN;
-						turn_state = PRETURN;
+						turn_state = PRETURN_BUILDING;
+						move_state = CARD_EFFECT;
+						row = 0;
+						col = 4;
+						for (int i = 0; i < 5; ++i) {
+							for (int j = 0; j < 4; ++j) {
+								game_board[i][j] = NULL;
 				}
 			} 
 						enable_timer_interrupt();
 				}
+			} 
+
 			break;
 
 		case TURN:
