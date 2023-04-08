@@ -1,0 +1,6 @@
+Victors of the Melee
+------------------------
+When attacking, deal 2
+damage to all
+surrounding enemy units
+and structures.

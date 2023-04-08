@@ -1,0 +1,6 @@
+Fleshmenders
+------------------------
+On play, give 6 strength
+to a random bordering
+friendly unit or
+structure.

@@ -8,7 +8,6 @@
 #include "game.h"
 
 int seg7[] = {0x3f, 0x06, 0x5b, 0x4f, 0x66, 0x6d, 0x7d, 0x07, 0x7f, 0x67, 0x063f};
-int time_left;
 
 static void config_KEYs(void) {
 	volatile int* KEY_ptr = (int*)KEY_BASE;
@@ -38,32 +37,18 @@ static void handle_event(struct event_t event) {
 		break;
 	case E_MOUSE_BUTTON_DOWN:
 		if (event.data.mouse_button_down.left) printf("Left button pressed\n");
-		if (event.data.mouse_button_down.middle) printf("Middle button pressed\n");
-		if (event.data.mouse_button_down.right) printf("Right button pressed\n");
 		break;
 	case E_MOUSE_BUTTON_UP:
 		if (event.data.mouse_button_up.left) printf("Left button released\n");
-		if (event.data.mouse_button_up.middle) printf("Middle button released\n");
-		if (event.data.mouse_button_up.right) printf("Right button released\n");
 		break;
 	case E_MOUSE_MOVE:
-		printf("Mouse moved to (%f, %f)\n", event.data.mouse_move.x, event.data.mouse_move.y);
 		break;
 	case E_TIMER_ENABLE:
 		time_left = 10;
-		printf("Timer enabled, time left = %d\n", time_left);
 		*LEDR_ptr = (1 << time_left) - 1;
 		break;
 	case E_TIMER_RELOAD:
-		if(!(--time_left)) {
-			disable_timer();
-			printf("timer disabled\n");
-			// put this somewhere else later, this is just for testing
-			enable_timer_interrupt();
-
-		} else {
-			printf("timer counted down, time left = %d\n", time_left);
-		}
+		if(!(--time_left)) disable_timer();
 		*LEDR_ptr = (1 << time_left) - 1;
 	}
 }
@@ -73,7 +58,6 @@ int main(void) {
 	config_interrupt(IRQ_KEY, &config_KEYs, &pushbutton_ISR);
 	enable_mouse();
 	enable_timer();
-	enable_timer_interrupt();
 	config_interrupts();
 
 	init_game();

@@ -1,0 +1,5 @@
+Head Start
+------------------------
+Spawn a 3 strength Satyr
+on a random tile in your
+furthest row.

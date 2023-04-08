@@ -14,11 +14,12 @@ enum game_state {
  * @brief Enum of states of a player turn
  */
 enum turn_state {
-	PRETURN,
+	PRETURN_BUILDING,
+	PRETURN_UNIT,
 	SELECT_CARD,
 	PLACE_CARD,
-	CONFIRM_CARD,
-	CARD_MOVING
+	CARD_MOVING,
+	TURN_END
 };
 
 /**
@@ -26,7 +27,7 @@ enum turn_state {
  */
 enum move_state {
 	CARD_EFFECT,
-	CARD_MOVE
+	CARD_MOVE_FORWARD
 };
 
 /**

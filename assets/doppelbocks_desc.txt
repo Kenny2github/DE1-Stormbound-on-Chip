@@ -1,0 +1,5 @@
+Doppelbocks
+------------------------
+On play, spawn a 1
+strength Satyr on the
+tile in front.

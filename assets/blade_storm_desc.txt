@@ -1,0 +1,5 @@
+Blade Storm
+------------------------
+Deal 1 damage to all
+enemy units and
+structures.

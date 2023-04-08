@@ -3,6 +3,8 @@
 #include "interrupts.h"
 #include "events.h"
 
+int time_left;
+
 void enable_timer_interrupt(void) {
 	volatile int* timer_ptr = (int*)MPCORE_PRIV_TIMER;
 	// set countdown to be from 1.8B cycles

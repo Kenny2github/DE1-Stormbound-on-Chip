@@ -6,7 +6,34 @@
 struct card {
 	char name[20];
 	int type;
+	int faction;
 	const struct image* img;
+	char* desc;
+	int cost;
+	int init_health;
+	int init_move;
+};
+
+struct troop {
+	int card_id;
+	int type;
+	int player;
+	int health;
+	int status;
+	struct image* img;
+};
+
+struct health_change {
+	int row;
+	int col;
+	int change;
+	int spawn_type;
+};
+
+struct status_change {
+	int row;
+	int col;
+	int change;
 };
 
 enum card_name {
@@ -39,15 +66,31 @@ enum card_name {
 	SOULCRUSHERS,
 	TODE_THE_ELEVATED,
 	VENOMFALL_SPIRE,
-	MARKED_AS_PREY
+	MARKED_AS_PREY,
+	KNIGHT,
+	DRAGON,
+	SATYR,
+	CONSTRUCT,
+	TOAD
 };
 
-enum card_type {
+enum card_faction {
 	NEUTRAL,
 	SWARM,
 	WINTER,
 	IRONCLAD,
 	SHADOWFEN
+};
+
+enum troop_type {
+	UNIT,
+	BUILDING
+};
+
+enum status_type {
+	NO_STATUS,
+	FROZEN,
+	POISONED
 };
 
 /**

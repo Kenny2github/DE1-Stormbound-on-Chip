@@ -4,6 +4,13 @@
 #ifndef TIMER_H
 #define TIMER_H
 
+/**** Global variables ****/
+
+/**
+ * @brief Current time left in a turn
+ */
+extern int time_left;
+
 /**** Exported functions ****/
 
 /**

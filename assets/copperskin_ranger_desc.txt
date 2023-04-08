@@ -1,0 +1,4 @@
+Copperskin Ranger
+------------------------
+On play, poison 1 random
+enemy unit.
