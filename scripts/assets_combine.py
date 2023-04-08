@@ -10,7 +10,7 @@ with open(Path('include') / 'assets.h', 'w') as hfile:
 #include "image_data.h"
 """.lstrip(), file=hfile)
 
-    for file in Path('assets').glob('*'):
+    for file in Path('assets').rglob('*'):
         # assets/xyz.123!1.png => xyz_123_1(_data)
         filename = file.name
         var_name, data_var_name = var_names(filename)
