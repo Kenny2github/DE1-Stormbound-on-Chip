@@ -1,4 +1,5 @@
 #include <stdbool.h>
+#include <time.h>
 #include <string.h>
 #include "assets.h"
 #include "image_data.h"
@@ -7,6 +8,13 @@
 #include "game.h"
 #include "states.h"
 #include "vga.h"
+
+#define VOTM_DMG -2
+#define ET_HEAL 2
+#define MA_HEAL 1
+#define WC_DMG -4
+#define MW_SPAWN 1
+#define UP_HEAL 1
 
 int game_state, turn_state, move_state, player_state;
 
