@@ -71,15 +71,6 @@ void draw_rectangle(int x, int y, int w, int h, uint16_t color);
 void clear_char_screen();
 
 /**
- * @brief Draw an image on VGA screen
- *
- * @param x x-coordinate of where the image is to be drawn
- * @param y y-coordinate of where the image is to be drawn
- * @param img The image data to draw
- */
-void draw_img_map(int x, int y, struct image img);
-
-/**
  * @brief Writes a string on VGA screen usign left-align
  *
  * @param x x-char-coordinate of where the string starts

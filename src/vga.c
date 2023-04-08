@@ -12,7 +12,8 @@ void wait_for_vsync(void) {
 	// write 1 to buffer
 	*pixel_ctrl_ptr = 1;
 	*char_ctrl_ptr = 1;
-	while ((*(pixel_ctrl_ptr + 3) & 1) && (*(char_ctrl_ptr + 3) & 1)); // wait for S to become 0
+	// wait for S bit to go to 0
+	while ((*(pixel_ctrl_ptr + 3) & 1) && (*(char_ctrl_ptr + 3) & 1));
 }
 
 void update_back_buffer(void) {
@@ -72,56 +73,6 @@ void configure_vga(void) {
 	char_buffer_start = *(char_ctrl_ptr + 1);
     fill_screen(BACKGROUND); // pixel_buffer_start points to the pixel buffer
 	clear_char_screen();
-}
-
-static void draw_RLE_img_map(int x, int y, struct image img) {
-	int size = img.length;
-	int h = 0, w = 0;
-	for (int i = 0; i < size; i += 2) {
-		for (int j = 0; j < img.data[i]; ++j) {
-			if (
-				img.data[i + 1] != TRANSPARENT
-				// other end of bounds guaranteed by
-				// code after this if-statement
-				&& 0 <= x + w && 0 <= y + h
-			) {
-				plot_pixel(x + w, y + h, img.data[i + 1]);
-			}
-			if (x + (++w) >= SCREEN_W) {
-				// skip pixels too far right
-				j += img.width - w;
-				w = 0;
-				++h;
-			} else if (w >= img.width) {
-				// move to next line
-				w = 0;
-				++h;
-			}
-			// don't bother drawing beyond bottom of screen
-			if (y + h >= SCREEN_H) return;
-		}
-	}
-}
-
-void draw_img_map(int x, int y, struct image img) {
-	if (img.encoding == VGA_RLE) {
-		draw_RLE_img_map(x, y, img);
-		return;
-	}
-	uint16_t (*data)[img.width] = (uint16_t (*)[img.width])img.data;
-	for (int h = y < 0 ? -y : 0; h < img.height; ++h) {
-		// stop function if at bottom edge of screen
-		if (y + h >= SCREEN_H) return;
-
-		for (int w = x < 0 ? -x : 0; w < img.width; ++w) {
-			// stop for loop if at right edge of screen
-			if (x + w >= SCREEN_W) break;
-			// if not transparent, fill pixel
-			if (data[h][w] != TRANSPARENT) {
-				plot_pixel(x + w, y + h, data[h][w]);
-			}
-		}
-	}
 }
 
 void write_string(int x, int y, const char* str) {
