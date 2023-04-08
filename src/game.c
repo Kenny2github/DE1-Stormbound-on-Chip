@@ -926,6 +926,10 @@ void play_card(void) {
 					TOAD
 				};
 			}
+			break;
+
+		default:
+			game_board[col][row] = new_troop;
 	}
 }
 
