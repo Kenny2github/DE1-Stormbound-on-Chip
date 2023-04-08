@@ -1,0 +1,6 @@
+Mech Workshop
+------------------------
+At the start of your
+turn, spawn a 1 strength
+Construct on the tile in
+front.

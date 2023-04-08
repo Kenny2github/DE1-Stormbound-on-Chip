@@ -1,0 +1,6 @@
+Marked as Prey
+------------------------
+Deal 5 damage to a
+target poisoned unit. If
+that kills it, spawn a
+5 strength Toad there.

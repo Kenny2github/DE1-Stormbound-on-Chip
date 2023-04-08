@@ -1,0 +1,6 @@
+Icicle Burst
+------------------------
+Freeze a target enemy
+unit. If it is already
+frozen, deal 8 damage to
+it instead.

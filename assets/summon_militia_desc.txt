@@ -1,0 +1,4 @@
+Summon Militia
+------------------------
+Randomly spawn a knight
+with 1 strength.

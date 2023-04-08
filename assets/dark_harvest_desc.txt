@@ -1,0 +1,5 @@
+Dark Harvest
+------------------------
+Deal 2 damage to all
+enemies surrounding a
+friendly unit.

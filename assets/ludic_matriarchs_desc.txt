@@ -1,0 +1,6 @@
+Ludic Matriarchs
+------------------------
+When played bordering a
+friendly Dragon, spawn 1
+strength Dragons on all
+tiles bordering either.

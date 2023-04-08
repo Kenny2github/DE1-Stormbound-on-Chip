@@ -1,0 +1,7 @@
+Wisp Cloud
+------------------------
+Before attacking a
+frozen enemy, deal 4
+damage to all
+surrounding frozen
+enemies.

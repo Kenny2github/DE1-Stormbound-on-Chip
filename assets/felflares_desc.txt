@@ -1,0 +1,5 @@
+Felfares
+------------------------
+On play, deal 2 damage
+to a random surrounding
+enemy.

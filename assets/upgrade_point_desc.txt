@@ -1,0 +1,6 @@
+Upgrade Point
+------------------------
+At the start of your
+turn, give 1 strength to
+all surrounding friendly
+Constructs.

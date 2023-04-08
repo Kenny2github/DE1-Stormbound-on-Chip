@@ -1,0 +1,4 @@
+Frosthexers
+------------------------
+On play, freeze all
+bordering enemy units.

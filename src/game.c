@@ -36,40 +36,42 @@ struct health_change health_change_list[21];
 int status_change_num;
 struct status_change status_change_list[20];
 
-struct card cards[33] = {
-	{"Lawless Herd", NEUTRAL, &lawless_herd},
-	{"Felflares", NEUTRAL, &felflares},
-	{"Heroic Soldiers", NEUTRAL, &heroic_soldiers},
-	{"Victors of the Melee", NEUTRAL, &victors_of_the_melee},
-	{"Emerald Towers", NEUTRAL, &emerald_towers},
-	{"Summon Militia", NEUTRAL, &summon_militia},
-	{"Execution", NEUTRAL, &execution},
-	{"Blade Storm", NEUTRAL, &blade_storm},
-	{"Dangeous Suitors", NEUTRAL, &dangerous_suitors},
-	{"Ludic Matriarchs", NEUTRAL, &ludic_matriarchs},
-	{"Shady Ghoul", SWARM, &shady_ghoul},
-	{"Doppelbocks", SWARM, &doppelbocks},
-	{"Moonlit Aerie", SWARM, &moonlit_aerie},
-	{"Head Start", SWARM, &head_start},
-	{"Dark Harvest", SWARM, &dark_harvest},
-	{"Frosthexers", WINTER, &frosthexers},
-	{"Wisp Cloud", WINTER, &wisp_cloud},
-	{"Fleshmenders", WINTER, &fleshmenders},
-	{"Moment's Peace", WINTER, &moments_peace},
-	{"Icicle Burst", WINTER, &icicle_burst},
-	{"Operators", IRONCLAD, &operators},
-	{"Dr. Mia", IRONCLAD, &dr_mia},
-	{"Agents In Charge", IRONCLAD, &agents_in_charge},
-	{"Mech Workshop", IRONCLAD, &mech_workshop},
-	{"Upgrade Point", IRONCLAD, &upgrade_point},
-	{"Copperskin Ranger", SHADOWFEN, &copperskin_ranger},
-	{"Soulcrushers", SHADOWFEN, &soulcrushers},
-	{"Tode the Elevated", SHADOWFEN, &tode_the_elevated},
-	{"Venomfall Spire", SHADOWFEN, &venomfall_spire},
-	{"Marked As Prey", SHADOWFEN, &marked_as_prey},
-	{"Dragon", NEUTRAL, NULL},
-	{"Satyr", SWARM, NULL},
-	{"Construct", IRONCLAD, NULL},
+struct card cards[35] = {
+	{"Lawless Herd", NEUTRAL, &lawless_herd, lawless_herd_desc_data},
+	{"Felflares", NEUTRAL, &felflares, felflares_desc_data},
+	{"Heroic Soldiers", NEUTRAL, &heroic_soldiers, heroic_soldiers_desc_data},
+	{"Victors of the Melee", NEUTRAL, &victors_of_the_melee, victors_of_the_melee_desc_data},
+	{"Emerald Towers", NEUTRAL, &emerald_towers, emerald_towers_desc_data},
+	{"Summon Militia", NEUTRAL, &summon_militia, summon_militia_desc_data},
+	{"Execution", NEUTRAL, &execution, execution_desc_data},
+	{"Blade Storm", NEUTRAL, &blade_storm, blade_storm_desc_data},
+	{"Dangeous Suitors", NEUTRAL, &dangerous_suitors, dangerous_suitors_desc_data},
+	{"Ludic Matriarchs", NEUTRAL, &ludic_matriarchs, ludic_matriarchs_desc_data},
+	{"Shady Ghoul", SWARM, &shady_ghoul, shady_ghoul_desc_data},
+	{"Doppelbocks", SWARM, &doppelbocks, doppelbocks_desc_data},
+	{"Moonlit Aerie", SWARM, &moonlit_aerie, moonlit_aerie_desc_data},
+	{"Head Start", SWARM, &head_start, head_start_desc_data},
+	{"Dark Harvest", SWARM, &dark_harvest, dark_harvest_desc_data},
+	{"Frosthexers", WINTER, &frosthexers, frosthexers_desc_data},
+	{"Wisp Cloud", WINTER, &wisp_cloud, wisp_cloud_desc_data},
+	{"Fleshmenders", WINTER, &fleshmenders, fleshmenders_desc_data},
+	{"Moment's Peace", WINTER, &moments_peace, moments_peace_desc_data},
+	{"Icicle Burst", WINTER, &icicle_burst, icicle_burst_desc_data},
+	{"Operators", IRONCLAD, &operators, operators_desc_data},
+	{"Dr. Mia", IRONCLAD, &dr_mia, dr_mia_desc_data},
+	{"Agents in Charge", IRONCLAD, &agents_in_charge, agents_in_charge_desc_data},
+	{"Mech Workshop", IRONCLAD, &mech_workshop, mech_workshop_desc_data},
+	{"Upgrade Point", IRONCLAD, &upgrade_point, upgrade_point_desc_data},
+	{"Copperskin Ranger", SHADOWFEN, &copperskin_ranger, copperskin_ranger_desc_data},
+	{"Soulcrushers", SHADOWFEN, &soulcrushers, soulcrushers_desc_data},
+	{"Tode the Elevated", SHADOWFEN, &tode_the_elevated, tode_the_elevated_desc_data},
+	{"Venomfall Spire", SHADOWFEN, &venomfall_spire, venomfall_spire_desc_data},
+	{"Marked as Prey", SHADOWFEN, &marked_as_prey, marked_as_prey_desc_data},
+	{"Knight", NEUTRAL, NULL, knight_desc_data},
+	{"Dragon", NEUTRAL, NULL, dragon_desc_data},
+	{"Satyr", SWARM, NULL, satyr_desc_data},
+	{"Construct", IRONCLAD, NULL, construct_desc_data},
+	{"Toad", SHADOWFEN, NULL, toad_desc_data}
 };
 
 struct image* card_selection_box[5] = {
@@ -154,19 +156,21 @@ void card_action(void) {
 			}
 			break;
 		case WISP_CLOUD:
-			for (int i = col - 1; i <= col + 1; ++i) {
-				if (i < 0 || i > 4) continue;
-				for (int j = row - 1; j <= row + 1; ++j) {
-					if (j < 0 || j > 3 || (i == col && j == row)) continue;
-					if (game_board[i][j] != NULL && game_board[i][j]->status == FROZEN) {
-						health_change_list[++health_change_num] = (struct health_change){
-							j,
-							i, 
-							WC_DMG, 
-							0
-						};
-					}
-				}	
+			if (game_board[col+1-player_state*2][row]->status == FROZEN) {
+				for (int i = col - 1; i <= col + 1; ++i) {
+					if (i < 0 || i > 4) continue;
+					for (int j = row - 1; j <= row + 1; ++j) {
+						if (j < 0 || j > 3 || (i == col && j == row)) continue;
+						if (game_board[i][j] != NULL && game_board[i][j]->status == FROZEN) {
+							health_change_list[++health_change_num] = (struct health_change){
+								j,
+								i, 
+								WC_DMG, 
+								0
+							};
+						}
+					}	
+				}
 			}
 			break;
 		case MECH_WORKSHOP: ;
@@ -388,6 +392,7 @@ void run_game() {
 					int idx = (int)(mouse_state.x / 80) * 10 + (int)((mouse_state.y - 12) / 12);
 					if (!(in_deck[idx])) {
 						draw_img_map(20, 156, *cards[idx].img);
+						write_string(28, 43, cards[idx].desc);
 					}
 					
 
@@ -396,6 +401,7 @@ void run_game() {
 
 					int idx = (mouse_state.y - 12) / 12;
 					draw_img_map(20, 156, *cards[deck[player_state][idx]].img);
+					write_string(28, 43, cards[deck[player_state][idx]].desc);
 					
 				}
 			}

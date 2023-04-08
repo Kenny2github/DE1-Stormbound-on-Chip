@@ -1,0 +1,5 @@
+Soulcrushers
+------------------------
+Before attacking a
+weaker unit, destroy it
+instantly.

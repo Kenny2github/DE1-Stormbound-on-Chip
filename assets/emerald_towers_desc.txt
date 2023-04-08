@@ -1,0 +1,6 @@
+Emerald Towers
+------------------------
+At the start of your
+turn, give 2 strength to
+all friendly units in
+front.

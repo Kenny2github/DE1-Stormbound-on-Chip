@@ -7,6 +7,7 @@ struct card {
 	char name[20];
 	int faction;
 	struct image* img;
+	char* desc;
 };
 
 struct troop {
@@ -62,9 +63,11 @@ enum card_name {
 	TODE_THE_ELEVATED,
 	VENOMFALL_SPIRE,
 	MARKED_AS_PREY,
+	KNIGHT,
 	DRAGON,
 	SATYR,
-	CONSTRUCT
+	CONSTRUCT,
+	TOAD
 };
 
 enum card_faction {

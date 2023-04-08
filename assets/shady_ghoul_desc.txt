@@ -1,0 +1,5 @@
+Shady Ghoul
+------------------------
+On death, spawn a 1
+strength Satyr on a
+random bordering tile.
