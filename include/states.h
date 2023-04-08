@@ -19,7 +19,7 @@ enum turn_state {
 	SELECT_CARD,
 	PLACE_CARD,
 	CARD_MOVING,
-	TIME_UP
+	TURN_END
 };
 
 /**
@@ -27,8 +27,7 @@ enum turn_state {
  */
 enum move_state {
 	CARD_EFFECT,
-	CARD_MOVE_FORWARD,
-	TTE_JUMP
+	CARD_MOVE_FORWARD
 };
 
 /**
