@@ -76,9 +76,16 @@ struct image* card_selection_box[5] = {
 	&shadowfen_box
 };
 
-/* basic func for returning random number between a and b (inclusive)*/
+/* basic func for returning random number between a and b (inclusive) */
 static int rand_num(int a, int b) {
 	return rand() % (b - a + 1) + a;
+}
+
+/* basic func for swapping two integers */
+static void swap_int(int* a, int* b) {
+	*a = *a + *b;
+	*b = *a - *b;
+	*a = *a - *b;
 }
 
 /* troop action at start of turn */
@@ -378,6 +385,11 @@ void run_game() {
 						move_state = CARD_EFFECT;
 						row = 0;
 						col = 4;
+						// shuffle both decks
+						for (int i = 0; i < 10; ++i) {
+							swap_int(&deck[P1][i], &deck[P1][rand_num(0, 9)]);
+							swap_int(&deck[P2][i], &deck[P2][rand_num(0, 9)]);
+						}
 						for (int i = 0; i < 5; ++i) {
 							for (int j = 0; j < 4; ++j) {
 								game_board[i][j] = NULL;
