@@ -11,6 +11,8 @@ with open(Path('include') / 'assets.h', 'w') as hfile:
 """.lstrip(), file=hfile)
 
     for file in Path('assets').rglob('*'):
+        if file.is_dir():
+            continue # skip directories
         # assets/xyz.123!1.png => xyz_123_1(_data)
         filename = file.name
         var_name, data_var_name = var_names(filename)
