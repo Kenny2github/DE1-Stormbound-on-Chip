@@ -18,6 +18,7 @@
 #define TTE_HEAL 2
 
 int game_state, turn_state, move_state, player_state;
+int round;
 
 bool in_deck[30];
 int deck[2][10];
@@ -29,6 +30,7 @@ int row, col;
 int base_health[2];
 
 struct troop* game_board[5][4];
+int front[2];
 
 int health_change_num;
 struct health_change health_change_list[21];
@@ -37,41 +39,41 @@ int status_change_num;
 struct status_change status_change_list[20];
 
 struct card cards[35] = {
-	{"Lawless Herd", NEUTRAL, &lawless_herd, lawless_herd_desc_data},
-	{"Felflares", NEUTRAL, &felflares, felflares_desc_data},
-	{"Heroic Soldiers", NEUTRAL, &heroic_soldiers, heroic_soldiers_desc_data},
-	{"Victors of the Melee", NEUTRAL, &victors_of_the_melee, victors_of_the_melee_desc_data},
-	{"Emerald Towers", NEUTRAL, &emerald_towers, emerald_towers_desc_data},
-	{"Summon Militia", NEUTRAL, &summon_militia, summon_militia_desc_data},
-	{"Execution", NEUTRAL, &execution, execution_desc_data},
-	{"Blade Storm", NEUTRAL, &blade_storm, blade_storm_desc_data},
-	{"Dangeous Suitors", NEUTRAL, &dangerous_suitors, dangerous_suitors_desc_data},
-	{"Ludic Matriarchs", NEUTRAL, &ludic_matriarchs, ludic_matriarchs_desc_data},
-	{"Shady Ghoul", SWARM, &shady_ghoul, shady_ghoul_desc_data},
-	{"Doppelbocks", SWARM, &doppelbocks, doppelbocks_desc_data},
-	{"Moonlit Aerie", SWARM, &moonlit_aerie, moonlit_aerie_desc_data},
-	{"Head Start", SWARM, &head_start, head_start_desc_data},
-	{"Dark Harvest", SWARM, &dark_harvest, dark_harvest_desc_data},
-	{"Frosthexers", WINTER, &frosthexers, frosthexers_desc_data},
-	{"Wisp Cloud", WINTER, &wisp_cloud, wisp_cloud_desc_data},
-	{"Fleshmenders", WINTER, &fleshmenders, fleshmenders_desc_data},
-	{"Moment's Peace", WINTER, &moments_peace, moments_peace_desc_data},
-	{"Icicle Burst", WINTER, &icicle_burst, icicle_burst_desc_data},
-	{"Operators", IRONCLAD, &operators, operators_desc_data},
-	{"Dr. Mia", IRONCLAD, &dr_mia, dr_mia_desc_data},
-	{"Agents in Charge", IRONCLAD, &agents_in_charge, agents_in_charge_desc_data},
-	{"Mech Workshop", IRONCLAD, &mech_workshop, mech_workshop_desc_data},
-	{"Upgrade Point", IRONCLAD, &upgrade_point, upgrade_point_desc_data},
-	{"Copperskin Ranger", SHADOWFEN, &copperskin_ranger, copperskin_ranger_desc_data},
-	{"Soulcrushers", SHADOWFEN, &soulcrushers, soulcrushers_desc_data},
-	{"Tode the Elevated", SHADOWFEN, &tode_the_elevated, tode_the_elevated_desc_data},
-	{"Venomfall Spire", SHADOWFEN, &venomfall_spire, venomfall_spire_desc_data},
-	{"Marked as Prey", SHADOWFEN, &marked_as_prey, marked_as_prey_desc_data},
-	{"Knight", NEUTRAL, NULL, knight_desc_data},
-	{"Dragon", NEUTRAL, NULL, dragon_desc_data},
-	{"Satyr", SWARM, NULL, satyr_desc_data},
-	{"Construct", IRONCLAD, NULL, construct_desc_data},
-	{"Toad", SHADOWFEN, NULL, toad_desc_data}
+	{"Lawless Herd", NEUTRAL, &lawless_herd, lawless_herd_desc_data, 2, 2, 0},
+	{"Felflares", NEUTRAL, &felflares, felflares_desc_data, 3, 2, 0},
+	{"Heroic Soldiers", NEUTRAL, &heroic_soldiers, heroic_soldiers_desc_data, 5, 6, 1},
+	{"Victors of the Melee", NEUTRAL, &victors_of_the_melee, victors_of_the_melee_desc_data, 6, 4, 1},
+	{"Emerald Towers", NEUTRAL, &emerald_towers, emerald_towers_desc_data, 4, 4, 0},
+	{"Summon Militia", NEUTRAL, &summon_militia, summon_militia_desc_data, 1, 0, 0},
+	{"Execution", NEUTRAL, &execution, execution_desc_data, 4, 0, 0},
+	{"Blade Storm", NEUTRAL, &blade_storm, blade_storm_desc_data, 5, 0, 0},
+	{"Dangeous Suitors", NEUTRAL, &dangerous_suitors, dangerous_suitors_desc_data, 6, 4, 1},
+	{"Ludic Matriarchs", NEUTRAL, &ludic_matriarchs, ludic_matriarchs_desc_data, 6, 5, 0},
+	{"Shady Ghoul", SWARM, &shady_ghoul, shady_ghoul_desc_data, 3, 1, 2},
+	{"Doppelbocks", SWARM, &doppelbocks, doppelbocks_desc_data, 2, 1, 0},
+	{"Moonlit Aerie", SWARM, &moonlit_aerie, moonlit_aerie_desc_data, 3, 3, 0},
+	{"Head Start", SWARM, &head_start, head_start_desc_data, 2, 0, 0},
+	{"Dark Harvest", SWARM, &dark_harvest, dark_harvest_desc_data, 5, 0, 0},
+	{"Frosthexers", WINTER, &frosthexers, frosthexers_desc_data, 2, 1, 0},
+	{"Wisp Cloud", WINTER, &wisp_cloud, wisp_cloud_desc_data, 3, 1, 1},
+	{"Fleshmenders", WINTER, &fleshmenders, fleshmenders_desc_data, 7, 5, 2},
+	{"Moment's Peace", WINTER, &moments_peace, moments_peace_desc_data, 5, 0, 0},
+	{"Icicle Burst", WINTER, &icicle_burst, icicle_burst_desc_data, 1, 0, 0},
+	{"Operators", IRONCLAD, &operators, operators_desc_data, 8, 12, 1},
+	{"Dr. Mia", IRONCLAD, &dr_mia, dr_mia_desc_data, 2, 2, 0},
+	{"Agents in Charge", IRONCLAD, &agents_in_charge, agents_in_charge_desc_data, 5, 3, 3},
+	{"Mech Workshop", IRONCLAD, &mech_workshop, mech_workshop_desc_data, 4, 3, 0},
+	{"Upgrade Point", IRONCLAD, &upgrade_point, upgrade_point_desc_data, 3, 4, 0},
+	{"Copperskin Ranger", SHADOWFEN, &copperskin_ranger, copperskin_ranger_desc_data, 2, 1, 0},
+	{"Soulcrushers", SHADOWFEN, &soulcrushers, soulcrushers_desc_data, 5, 5, 1},
+	{"Tode the Elevated", SHADOWFEN, &tode_the_elevated, tode_the_elevated_desc_data, 4, 3, 1},
+	{"Venomfall Spire", SHADOWFEN, &venomfall_spire, venomfall_spire_desc_data, 4, 4, 0},
+	{"Marked as Prey", SHADOWFEN, &marked_as_prey, marked_as_prey_desc_data, 4, 0, 0},
+	{"Knight", NEUTRAL, NULL, knight_desc_data, 0, 0, 0},
+	{"Dragon", NEUTRAL, NULL, dragon_desc_data, 0, 0, 0},
+	{"Satyr", SWARM, NULL, satyr_desc_data, 0, 0, 0},
+	{"Construct", IRONCLAD, NULL, construct_desc_data, 0, 0, 0},
+	{"Toad", SHADOWFEN, NULL, toad_desc_data, 0, 0, 0}
 };
 
 struct image* card_selection_box[5] = {
@@ -299,6 +301,37 @@ static void move_forward(void) {
 	}
 }
 
+/* determine whether a card can be placed on a tile */
+bool valid_play_card() {
+	switch(deck[player_state][cur_card_selected]) {
+		case EXECUTION:
+		case ICICLE_BURST:
+		case MARKED_AS_PREY:
+			return (game_board[col][row] != NULL
+			 && game_board[col][row]->player != player_state);
+			 break;
+
+		case DARK_HARVEST:
+		case MOMENTS_PEACE:
+			return (game_board[col][row] != NULL
+			 && game_board[col][row]->player == player_state);
+			 break;
+			
+		case SUMMON_MILITIA:
+		case BLADE_STORM:
+		case HEAD_START:
+			return true;
+			break;
+
+		default:
+			return (game_board[col][row] == NULL);
+	}
+}
+
+void play_card() {
+	return;
+}
+
 /* manage health change list */
 static void change_healths(void) {
 	return;
@@ -422,6 +455,8 @@ void run_game() {
 						move_state = CARD_EFFECT;
 						row = 0;
 						col = 4;
+						front[P1] = 0;
+						front[P2] = 4;
 						// shuffle both decks
 						for (int i = 0; i < 10; ++i) {
 							swap_int(&deck[P1][i], &deck[P1][rand_num(0, 9)]);
@@ -478,6 +513,7 @@ void run_game() {
 							move_state = CARD_EFFECT;
 					}
 					
+					break;
 				
 				case PRETURN_UNIT:
 					switch (move_state) {
@@ -510,8 +546,12 @@ void run_game() {
 						case CARD_MOVE_FORWARD:
 							move_forward();
 					}
+
+					break;
 				
 				case SELECT_CARD:
+					// draw mouse
+					draw_rectangle(mouse_state.x, mouse_state.y, 2, 2, WHITE);
 					for (int i = 0; i < 4; ++i) {
 						if (!(cur_cards_played[i])) {
 							draw_img_map(i * 46 + 10, 166, *cards[deck[player_state][i]].img);
@@ -533,11 +573,70 @@ void run_game() {
 						if (mouse_state.y >= 166 && mouse_state.y < 227) {
 							for (int i = 0; i < 4; ++i) {
 								if (mouse_state.x >= i * 46 + 10 && mouse_state.x < i * 46 + 51) {
-									// TODO: display stuff
+									write_string(52, 43, cards[deck[player_state][i]].desc);
 									continue;
 								}
 							}
 						}
+					}
+
+					break;
+
+				case PLACE_CARD:
+					// draw mouse
+					draw_rectangle(mouse_state.x, mouse_state.y, 2, 2, WHITE);
+					for (int i = 0; i < 4; ++i) {
+						if (!(cur_cards_played[i])) {
+							draw_img_map(i * 46 + 10, 166, *cards[deck[player_state][i]].img);
+						}
+					}
+
+					if (mouse_state.left_clicked) {
+						if (mouse_state.y >= 166 && mouse_state.y < 227) {
+							for (int i = 0; i < 4; ++i) {
+								if (mouse_state.x >= i * 46 + 10 && mouse_state.x < i * 46 + 51) {
+									cur_card_selected = i;
+									turn_state = PLACE_CARD;
+									break;
+								}
+							}
+						} else if (mouse_state.y >= 17 && mouse_state.y < 127) {
+							for (col = 0; col < 5 && ((player_state == P1 && col <= front[P1])
+							 || (player_state == P2 && col >= front[P2])) && turn_state == PLACE_CARD; ++col) {
+								for (row = 0; row < 4; ++row) {
+									if (mouse_state.x >= col*42+56 && mouse_state.x < col*42+106
+									 && mouse_state.y >= row*28+17 && mouse_state.x < row*28+43) {
+										if (valid_play_card()) {
+											turn_state = CARD_MOVING;
+											move_state = CARD_EFFECT;
+											break;
+										};
+									}
+								}
+							}
+						}
+						// TODO: END TURN BUTTON
+					} else {
+						if (mouse_state.y >= 166 && mouse_state.y < 227) {
+							for (int i = 0; i < 4; ++i) {
+								if (mouse_state.x >= i * 46 + 10 && mouse_state.x < i * 46 + 51) {
+									write_string(52, 43, cards[deck[player_state][i]].desc);
+									continue;
+								}
+							}
+						}
+					}
+
+					break;
+
+				case CARD_MOVING:
+					switch(move_state) {
+						case CARD_EFFECT:
+							play_card();
+							move_state = CARD_MOVE_FORWARD;
+							break;
+						case CARD_MOVE_FORWARD:
+							;
 					}
 
 				case TURN_END:

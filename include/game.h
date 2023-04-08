@@ -8,6 +8,9 @@ struct card {
 	int faction;
 	struct image* img;
 	char* desc;
+	int cost;
+	int init_health;
+	int init_move;
 };
 
 struct troop {
