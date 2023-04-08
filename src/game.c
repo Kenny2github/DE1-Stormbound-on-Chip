@@ -13,14 +13,24 @@
 #define FF_DMG -2
 #define VOTM_DMG -2
 #define ET_HEAL 2
+#define SM_SPAWN 1
+#define E_DMG -4
+#define BS_DMG -1
 #define DS_HEAL 2
 #define LM_SPAWN 1
 #define DB_SPAWN 1
 #define MA_HEAL 1
+#define HS_SPAWN 3
+#define DH_DMG -2
 #define WC_DMG -4
+#define FM_HEAL 6
+#define MP_HEAL 5
+#define IB_DMG -8
 #define MW_SPAWN 1
 #define UP_HEAL 1
 #define TTE_HEAL 2
+#define MAP_DMG -5
+#define MAP_SPAWN 5
 
 int game_state, turn_state, move_state, player_state;
 int round;
@@ -394,6 +404,22 @@ static void move_forward(void) {
 	}
 }
 
+static void update_front(void) {
+	for (int i = 4; i > 0; --i) {
+		int cur_front = player_state == P1 ? i : 4-i;
+		for (int j = 0; j < 4; ++j) {
+			if (game_board[cur_front][j] != NULL
+			 && game_board[cur_front][j]->player) {
+				if (player_state == P1 && cur_front == 4) front[player_state] = 3;
+				else if (player_state == P2 && cur_front == 0) front[player_state] = 1;
+				else front[player_state] = cur_front;
+				return;
+			}
+		}
+	}
+	front[player_state] = player_state == P1 ? 0 : 4;
+}
+
 /* determine whether a card can be placed on a tile */
 static bool valid_play_card(void) {
 	int card_id = deck[player_state][cur_card_selected];
@@ -402,16 +428,21 @@ static bool valid_play_card(void) {
 	switch(deck[player_state][cur_card_selected]) {
 		case EXECUTION:
 		case ICICLE_BURST:
-		case MARKED_AS_PREY:
 			return (game_board[col][row] != NULL
 			 && game_board[col][row]->player != player_state);
-			 break;
+			break;
+
+		case MARKED_AS_PREY:
+			return (game_board[col][row] != NULL
+			 && game_board[col][row]->player != player_state
+			 && game_board[col][row]->status == POISONED);
+			break;
 
 		case DARK_HARVEST:
 		case MOMENTS_PEACE:
 			return (game_board[col][row] != NULL
 			 && game_board[col][row]->player == player_state);
-			 break;
+			break;
 			
 		case SUMMON_MILITIA:
 		case BLADE_STORM:
@@ -609,7 +640,49 @@ void play_card(void) {
 			break;
 
 		case SUMMON_MILITIA:
-			;
+			for (int i = 0; i <= (player_state == P1 ? front[P1] : 5-front[P2]); ++i) {
+				int cur_col = player_state == P1 ? i : 5-i;
+				for (int j = 0; j < 4; ++j) {
+					if (game_board[cur_col][j] != NULL && game_board[cur_col][j]->player != player_state) {
+						cur_rows[list_num] = j;
+						cur_cols[list_num++] = cur_col;
+					}
+				}
+			}
+			if (list_num > 0) {
+				int idx = rand_num(0, list_num - 1);
+				health_change_list[++health_change_num] = (struct health_change){
+					cur_rows[idx],
+					cur_cols[idx],
+					SM_SPAWN,
+					KNIGHT
+				};
+			}
+			break;
+
+		case EXECUTION:
+			health_change_list[++health_change_num] = (struct health_change){
+				row,
+				col,
+				E_DMG,
+				0
+			};
+			break;
+
+		case BLADE_STORM:
+			for (int i = 0; i < 5; ++i) {
+				for (int j = 0; j < 4; ++j) {
+					if (game_board[i][j] != NULL && game_board[i][j]->player != player_state) {
+						health_change_list[++health_change_num] = (struct health_change){
+							row,
+							col,
+							BS_DMG,
+							0
+						};
+					}
+				}
+			}
+			break;
 
 		case DANGEROUS_SUITORS:
 			game_board[col][row] = new_troop;
@@ -685,11 +758,46 @@ void play_card(void) {
 			}
 			break;
 
+		case HEAD_START:
+			for (int i = 0; i < 4; ++i) {
+				if (game_board[front[player_state]][i] == NULL) {
+					cur_rows[list_num++] = i;
+				}
+			}
+			if (list_num > 0) {
+				int idx = rand_num(0, list_num - 1);
+				health_change_list[++health_change_num] = (struct health_change){
+					cur_rows[idx],
+					front[player_state],
+					HS_SPAWN,
+					SATYR
+				};
+			}
+			break;
+
+		case DARK_HARVEST:
+			for (int i = col - 1; i <= col + 1; ++i) {
+				if (i < 0 || i > 4) continue;
+				for (int j = row - 1; j <= row + 1; ++j) {
+					if (j < 0 || j > 3 || (i == col && j == row)) continue;
+					if (game_board[i][j] != NULL && game_board[i][j]->player != player_state) {
+						health_change_list[++health_change_num] = (struct health_change){
+							j,
+							i, 
+							DH_DMG, 
+							0
+						};
+					}
+				}	
+			}
+			break;
+
 		case FROSTHEXERS:
 			game_board[col][row] = new_troop;
 			for (int i = 0; i < 4; ++i) {
 				int check_row = row + bordering_row[i];
 				int check_col = col + bordering_col[i];
+				if (check_row < 0 || check_row > 3 || check_col < 0 || check_col > 4) continue;
 				if (game_board[check_col][check_row] != NULL
 				 && game_board[check_col][check_row]->player != player_state
 				 && game_board[check_col][check_row]->type == UNIT) {
@@ -702,11 +810,76 @@ void play_card(void) {
 			}
 			break;
 
+		case FLESHMENDERS:
+			game_board[col][row] = new_troop;
+			for (int i = 0; i < 4; ++i) {
+				int check_row = row + bordering_row[i];
+				int check_col = col + bordering_col[i];
+				if (check_row < 0 || check_row > 3 || check_col < 0 || check_col > 4) continue;
+				if (game_board[check_col][check_row] != NULL
+				 && game_board[check_col][check_row]->player == player_state) {
+					cur_rows[list_num] = check_row;
+					cur_cols[list_num++] = check_col;
+				}
+			}
+			if (list_num > 0) {
+				int idx = rand_num(0, list_num - 1);
+				health_change_list[++health_change_num] = (struct health_change){
+					cur_rows[idx],
+					cur_cols[idx],
+					FM_HEAL,
+					0
+				};
+			}
+			break;
+
+		case MOMENTS_PEACE:
+			health_change_list[++health_change_num] = (struct health_change){
+				row,
+				col,
+				MP_HEAL,
+				0
+			};
+			for (int i = col - 1; i <= col + 1; ++i) {
+				if (i < 0 || i > 4) continue;
+				for (int j = row - 1; j <= row + 1; ++j) {
+					if (j < 0 || j > 3 || (i == col && j == row)) continue;
+					if (game_board[i][j] != NULL
+					 && game_board[i][j]->player != player_state
+					 && game_board[i][j]->type == UNIT) {
+						status_change_list[++status_change_num] = (struct status_change){
+							j,
+							i, 
+							FROZEN
+						};
+					}
+				}	
+			}
+			break;
+
+		case ICICLE_BURST:
+			if (game_board[col][row]->status == NO_STATUS) {
+				status_change_list[++status_change_num] = (struct status_change){
+					row,
+					col,
+					FROZEN
+				};
+			} else {
+				health_change_list[++health_change_num] = (struct health_change){
+					row,
+					col,
+					IB_DMG,
+					0
+				};
+			}
+			break;
+
 		case DR_MIA:
 			game_board[col][row] = new_troop;
 			for (int i = 0; i < 4; ++i) {
 				int check_row = row + bordering_row[i];
 				int check_col = col + bordering_col[i];
+				if (check_row < 0 || check_row > 3 || check_col < 0 || check_col > 4) continue;
 				if (game_board[check_col][check_row] != NULL
 				 && game_board[check_col][check_row]->player == player_state
 				 && game_board[check_col][check_row]->type == BUILDING) {
@@ -737,6 +910,22 @@ void play_card(void) {
 				};
 			}
 			break;
+
+		case MARKED_AS_PREY:
+			health_change_list[++health_change_num] = (struct health_change){
+				row,
+				col,
+				MAP_DMG,
+				0
+			};
+			if (game_board[col][row]->health + MAP_DMG <= 0) {
+				health_change_list[++health_change_num] = (struct health_change){
+					row,
+					col,
+					MAP_SPAWN,
+					TOAD
+				};
+			}
 	}
 }
 
@@ -955,6 +1144,7 @@ void run_game() {
 
 						case CARD_MOVE_FORWARD:
 							move_forward();
+							update_front();
 					}
 
 					break;
