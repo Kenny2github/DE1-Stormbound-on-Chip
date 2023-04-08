@@ -3,6 +3,7 @@
 #include "assets.h"
 #include "image_data.h"
 #include "mouse.h"
+#include "timer.h"
 #include "game.h"
 #include "states.h"
 #include "vga.h"
@@ -178,6 +179,8 @@ void run_game() {
 						turn_state = PRETURN;
 				}
 			} 
+						enable_timer_interrupt();
+				}
 			break;
 
 		case TURN:
