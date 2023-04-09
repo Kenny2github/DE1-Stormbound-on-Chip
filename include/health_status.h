@@ -1,11 +1,11 @@
 #ifndef HEALTH_STATUS_H
 #define HEALTH_STATUS_H
 
-/**** Structs ****/ 
+/**** Structs ****/
 
 /**
  * @brief Info of health change
- * 
+ *
  * @param row Row where health change occurs
  * @param col Column where health change occurs
  * @param change The amount of change to the tile
@@ -20,7 +20,7 @@ struct health_change {
 
 /**
  * @brief Info of status effect change
- * 
+ *
  * @param row Row where status effect change occurs
  * @param col Column where status effect change occurs
  * @param change The status effect to set the unit at the tile to
@@ -34,7 +34,7 @@ struct status_change {
 /**** Global Variables ****/
 
 /**
- * @brief Health of each player's base 
+ * @brief Health of each player's base
  */
 int base_health[2];
 
@@ -42,6 +42,10 @@ int base_health[2];
  * @brief Total number of pending health changes
  */
 extern int health_change_num;
+/**
+ * @brief Current index of health change
+ */
+extern int health_change_idx;
 /**
  * @brief List of health changes to be made
  */
@@ -51,6 +55,10 @@ extern struct health_change health_change_list[21];
  * @brief Total number of pending status effect changes
  */
 extern int status_change_num;
+/**
+ * @brief Current index of status effect change
+ */
+extern int status_change_idx;
 /**
  * @brief List of status effect changes to be made
  */

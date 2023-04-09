@@ -106,29 +106,33 @@ void run_game() {
 				case PRETURN_BUILDING:
 					switch (move_state) {
 						case CARD_EFFECT:
-							while (game_board[col][row] == NULL || game_board[col][row]->type != BUILDING) {
-								if (((player_state == P1) ? ++row : --row) == 4) {
-									if (player_state == P1) {
-										--col;
-										row = 0;
-									} else {
-										++col;
-										row = 3;
+							if (health_change_num == 0 && status_change_num == 0) {
+								while (game_board[col][row] == NULL || game_board[col][row]->type != BUILDING) {
+									if (((player_state == P1) ? ++row : --row) == 4) {
+										if (player_state == P1) {
+											--col;
+											row = 0;
+										} else {
+											++col;
+											row = 3;
+										}
 									}
-								}
-								if ((col == -1 && player_state == P1) || (col == 5 && player_state == P2)) {
-									turn_state = PRETURN_UNIT;
-									row = (player_state == P1) ? 0 : 3;
-									col = (player_state == P1) ? 4 : 0;
-									break;
+									if ((col == -1 && player_state == P1) || (col == 5 && player_state == P2)) {
+										turn_state = PRETURN_UNIT;
+										row = (player_state == P1) ? 0 : 3;
+										col = (player_state == P1) ? 4 : 0;
+										break;
+									}
 								}
 							}
 							if (turn_state == PRETURN_BUILDING) {
-								health_change_num = 0;
-								status_change_num = 0;
-								start_turn_action(row, col);
-								change_healths();
+								if (health_change_num == 0 && status_change_num == 0) {
+									start_turn_action(row, col);
+									health_change_idx = 0;
+									status_change_idx = 0;
+								}
 								change_statuses();
+								if (status_change_num == 0) change_healths();
 							}
 							break;
 
