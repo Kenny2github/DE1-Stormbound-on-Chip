@@ -12,7 +12,6 @@
 #include "vga.h"
 
 #define RENDER_STACK_SIZE 128
-#define BITFIELD_SIZE (SCREEN_W * SCREEN_H / (sizeof(int) * 8))
 
 /**** Global variables ****/
 
@@ -21,29 +20,7 @@ static volatile struct surface r_stack[RENDER_STACK_SIZE];
 
 /**** Static functions ****/
 
-static inline bool is_plotted(int x, int y, int bitfield[BITFIELD_SIZE]) {
-	// pixel index
-	int pix_idx = y * SCREEN_H + x;
-	// index into bit in bitfield element
-	int bit_idx = pix_idx & (sizeof(int) * 8 - 1);
-	// index into the bitfield array
-	int word_idx = (pix_idx ^ bit_idx) >> 5;
-	// return that bit
-	return bitfield[word_idx] & (1 << bit_idx);
-}
-
-static inline void set_plotted(int x, int y, int bitfield[BITFIELD_SIZE]) {
-	// pixel index
-	int pix_idx = y * SCREEN_H + x;
-	// index into bit in bitfield element
-	int bit_idx = pix_idx & (sizeof(int) * 8 - 1);
-	// index into the bitfield array
-	int word_idx = (pix_idx ^ bit_idx) >> 5;
-	// set that bit
-	bitfield[word_idx] |= 1 << bit_idx;
-}
-
-static void do_draw_RLE_image(int bitfield[BITFIELD_SIZE], struct surface surf) {
+static void do_draw_RLE_image(bool plotted[SCREEN_H][SCREEN_W], struct surface surf) {
 	const struct image* img = surf.data;
 	int size = img->length;
 	int w = 0, h = 0, x = surf.x, y = surf.y;
@@ -51,11 +28,11 @@ static void do_draw_RLE_image(int bitfield[BITFIELD_SIZE], struct surface surf) 
 		for (int j = 0; j < img->data[i]; ++j) {
 			if (
 				// The thing! skip already-plotted pixels
-				!is_plotted(x + w, y + h, bitfield)
+				!plotted[y + h][x + w]
 				// skip transparent pixels
 				&& img->data[i + 1] != TRANSPARENT
 			) {
-				set_plotted(x + w, y + h, bitfield);
+				plotted[y + h][x + w] = true;
 
 				if (0 <= x + w && 0 <= y + h) {
 					plot_pixel(x + w, y + h, img->data[i + 1]);
@@ -80,10 +57,10 @@ static void do_draw_RLE_image(int bitfield[BITFIELD_SIZE], struct surface surf) 
 	}
 }
 
-static void do_draw_image(int bitfield[BITFIELD_SIZE], struct surface surf) {
+static void do_draw_image(bool plotted[SCREEN_H][SCREEN_W], struct surface surf) {
 	const struct image* img = surf.data;
 	if (img->encoding == VGA_RLE) {
-		do_draw_RLE_image(bitfield, surf);
+		do_draw_RLE_image(plotted, surf);
 		return;
 	}
 	uint16_t (*data)[img->width] = (uint16_t (*)[img->width])img->data;
@@ -96,12 +73,12 @@ static void do_draw_image(int bitfield[BITFIELD_SIZE], struct surface surf) {
 			// stop at right edge of screen
 			if (x + w >= SCREEN_W) break;
 			// The thing! skip already-plotted pixels
-			if (is_plotted(x + w, y + h, bitfield)) continue;
+			if (plotted[y + h][x + w]) continue;
 			// skip transparent pixels
 			if (data[h][w] == TRANSPARENT) continue;
 			// unavoidably do the plot
 			plot_pixel(x + w, y + h, data[h][w]);
-			set_plotted(x + w, y + h, bitfield);
+			plotted[y + h][x + w] = true;
 		}
 	}
 }
@@ -109,12 +86,12 @@ static void do_draw_image(int bitfield[BITFIELD_SIZE], struct surface surf) {
 /**** Exported functions ****/
 
 void render_stack(void) {
-	// bitfield of "has this pixel been rendered?"
-	int bitfield[BITFIELD_SIZE] = {0};
+	// array of "has this pixel been rendered?"
+	bool plotted[SCREEN_H][SCREEN_W] = {};
 	while (r_stack_size > 0) {
 		// image popped from stack
 		struct surface surf = r_stack[--r_stack_size];
-		do_draw_image(bitfield, surf);
+		do_draw_image(plotted, surf);
 	}
 	wait_for_vsync();
 	update_back_buffer();
