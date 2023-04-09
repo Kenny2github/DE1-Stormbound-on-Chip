@@ -3,9 +3,14 @@
 
 /**** Exported Functions ****/
 
+
+void place_new_tile_asset(int r, int c, struct troop* new_troop);
+
+void remove_tile_asset(int r, int c);
+
 /**
  * @brief Perform start-of-turn action for troop located at coordinates
- * 
+ *
  * @param act_row Row where troop is located
  * @param act_col Column where troop is located
  */
@@ -22,7 +27,7 @@ void move_forward(void);
 bool valid_play_card(void);
 
 /**
- * @brief Perform on-play action for troop 
+ * @brief Perform on-play action for troop
  */
 void play_card(void);
 

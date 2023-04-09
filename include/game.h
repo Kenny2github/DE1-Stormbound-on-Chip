@@ -6,6 +6,8 @@
 #include "events.h"
 
 #define NUM_CARDS 30
+#define COL 5
+#define ROW 4
 
 /**** Structs and Enums ****/
 
@@ -188,7 +190,7 @@ const int bordering_col[4] = {1, 0, 0, -1};
 /**
  * @brief Current state of the board, filled with troops
  */
-extern struct troop* game_board[5][4];
+extern struct troop* game_board[COL][ROW];
 /**
  * @brief Currently selected row/col
  */
@@ -229,6 +231,14 @@ int rand_num(int a, int b);
  * @param b Pointer to second int
  */
 void swap_int(int* a, int* b);
+
+int col2x(int c);
+
+int row2y(int r);
+
+int x2col(int x);
+
+int y2row(int y);
 
 void default_event_handlers(struct event_t event);
 

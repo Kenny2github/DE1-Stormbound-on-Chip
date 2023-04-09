@@ -3,8 +3,10 @@
 #include "game.h"
 #include "states.h"
 #include "assets.h"
+#include "render.h"
 #include "card_logic.h"
 #include "health_status.h"
+#include "turn.h"
 
 #define FF_DMG -2
 #define VOTM_DMG -2
@@ -27,6 +29,26 @@
 #define TTE_HEAL 2
 #define MAP_DMG -5
 #define MAP_SPAWN 5
+
+void place_new_tile_asset(int r, int c, struct troop* new_troop) {
+	game_board[c][r] = new_troop;
+	board_base_surfs[c][r] = (struct surface){
+		col2x(c),
+		row2y(r),
+		new_troop->img
+	};
+	r_stack_push(board_base_surfs[c][r]);
+}
+
+void remove_tile_asset(int r, int c) {
+	free(game_board[c][r]);
+	board_base_surfs[c][r] = (struct surface){
+		col2x(c),
+		row2y(r),
+		&empty_tile
+	};
+	r_stack_push(board_base_surfs[c][r]);
+}
 
 /* determine whether card at location has same type as card_id */
 static bool of_same_type(int row, int col, int card_id) {
@@ -501,12 +523,18 @@ void play_card(void) {
 		case WISP_CLOUD:
 		case SOULCRUSHERS:
 			// same as start turn action
-			game_board[col][row] = new_troop;
+			place_new_tile_asset(row, col, new_troop);
+			board_overlay_surfs[col][row][++board_overlay_surf_num[col][row]] = (struct surface){
+				col2x(col),
+				row2y(row),
+				&on_attack
+			};
+
 			start_turn_action(row, col);
 			break;
 
 		case FELFLARES:
-			game_board[col][row] = new_troop;
+			place_new_tile_asset(row, col, new_troop);
 			for (int i = col - 1; i <= col + 1; ++i) {
 				if (i < 0 || i > 4) continue;
 				for (int j = row - 1; j <= row + 1; ++j) {
@@ -574,7 +602,7 @@ void play_card(void) {
 			break;
 
 		case DANGEROUS_SUITORS:
-			game_board[col][row] = new_troop;
+			place_new_tile_asset(row, col, new_troop);
 			int heal = 0;
 			for (int i = 0; i < 5; ++i) {
 				for (int j = 0; j < 4; ++j) {
@@ -595,7 +623,7 @@ void play_card(void) {
 			break;
 
 		case LUDIC_MATRIARCHS:
-			game_board[col][row] = new_troop;
+			place_new_tile_asset(row, col, new_troop);
 			int adj_row = row, adj_col = col;
 
 			// find adjacent dragon
@@ -634,7 +662,7 @@ void play_card(void) {
 			break;
 
 		case DOPPELBOCKS:
-			game_board[col][row] = new_troop;
+			place_new_tile_asset(row, col, new_troop);
 			int check_col = col+1-player_state*2;
 			if (check_col >= 0 && check_col <= 4
 			 && game_board[check_col][row] == NULL) {
@@ -682,7 +710,7 @@ void play_card(void) {
 			break;
 
 		case FROSTHEXERS:
-			game_board[col][row] = new_troop;
+			place_new_tile_asset(row, col, new_troop);
 			for (int i = 0; i < 4; ++i) {
 				int check_row = row + bordering_row[i];
 				int check_col = col + bordering_col[i];
@@ -700,7 +728,7 @@ void play_card(void) {
 			break;
 
 		case FLESHMENDERS:
-			game_board[col][row] = new_troop;
+			place_new_tile_asset(row, col, new_troop);
 			for (int i = 0; i < 4; ++i) {
 				int check_row = row + bordering_row[i];
 				int check_col = col + bordering_col[i];
@@ -764,7 +792,7 @@ void play_card(void) {
 			break;
 
 		case DR_MIA:
-			game_board[col][row] = new_troop;
+			place_new_tile_asset(row, col, new_troop);
 			for (int i = 0; i < 4; ++i) {
 				int check_row = row + bordering_row[i];
 				int check_col = col + bordering_col[i];
@@ -779,7 +807,7 @@ void play_card(void) {
 			break;
 
 		case COPPERSKIN_RANGER:
-			game_board[col][row] = new_troop;
+			place_new_tile_asset(row, col, new_troop);
 			for (int i = 0; i < 5; ++i) {
 				for (int j = 0; j < 4; ++j) {
 					if (game_board[i][j] != NULL
@@ -818,6 +846,6 @@ void play_card(void) {
 			break;
 
 		default:
-			game_board[col][row] = new_troop;
+			place_new_tile_asset(row, col, new_troop);
 	}
 }

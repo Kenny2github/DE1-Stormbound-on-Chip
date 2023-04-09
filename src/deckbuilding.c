@@ -151,6 +151,7 @@ void run_deckbuilding(void) {
 		}
 		if (event.type == E_MOUSE_MOVE) mouse_moved = true;
 	}
+	if (game_state != DECK) return;
 	// rerender mouse if it has moved
 	if (mouse_moved) {
 		// clear old mouse positions
