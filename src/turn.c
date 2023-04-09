@@ -218,7 +218,6 @@ static void run_select_card(void) {
 				)) r_stack_push(cur_card_deck_surfs[i]);
 			}
 		}
-		bool on_tile = false;
 		for (int i = 0; i < COL; ++i) {	// troops
 			for (int j = 0; j < ROW; ++j) {
 				for (int k = 1; k < NUM_MOUSE_STATES; ++k) {
@@ -234,14 +233,13 @@ static void run_select_card(void) {
 						for (int l = 0; l < board_overlay_surf_num[i][j]; ++l) {
 							r_stack_push(board_overlay_surfs[i][j][l]);
 						}
-						on_tile = true;
 					}
 				}
 			}
 		}
 		for (int i = 5; i < 8; ++i) {	// board
 			for (int j = 1; j < NUM_MOUSE_STATES; ++j) {
-				if (!(i == 6 && !on_tile) && rects_collide(
+				if (rects_collide(
 					// this surf's rect
 					board_base_surfs[i][0].x, board_base_surfs[i][0].y,
 					board_base_surfs[i][0].data->width, board_base_surfs[i][0].data->height,
