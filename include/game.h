@@ -8,7 +8,7 @@
 
 /**
  * @brief Info of card
- * 
+ *
  * @param name String name of the card
  * @param faction Faction the card belongs to
  * @param img Image of the card
@@ -29,7 +29,7 @@ struct card {
 
 /**
  * @brief Info of troop
- * 
+ *
  * @param card_id ID of the card, based on card_name
  * @param type Whether it's UNIT or BUILDING
  * @param player Owner of the troop
@@ -99,7 +99,7 @@ enum card_faction {
 };
 
 /**
- * @brief Enum of troop type, either UNIT or BUILDING 
+ * @brief Enum of troop type, either UNIT or BUILDING
  */
 enum troop_type {
 	UNIT,
@@ -190,21 +190,21 @@ extern struct troop* game_board[5][4];
  */
 extern int row, col;
 /**
- * @brief Current front of each player 
+ * @brief Current front of each player
  */
 extern int front[2];
 
 /**
- * @brief Current amount of mana left 
+ * @brief Current amount of mana left
  */
 extern int mana;
 
 /**
- * @brief Deck of both players, in order of appearance in hand 
+ * @brief Deck of both players, in order of appearance in hand
  */
 extern int deck[2][10];
 /**
- * @brief Currently selected card to be placed 
+ * @brief Currently selected card to be placed
  */
 extern int cur_card_selected;
 
@@ -218,7 +218,7 @@ int rand_num(int a, int b);
 
 /**
  * @brief Swap two integers
- * 
+ *
  * @param a Pointer to first int
  * @param b Pointer to second int
  */

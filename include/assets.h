@@ -117,6 +117,9 @@ extern const struct image agents_in_charge;
 // blade_storm.png
 extern const struct image blade_storm;
 
+// clear_card.png
+extern const struct image clear_card;
+
 // copperskin_ranger.png
 extern const struct image copperskin_ranger;
 
@@ -201,6 +204,9 @@ extern const struct image victors_of_the_melee;
 // wisp_cloud.png
 extern const struct image wisp_cloud;
 
+// clear_box.png
+extern const struct image clear_box;
+
 // ironclad_box.png
 extern const struct image ironclad_box;
 
@@ -245,6 +251,9 @@ extern const char dr_mia_desc_data[];
 
 // emerald_towers_desc.txt
 extern const char emerald_towers_desc_data[];
+
+// empty_desc.txt
+extern const char empty_desc_data[];
 
 // execution_desc.txt
 extern const char execution_desc_data[];
