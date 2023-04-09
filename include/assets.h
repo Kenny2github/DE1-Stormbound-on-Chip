@@ -6,20 +6,8 @@
 // board.png
 extern const struct image board;
 
-// board_sprites
-extern const struct image board_sprites;
-
 // cardbuilding_done.png
 extern const struct image cardbuilding_done;
-
-// cards
-extern const struct image cards;
-
-// card_boxes
-extern const struct image card_boxes;
-
-// card_descs
-extern const struct image card_descs;
 
 // instructions.txt
 extern const char instructions_data[];

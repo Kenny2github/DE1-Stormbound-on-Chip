@@ -4,6 +4,7 @@
 #include "mouse.h"
 #include "timer.h"
 #include "events.h"
+#include "render.h"
 #include "vga.h"
 #include "game.h"
 
@@ -29,35 +30,9 @@ static void pushbutton_ISR(void) {
 	*HEX30_ptr = HEX_bits;
 }
 
-static void handle_event(struct event_t event) {
-	volatile int* LEDR_ptr = (int*) LEDR_BASE;
-	switch (event.type) {
-	case E_MOUSE_ENABLED:
-		printf("Mouse plugged in\n");
-		break;
-	case E_MOUSE_BUTTON_DOWN:
-		if (event.data.mouse_button_down.left) printf("Left button pressed\n");
-		break;
-	case E_MOUSE_BUTTON_UP:
-		if (event.data.mouse_button_up.left) printf("Left button released\n");
-		break;
-	case E_MOUSE_MOVE:
-		break;
-	case E_TIMER_ENABLE:
-		time_left = 10;
-		*LEDR_ptr = (1 << time_left) - 1;
-		break;
-	case E_TIMER_RELOAD:
-		if(!(--time_left)) disable_timer();
-		*LEDR_ptr = (1 << time_left) - 1;
-		break;
-	case E_INTVAL_TIMER_ENABLE:
-		animation_waiting = true;
-		break;
-	case E_INTVAL_TIMER_RELOAD:
-		animation_waiting = false;
-	}
-}
+static struct mouse_state_t mouse_states_1[NUM_MOUSE_STATES];
+// static struct mouse_state_t mouse_states_2[NUM_MOUSE_STATES];
+struct mouse_state_t* saved_mouse_states = mouse_states_1;
 
 int main(void) {
 	configure_vga();
@@ -70,13 +45,19 @@ int main(void) {
 	init_game();
 
 	while (1) {
-		while (!event_queue_empty()) {
-			handle_event(event_queue_pop());
+		// shift mouse states
+		for (int i = NUM_MOUSE_STATES - 1; i > 0; --i) {
+			saved_mouse_states[i] = saved_mouse_states[i - 1];
 		}
-
+		saved_mouse_states[0] = mouse_state;
 		run_game();
 
-		wait_for_vsync();
-		update_back_buffer();
+		// flip mouse state buffers
+		// if (saved_mouse_states == mouse_states_1) {
+		// 	saved_mouse_states = mouse_states_2;
+		// } else {
+		// 	saved_mouse_states = mouse_states_1;
+		// }
+		render_stack();
 	}
 }
