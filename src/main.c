@@ -30,9 +30,7 @@ static void pushbutton_ISR(void) {
 	*HEX30_ptr = HEX_bits;
 }
 
-static struct mouse_state_t mouse_states_1[NUM_MOUSE_STATES];
-// static struct mouse_state_t mouse_states_2[NUM_MOUSE_STATES];
-struct mouse_state_t* saved_mouse_states = mouse_states_1;
+struct mouse_state_t saved_mouse_states[NUM_MOUSE_STATES];
 
 int main(void) {
 	configure_vga();
@@ -51,13 +49,6 @@ int main(void) {
 		}
 		saved_mouse_states[0] = mouse_state;
 		run_game();
-
-		// flip mouse state buffers
-		// if (saved_mouse_states == mouse_states_1) {
-		// 	saved_mouse_states = mouse_states_2;
-		// } else {
-		// 	saved_mouse_states = mouse_states_1;
-		// }
 		render_stack();
 	}
 }

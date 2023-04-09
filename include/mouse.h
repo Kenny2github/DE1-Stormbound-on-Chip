@@ -30,13 +30,13 @@ struct mouse_state_t {
  */
 extern struct mouse_state_t mouse_state;
 
-#define NUM_MOUSE_STATES 6
+#define NUM_MOUSE_STATES 2
 
 /**
  * @brief States of the mouse from the most recent frames.
  * saved_mouse_states[0] is the most recent state.
  */
-extern struct mouse_state_t* saved_mouse_states;
+extern struct mouse_state_t saved_mouse_states[NUM_MOUSE_STATES];
 
 /**** Exported functions ****/
 

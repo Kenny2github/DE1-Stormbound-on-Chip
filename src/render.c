@@ -93,8 +93,6 @@ void render_stack(void) {
 		struct surface surf = r_stack[--r_stack_size];
 		do_draw_image(plotted, surf);
 	}
-	wait_for_vsync();
-	update_back_buffer();
 }
 
 void r_stack_push(struct surface surf) {

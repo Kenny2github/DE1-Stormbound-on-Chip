@@ -188,8 +188,6 @@ void init_game() {
 	move_state = CARD_EFFECT;
 	draw_intro();
 	render_stack();
-	draw_intro();
-	render_stack();
 }
 
 void run_game() {
