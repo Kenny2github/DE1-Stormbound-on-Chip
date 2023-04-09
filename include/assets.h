@@ -27,6 +27,9 @@ extern const struct image construct_p1;
 // construct_p2.png
 extern const struct image construct_p2;
 
+// damage.png
+extern const struct image damage;
+
 // dragon_p1.png
 extern const struct image dragon_p1;
 
@@ -45,6 +48,12 @@ extern const struct image frostling_p1;
 // frostling_p2.png
 extern const struct image frostling_p2;
 
+// frozen.png
+extern const struct image frozen;
+
+// heal.png
+extern const struct image heal;
+
 // knight_p1.png
 extern const struct image knight_p1;
 
@@ -56,6 +65,15 @@ extern const struct image moonlit_p1;
 
 // moonlit_p2.png
 extern const struct image moonlit_p2;
+
+// on_attack.png
+extern const struct image on_attack;
+
+// on_death.png
+extern const struct image on_death;
+
+// poisoned.png
+extern const struct image poisoned;
 
 // rodent_p1.png
 extern const struct image rodent_p1;
