@@ -104,9 +104,9 @@ void start_turn_action(int act_row, int act_col) {
 		case VICTORS_OF_THE_MELEE:
 			if ((act_col == 4 && player_state == P1) || (act_col == 0 && player_state == P2)) {
 				health_change_list[++health_change_num] = (struct health_change){
-					0, 
-					(player_state == P1 ? 5 : -1), 
-					VOTM_DMG, 
+					0,
+					(player_state == P1 ? 5 : -1),
+					VOTM_DMG,
 					0
 				};
 			}
@@ -117,12 +117,12 @@ void start_turn_action(int act_row, int act_col) {
 					if (game_board[i][j] != NULL && game_board[i][j]->player != player_state) {
 						health_change_list[++health_change_num] = (struct health_change){
 							j,
-							i, 
-							VOTM_DMG, 
+							i,
+							VOTM_DMG,
 							0
 						};
 					}
-				}	
+				}
 			}
 			break;
 		case EMERALD_TOWERS:
@@ -133,8 +133,8 @@ void start_turn_action(int act_row, int act_col) {
 				 && game_board[cur_col][act_row]->type == UNIT) {
 					health_change_list[++health_change_num] = (struct health_change){
 						cur_col,
-						act_row, 
-						ET_HEAL, 
+						act_row,
+						ET_HEAL,
 						0
 					};
 				}
@@ -148,29 +148,29 @@ void start_turn_action(int act_row, int act_col) {
 					 && of_same_type(j, i, SATYR)) {
 						health_change_list[++health_change_num] = (struct health_change){
 							j,
-							i, 
-							MA_HEAL, 
+							i,
+							MA_HEAL,
 							0
 						};
 					}
-				}	
+				}
 			}
 			break;
 		case WISP_CLOUD:
-			if (game_board[act_col+1-player_state*2][act_row]->status == FROZEN) {
+			if (game_board[act_col+1-player_state*2][act_row]->frozen) {
 				for (int i = act_col - 1; i <= act_col + 1; ++i) {
 					if (i < 0 || i > 4) continue;
 					for (int j = act_row - 1; j <= act_row + 1; ++j) {
 						if (j < 0 || j > 3 || (i == act_col && j == act_row)) continue;
-						if (game_board[i][j] != NULL && game_board[i][j]->status == FROZEN) {
+						if (game_board[i][j] != NULL && game_board[i][j]->frozen) {
 							health_change_list[++health_change_num] = (struct health_change){
 								j,
-								i, 
-								WC_DMG, 
+								i,
+								WC_DMG,
 								0
 							};
 						}
-					}	
+					}
 				}
 			}
 			break;
@@ -179,8 +179,8 @@ void start_turn_action(int act_row, int act_col) {
 			if (spawn_col >= 0 && spawn_col <= 4 && game_board[spawn_col][act_row] == NULL) {
 				health_change_list[++health_change_num] = (struct health_change){
 					act_row,
-					spawn_col, 
-					MW_SPAWN, 
+					spawn_col,
+					MW_SPAWN,
 					CONSTRUCT
 				};
 			}
@@ -190,17 +190,17 @@ void start_turn_action(int act_row, int act_col) {
 				if (i < 0 || i > 4) continue;
 				for (int j = act_row - 1; j <= act_row + 1; ++j) {
 					if (j < 0 || j > 3 || (i == act_col && j == act_row)) continue;
-					if (game_board[i][j] != NULL 
+					if (game_board[i][j] != NULL
 					 && game_board[i][j]->player == player_state
 					 && of_same_type(j, i, CONSTRUCT)) {
 						health_change_list[++health_change_num] = (struct health_change){
 							j,
-							i, 
-							UP_HEAL, 
+							i,
+							UP_HEAL,
 							0
 						};
 					}
-				}	
+				}
 			}
 			break;
 		case SOULCRUSHERS: ;
@@ -213,8 +213,8 @@ void start_turn_action(int act_row, int act_col) {
 			 && game_board[destroy_col][act_row]->health < game_board[act_col][act_row]->health) {
 				health_change_list[++health_change_num] = (struct health_change){
 					act_row,
-					destroy_col, 
-					-game_board[destroy_col][act_row]->health, 
+					destroy_col,
+					-game_board[destroy_col][act_row]->health,
 					0
 				};
 			}
@@ -229,7 +229,7 @@ void start_turn_action(int act_row, int act_col) {
 						cur_rows[list_num] = j;
 						cur_cols[list_num++] = i;
 					}
-				}	
+				}
 			}
 			if (list_num > 0) {
 				int idx = rand_num(0, list_num - 1);
@@ -275,8 +275,8 @@ void move_forward(void) {
 									cur_rows[list_num] = j;
 									cur_cols[list_num++] = jump_col;
 								}
-							}	
-						} 
+							}
+						}
 						if (list_num > 0) {
 							int idx = rand_num(0, list_num - 1);
 							game_board[col][row]->health += TTE_HEAL;
@@ -312,7 +312,7 @@ bool valid_play_card(void) {
 		case MARKED_AS_PREY:
 			return (game_board[col][row] != NULL
 			 && game_board[col][row]->player != player_state
-			 && game_board[col][row]->status == POISONED);
+			 && game_board[col][row]->poisoned);
 			break;
 
 		case DARK_HARVEST:
@@ -320,7 +320,7 @@ bool valid_play_card(void) {
 			return (game_board[col][row] != NULL
 			 && game_board[col][row]->player == player_state);
 			break;
-			
+
 		case SUMMON_MILITIA:
 		case BLADE_STORM:
 		case HEAD_START:
@@ -346,7 +346,8 @@ void play_card(void) {
 				UNIT,
 				player_state,
 				card_data[card_id].init_health,
-				NO_STATUS,
+				false,
+				false,
 				(player_state == P1) ? &satyr_p1 : &satyr_p2
 			};
 			break;
@@ -359,7 +360,8 @@ void play_card(void) {
 				UNIT,
 				player_state,
 				card_data[card_id].init_health,
-				NO_STATUS,
+				false,
+				false,
 				(player_state == P1) ? &frostling_p1 : &frostling_p2
 			};
 			break;
@@ -372,7 +374,8 @@ void play_card(void) {
 				UNIT,
 				player_state,
 				card_data[card_id].init_health,
-				NO_STATUS,
+				false,
+				false,
 				(player_state == P1) ? &knight_p1 : &knight_p2
 			};
 			break;
@@ -384,7 +387,8 @@ void play_card(void) {
 				UNIT,
 				player_state,
 				card_data[card_id].init_health,
-				NO_STATUS,
+				false,
+				false,
 				(player_state == P1) ? &dragon_p1 : &dragon_p2
 			};
 			break;
@@ -395,7 +399,8 @@ void play_card(void) {
 				UNIT,
 				player_state,
 				card_data[card_id].init_health,
-				NO_STATUS,
+				false,
+				false,
 				(player_state == P1) ? &construct_p1 : &construct_p2
 			};
 			break;
@@ -408,7 +413,8 @@ void play_card(void) {
 				UNIT,
 				player_state,
 				card_data[card_id].init_health,
-				NO_STATUS,
+				false,
+				false,
 				(player_state == P1) ? &rodent_p1 : &rodent_p2
 			};
 			break;
@@ -420,18 +426,20 @@ void play_card(void) {
 				UNIT,
 				player_state,
 				card_data[card_id].init_health,
-				NO_STATUS,
+				false,
+				false,
 				(player_state == P1) ? &toad_p1 : &toad_p2
 			};
 			break;
-		
+
 		case EMERALD_TOWERS:
 			*new_troop = (struct troop){
 				card_id,
 				BUILDING,
 				player_state,
 				card_data[card_id].init_health,
-				NO_STATUS,
+				false,
+				false,
 				(player_state == P1) ? &emerald_p1 : &emerald_p2
 			};
 			break;
@@ -442,7 +450,8 @@ void play_card(void) {
 				BUILDING,
 				player_state,
 				card_data[card_id].init_health,
-				NO_STATUS,
+				false,
+				false,
 				(player_state == P1) ? &moonlit_p1 : &moonlit_p2
 			};
 			break;
@@ -453,7 +462,8 @@ void play_card(void) {
 				BUILDING,
 				player_state,
 				card_data[card_id].init_health,
-				NO_STATUS,
+				false,
+				false,
 				(player_state == P1) ? &workshop_p1 : &workshop_p2
 			};
 			break;
@@ -464,7 +474,8 @@ void play_card(void) {
 				BUILDING,
 				player_state,
 				card_data[card_id].init_health,
-				NO_STATUS,
+				false,
+				false,
 				(player_state == P1) ? &upgrade_p1 : &upgrade_p2
 			};
 			break;
@@ -475,7 +486,8 @@ void play_card(void) {
 				BUILDING,
 				player_state,
 				card_data[card_id].init_health,
-				NO_STATUS,
+				false,
+				false,
 				(player_state == P1) ? &venomfall_p1 : &venomfall_p2
 			};
 			break;
@@ -503,7 +515,7 @@ void play_card(void) {
 						cur_rows[list_num] = j;
 						cur_cols[list_num++] = i;
 					}
-				}	
+				}
 			}
 			if (list_num > 0) {
 				int idx = rand_num(0, list_num - 1);
@@ -581,7 +593,7 @@ void play_card(void) {
 				};
 			}
 			break;
-		
+
 		case LUDIC_MATRIARCHS:
 			game_board[col][row] = new_troop;
 			int adj_row = row, adj_col = col;
@@ -620,7 +632,7 @@ void play_card(void) {
 				}
 			}
 			break;
-		
+
 		case DOPPELBOCKS:
 			game_board[col][row] = new_troop;
 			int check_col = col+1-player_state*2;
@@ -660,12 +672,12 @@ void play_card(void) {
 					if (game_board[i][j] != NULL && game_board[i][j]->player != player_state) {
 						health_change_list[++health_change_num] = (struct health_change){
 							j,
-							i, 
-							DH_DMG, 
+							i,
+							DH_DMG,
 							0
 						};
 					}
-				}	
+				}
 			}
 			break;
 
@@ -726,16 +738,16 @@ void play_card(void) {
 					 && game_board[i][j]->type == UNIT) {
 						status_change_list[++status_change_num] = (struct status_change){
 							j,
-							i, 
+							i,
 							FROZEN
 						};
 					}
-				}	
+				}
 			}
 			break;
 
 		case ICICLE_BURST:
-			if (game_board[col][row]->status == NO_STATUS) {
+			if (!game_board[col][row]->frozen) {
 				status_change_list[++status_change_num] = (struct status_change){
 					row,
 					col,
@@ -776,7 +788,7 @@ void play_card(void) {
 						cur_rows[list_num] = j;
 						cur_cols[list_num++] = i;
 					}
-				}	
+				}
 			}
 			if (list_num > 0) {
 				int idx = rand_num(0, list_num - 1);

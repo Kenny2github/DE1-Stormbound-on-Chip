@@ -44,7 +44,8 @@ struct troop {
 	int type;
 	int player;
 	int health;
-	int status;
+	bool frozen;
+	bool poisoned;
 	const struct image* img;
 };
 
