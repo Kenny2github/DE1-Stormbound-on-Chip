@@ -50,6 +50,12 @@ static void handle_event(struct event_t event) {
 	case E_TIMER_RELOAD:
 		if(!(--time_left)) disable_timer();
 		*LEDR_ptr = (1 << time_left) - 1;
+		break;
+	case E_INTVAL_TIMER_ENABLE:
+		animation_waiting = true;
+		break;
+	case E_INTVAL_TIMER_RELOAD:
+		animation_waiting = false;
 	}
 }
 
@@ -58,6 +64,7 @@ int main(void) {
 	config_interrupt(IRQ_KEY, &config_KEYs, &pushbutton_ISR);
 	enable_mouse();
 	enable_timer();
+	enable_intval_timer();
 	config_interrupts();
 
 	init_game();
