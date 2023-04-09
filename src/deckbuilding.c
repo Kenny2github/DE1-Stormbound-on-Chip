@@ -6,12 +6,13 @@
 #include "states.h"
 #include "events.h"
 #include "event_types.h"
+#include "game.h"
 #include "turn.h"
 
 int card_num;
 bool in_deck[30];
 
-static void display_card_info(int card_id) {
+static void db_display_card_info(int card_id) {
 	if (card_id != deckbuilding_cur_display) {
 		push_image(20, 156, card_data[card_id].img);
 		write_string(28, 43, empty_desc_data);
@@ -131,7 +132,7 @@ void run_deckbuilding(void) {
 
 				int idx = (int)(saved_mouse_states[0].x / 80) * 10 + (int)((saved_mouse_states[0].y - 12) / 12);
 				if (!in_deck[idx]) {
-					display_card_info(idx);
+					db_display_card_info(idx);
 				} else {
 					clear_card_info();
 				}
@@ -141,7 +142,7 @@ void run_deckbuilding(void) {
 				&& saved_mouse_states[0].y >= 12 && saved_mouse_states[0].y < (card_num * 12 + 12)) {
 
 				int card_id = deck[player_state][(int)((saved_mouse_states[0].y - 12) / 12)];
-				display_card_info(card_id);
+				db_display_card_info(card_id);
 
 			} else {
 				if (deckbuilding_displaying) {

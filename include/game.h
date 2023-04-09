@@ -123,6 +123,16 @@ enum status_type {
 
 /**** Global Constants ****/
 
+const char empty_desc_data[] =
+	"                        \n"
+	"                        \n"
+	"                        \n"
+	"                        \n"
+	"                        \n"
+	"                        \n"
+	"                        \n"
+;
+
 /**
  * @brief Const array of card items, ordered by card ID
  */

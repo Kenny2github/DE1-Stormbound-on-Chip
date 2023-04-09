@@ -10,16 +10,6 @@ const char empty_card_name_data[] =
 	"                    "
 ;
 
-const char empty_desc_data[] =
-	"                        \n"
-	"                        \n"
-	"                        \n"
-	"                        \n"
-	"                        \n"
-	"                        \n"
-	"                        \n"
-;
-
 /**** Globals ****/
 
 extern int card_num;

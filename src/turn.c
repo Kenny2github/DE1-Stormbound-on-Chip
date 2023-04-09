@@ -2,6 +2,7 @@
 #include "address_map_arm.h"
 #include "vga.h"
 #include "render.h"
+#include "assets.h"
 #include "mouse.h"
 #include "states.h"
 #include "events.h"
@@ -12,6 +13,8 @@
 
 bool cur_cards_played[4];
 int cur_card_selected;
+int cur_card_displayed;
+bool cur_card_displaying;
 
 /* change mana to new_mana, and display mana value on HEX3-0 */
 void update_mana(int new_mana) {
@@ -44,6 +47,16 @@ void update_front(void) {
 		}
 	}
 	front[player_state] = player_state == P1 ? 0 : 4;
+}
+
+static void t_display_card_info(int card_id) {
+	if (card_id != cur_card_displayed) {
+		write_string(52, 43, empty_desc_data);
+		write_string(52, 43, card_data[card_id].desc);
+	} else if (!cur_card_displaying) {
+		write_string(52, 43, card_data[card_id].desc);
+	}
+	cur_card_displaying = true;
 }
 
 void init_turn() {
@@ -93,6 +106,9 @@ static void init_select_card(void) {
 		cur_card_deck_surfs[i] = (struct surface){i * 46 + 10, 166, card_data[deck[player_state][i]].img};
 		r_stack_push(cur_card_deck_surfs[i]);
 	}
+	cur_card_selected = 100;
+	cur_card_displayed = 100;
+	cur_card_displaying = false;
 	turn_state = SELECT_CARD;
 }
 
@@ -171,6 +187,117 @@ static void run_preturn_unit(void) {
 	}
 }
 
+static void select_card_click(void) {
+	if (saved_mouse_states[0].y >= 166 && saved_mouse_states[0].y < 227) {
+		for (int i = 0; i < 4; ++i) {
+			if (saved_mouse_states[0].x >= i * 46 + 10 && saved_mouse_states[0].x < i * 46 + 51) {
+				if (i != cur_card_selected) {
+					if (cur_card_selected >= 0 && cur_card_selected < 4) {
+						// clear card image
+						push_image(cur_card_selected * 46 + 10, 146, &clear_card);
+						// redraw but slightly higher
+						cur_card_deck_surfs[cur_card_selected].y = 166;
+						r_stack_push(cur_card_deck_surfs[cur_card_selected]);
+					}
+					cur_card_selected = i;
+					// clear card image
+					push_image(i * 46 + 10, 166, &clear_card);
+					// redraw but slightly higher
+					cur_card_deck_surfs[i].y = 146;
+					r_stack_push(cur_card_deck_surfs[i]);
+					turn_state = PLACE_CARD;
+					break;
+				}
+
+			}
+		}
+	}
+}
+
+static void select_card_hover(void) {
+	for (int i = 0; i < 4; ++i) {
+		if (rects_collide(
+			// this surf's rect
+			cur_card_deck_surfs[i].x, cur_card_deck_surfs[i].y,
+			cur_card_deck_surfs[i].data->width, cur_card_deck_surfs[i].data->height,
+			// previous mouse surf's rect
+			saved_mouse_states[0].x, saved_mouse_states[0].y,
+			mouse_clear.width, mouse_clear.height
+		)) {
+			int card_id = deck[player_state][i];
+			t_display_card_info(card_id);
+			return;
+		}
+	}
+	for (int i = 0; i < COL; ++i) {
+		for (int j = 0; j < ROW; ++j) {
+			if (game_board[i][j] != NULL && rects_collide(
+				// this surf's rect
+				board_base_surfs[i][j].x, board_base_surfs[i][j].y,
+				board_base_surfs[i][j].data->width, board_base_surfs[i][j].data->height,
+				// previous mouse surf's rect
+				saved_mouse_states[0].x, saved_mouse_states[0].y,
+				mouse_clear.width, mouse_clear.height
+			)) {
+				int card_id = game_board[i][j]->card_id;
+				t_display_card_info(card_id);
+				return;
+			}
+		}
+	}
+	if (cur_card_displaying) {
+		cur_card_displaying = false;
+		write_string(52, 43, empty_desc_data);
+	}
+}
+
+static void select_card_rerendering(void) {
+	// re-render affected surfaces
+	for (int i = 0; i < 4; ++i) {	// cards
+		for (int j = 1; j < NUM_MOUSE_STATES; ++j) {
+			if (rects_collide(
+				// this surf's rect
+				cur_card_deck_surfs[i].x, cur_card_deck_surfs[i].y,
+				cur_card_deck_surfs[i].data->width, cur_card_deck_surfs[i].data->height,
+				// previous mouse surf's rect
+				saved_mouse_states[j].x, saved_mouse_states[j].y,
+				mouse_clear.width, mouse_clear.height
+			)) r_stack_push(cur_card_deck_surfs[i]);
+		}
+	}
+	for (int i = 0; i < COL; ++i) {	// troops
+		for (int j = 0; j < ROW; ++j) {
+			for (int k = 1; k < NUM_MOUSE_STATES; ++k) {
+				if (rects_collide(
+					// this surf's rect
+					board_base_surfs[i][j].x, board_base_surfs[i][j].y,
+					board_base_surfs[i][j].data->width, board_base_surfs[i][j].data->height,
+					// previous mouse surf's rect
+					saved_mouse_states[k].x, saved_mouse_states[k].y,
+					mouse_clear.width, mouse_clear.height
+				)) {
+					r_stack_push(board_base_surfs[i][j]);
+					for (int l = 0; l < board_overlay_surf_num[i][j]; ++l) {
+						r_stack_push(board_overlay_surfs[i][j][l]);
+					}
+				}
+			}
+		}
+	}
+	for (int i = 5; i < 8; ++i) {	// board
+		for (int j = 1; j < NUM_MOUSE_STATES; ++j) {
+			if (rects_collide(
+				// this surf's rect
+				board_base_surfs[i][0].x, board_base_surfs[i][0].y,
+				board_base_surfs[i][0].data->width, board_base_surfs[i][0].data->height,
+				// previous mouse surf's rect
+				saved_mouse_states[j].x, saved_mouse_states[j].y,
+				mouse_clear.width, mouse_clear.height
+			)) r_stack_push(board_base_surfs[i][0]);
+		}
+	}
+}
+
 static void run_select_card(void) {
 	bool mouse_moved = false;
 	while (!event_queue_empty()) {
@@ -178,20 +305,9 @@ static void run_select_card(void) {
 		default_event_handlers(event);
 
 		if (event.type == E_MOUSE_BUTTON_DOWN && event.data.mouse_button_down.left) {
-			if (mouse_state.y >= 166 && mouse_state.y < 227) {
-				for (int i = 0; i < 4; ++i) {
-					if (mouse_state.x >= i * 46 + 10 && mouse_state.x < i * 46 + 51) {
-						cur_card_selected = i;
-						// clear card image
-						push_image(i * 46 + 10, 166, &clear_card);
-						// redraw but slightly higher
-						cur_card_deck_surfs[i].y = 146;
-						r_stack_push(cur_card_deck_surfs[i]);
-						turn_state = PLACE_CARD;
-						break;
-					}
-				}
-			}
+			select_card_click();
+		} else {
+			select_card_hover();
 		}
 		if (event.type == E_MOUSE_MOVE) mouse_moved = true;
 	}
@@ -205,50 +321,40 @@ static void run_select_card(void) {
 				&mouse_clear
 			);
 		}
-		// re-render affected surfaces
-		for (int i = 0; i < 4; ++i) {	// cards
-			for (int j = 1; j < NUM_MOUSE_STATES; ++j) {
-				if (rects_collide(
-					// this surf's rect
-					cur_card_deck_surfs[i].x, cur_card_deck_surfs[i].y,
-					cur_card_deck_surfs[i].data->width, cur_card_deck_surfs[i].data->height,
-					// previous mouse surf's rect
-					saved_mouse_states[j].x, saved_mouse_states[j].y,
-					mouse_clear.width, mouse_clear.height
-				)) r_stack_push(cur_card_deck_surfs[i]);
-			}
+		select_card_rerendering();
+	}
+	// render new mouse position
+	push_image(
+		saved_mouse_states[0].x,
+		saved_mouse_states[0].y,
+		&mouse
+	);
+}
+
+static void run_place_card(void) {
+	bool mouse_moved = false;
+	while (!event_queue_empty()) {
+		struct event_t event = event_queue_pop();
+		default_event_handlers(event);
+
+		if (event.type == E_MOUSE_BUTTON_DOWN && event.data.mouse_button_down.left) {
+			select_card_click();
+		} else {
+			select_card_hover();
 		}
-		for (int i = 0; i < COL; ++i) {	// troops
-			for (int j = 0; j < ROW; ++j) {
-				for (int k = 1; k < NUM_MOUSE_STATES; ++k) {
-					if (rects_collide(
-						// this surf's rect
-						board_base_surfs[i][j].x, board_base_surfs[i][j].y,
-						board_base_surfs[i][j].data->width, board_base_surfs[i][j].data->height,
-						// previous mouse surf's rect
-						saved_mouse_states[k].x, saved_mouse_states[k].y,
-						mouse_clear.width, mouse_clear.height
-					)) {
-						r_stack_push(board_base_surfs[i][j]);
-						for (int l = 0; l < board_overlay_surf_num[i][j]; ++l) {
-							r_stack_push(board_overlay_surfs[i][j][l]);
-						}
-					}
-				}
-			}
+		if (event.type == E_MOUSE_MOVE) mouse_moved = true;
+	}
+	if (turn_state != PLACE_CARD) return;
+	if (mouse_moved) {
+		// clear old mouse positions
+		for (int i = NUM_MOUSE_STATES - 1; i > 0; --i) {
+			push_image(
+				saved_mouse_states[i].x,
+				saved_mouse_states[i].y,
+				&mouse_clear
+			);
 		}
-		for (int i = 5; i < 8; ++i) {	// board
-			for (int j = 1; j < NUM_MOUSE_STATES; ++j) {
-				if (rects_collide(
-					// this surf's rect
-					board_base_surfs[i][0].x, board_base_surfs[i][0].y,
-					board_base_surfs[i][0].data->width, board_base_surfs[i][0].data->height,
-					// previous mouse surf's rect
-					saved_mouse_states[j].x, saved_mouse_states[j].y,
-					mouse_clear.width, mouse_clear.height
-				)) r_stack_push(board_base_surfs[i][0]);
-			}
-		}
+		select_card_rerendering();
 	}
 	// render new mouse position
 	push_image(
@@ -273,6 +379,7 @@ void run_turn(void) {
 			break;
 
 		case PLACE_CARD:
+			run_place_card();
 			break;
 
 		case CARD_MOVING:
