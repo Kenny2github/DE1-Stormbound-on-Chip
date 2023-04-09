@@ -9,6 +9,7 @@ goto :error
 :combined.c
 
 echo #define CPULATOR>combined.c
+type nul > headers.txt
 for /R "src" %%f in (*.c) do (
 	echo Combining %%~nxf
 	py scripts\combine.py "%%f"
