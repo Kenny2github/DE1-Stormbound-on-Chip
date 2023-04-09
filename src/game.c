@@ -41,39 +41,6 @@ void swap_int(int* a, int* b) {
 	*a = *a - *b;
 }
 
-/* change mana to new_mana, and display mana value on HEX3-0 */
-static void update_mana(int new_mana) {
-	int seg7[] = {0x3f, 0x06, 0x5b, 0x4f, 0x66, 0x6d, 0x7d, 0x07, 0x7f, 0x67, 0x063f};
-	volatile int* HEX30_ptr = (int*)HEX3_HEX0_BASE;
-	int HEX_bits = 0;
-	mana = new_mana;
-	int j = 1;
-	for (int i = 10; i < 10000 && new_mana != 0; i *= 10) {
-		if (new_mana < i) {
-			HEX_bits += seg7[(new_mana % i) / (i / 10)] *= j;
-			new_mana -= new_mana % i;
-			j *= 0x100;
-		}
-	}
-	*HEX30_ptr = HEX_bits;
-}
-
-static void update_front(void) {
-	for (int i = 4; i > 0; --i) {
-		int cur_front = player_state == P1 ? i : 4-i;
-		for (int j = 0; j < 4; ++j) {
-			if (game_board[cur_front][j] != NULL
-			 && game_board[cur_front][j]->player) {
-				if (player_state == P1 && cur_front == 4) front[player_state] = 3;
-				else if (player_state == P2 && cur_front == 0) front[player_state] = 1;
-				else front[player_state] = cur_front;
-				return;
-			}
-		}
-	}
-	front[player_state] = player_state == P1 ? 0 : 4;
-}
-
 /**** Exported functions ****/
 
 void default_event_handlers(struct event_t event) {
@@ -124,105 +91,7 @@ void run_game() {
 
 
 		case DECK:
-			fill_screen(BACKGROUND);
-			clear_char_screen();
-			// draw current available cards
-			write_string(1, 1, "Cards:");
-			for (int i = 0; i < 30; ++i) {
-				if (in_deck[i]) continue;
-				push_image((int)(i / 10) * 80, i % 10 * 12 + 12, card_selection_box[card_data[i].faction]);
-				write_string((int)(i / 10) * 20 + (20 - strlen(card_data[i].name)) / 2, i % 10 * 3 + 4, card_data[i].name);
-			}
-			// draw current cards in deck
-			write_string(61, 1, (player_state == P1) ? "P1 deck:" : "P2 deck:");
-			for (int i = 0; i < card_num; ++i) {
-				push_image(240, i * 12 + 12, card_selection_box[card_data[deck[player_state][i]].faction]);
-				write_string(60 + (20 - strlen(card_data[deck[player_state][i]].name)) / 2, i * 3 + 4, card_data[deck[player_state][i]].name);
-			}
-			// draw button for if
-			if (card_num == 10) push_image(SCREEN_W - 61, 156, &cardbuilding_done);
-			// draw mouse
-			push_image(mouse_state.x, mouse_state.y, &mouse);
-
-
-			if (mouse_state.left_clicked) {
-				if (card_num != 10
-				 && mouse_state.x >= 0 && mouse_state.x < 240
-				 && mouse_state.y >= 12 && mouse_state.y < 132) {	// clicked on available cards
-
-					int idx = (int)(mouse_state.x / 80) * 10 + (int)((mouse_state.y - 12) / 12);
-					if (!(in_deck[idx])) {	// move card to deck
-						in_deck[idx] = true;
-						deck[player_state][card_num++] = idx;
-					}
-
-				} else if (mouse_state.x >= 240 && mouse_state.x < SCREEN_W
-				 && mouse_state.y >= 12 && mouse_state.y < (card_num * 12 + 12)) {	// clicked on deck
-
-					int idx = (mouse_state.y - 12) / 12;
-					in_deck[deck[player_state][idx]] = false; // remove card from deck
-					for (int i = idx; i < card_num - 1; ++i) {	// shift deck cards down
-						deck[player_state][i] = deck[player_state][i + 1];
-					}
-					--card_num;
-
-				}
-			} else {
-				// highlight card_data
-				if (mouse_state.x >= 0 && mouse_state.x < 240
-				 && mouse_state.y >= 12 && mouse_state.y < 132) {
-
-					int idx = (int)(mouse_state.x / 80) * 10 + (int)((mouse_state.y - 12) / 12);
-					if (!(in_deck[idx])) {
-						push_image(20, 156, card_data[idx].img);
-						write_string(28, 43, card_data[idx].desc);
-					}
-
-
-				} else if (mouse_state.x >= 240 && mouse_state.x < SCREEN_W
-				 && mouse_state.y >= 12 && mouse_state.y < (card_num * 12 + 12)) {
-
-					int idx = (mouse_state.y - 12) / 12;
-					push_image(20, 156, card_data[deck[player_state][idx]].img);
-					write_string(28, 43, card_data[deck[player_state][idx]].desc);
-
-				}
-			}
-
-			/* done button */
-			if (mouse_state.x >= SCREEN_W - 61 && mouse_state.x < SCREEN_W - 20
-			 && mouse_state.y >= 156 && mouse_state.y < 217 && mouse_state.left_clicked) {
-				switch(player_state) {
-					case P1: // go to next player
-						player_state = P2;
-						card_num = 0;
-						for (int i = 0; i < 30; ++i) in_deck[i] = false;
-						break;
-					case P2: // go to turn state
-						player_state = P1;
-						game_state = TURN;
-						turn_state = PRETURN_BUILDING;
-						move_state = CARD_EFFECT;
-						row = 0;
-						col = 4;
-						front[P1] = 0;
-						front[P2] = 4;
-						// shuffle both decks
-						for (int i = 0; i < 10; ++i) {
-							swap_int(&deck[P1][i], &deck[P1][rand_num(0, 9)]);
-							swap_int(&deck[P2][i], &deck[P2][rand_num(0, 9)]);
-						}
-						for (int i = 0; i < 5; ++i) {
-							for (int j = 0; j < 4; ++j) {
-								game_board[i][j] = NULL;
-							}
-						}
-						cur_round = 0;
-						update_mana(3);
-						enable_timer_interrupt();
-				}
-			}
-
+			run_deckbuilding();
 			break;
 
 

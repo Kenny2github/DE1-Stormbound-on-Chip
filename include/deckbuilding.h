@@ -4,6 +4,22 @@
 #include "game.h"
 #include "render.h"
 
+/**** Constatns ****/
+
+const char empty_card_name_data[] =
+	"                    "
+;
+
+const char empty_desc_data[] =
+	"                        \n"
+	"                        \n"
+	"                        \n"
+	"                        \n"
+	"                        \n"
+	"                        \n"
+	"                        \n"
+;
+
 /**** Globals ****/
 
 extern int card_num;
@@ -17,7 +33,7 @@ bool deckbuilding_done_displaying;
 
 /**** Exported Functions ****/
 
-void draw_deckbuilding(void);
+void init_deckbuilding(void);
 
 void run_deckbuilding(void);
 

@@ -3,6 +3,7 @@
 
 #include "assets.h"
 #include "image_data.h"
+#include "events.h"
 
 #define NUM_CARDS 30
 
@@ -196,6 +197,8 @@ extern int row, col;
  * @brief Current front of each player
  */
 extern int front[2];
+
+extern int cur_round;
 
 /**
  * @brief Current amount of mana left

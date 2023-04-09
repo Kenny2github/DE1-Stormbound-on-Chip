@@ -27,12 +27,8 @@ void run_title(void) {
 
 		if (event.type == E_MOUSE_BUTTON_DOWN && event.data.mouse_button_down.left) {
 			// state transition on mouse click
-			game_state = DECK;
 			player_state = P1;
-			card_num = 0;
-			for (int i = 0; i < sizeof(in_deck) / sizeof(in_deck[0]); ++i) {
-				in_deck[i] = false;
-			}
+			init_deckbuilding();
 		}
 		if (event.type == E_MOUSE_MOVE) mouse_moved = true;
 	}
