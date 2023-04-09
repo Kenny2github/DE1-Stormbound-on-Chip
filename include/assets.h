@@ -261,9 +261,6 @@ extern const char dr_mia_desc_data[];
 // emerald_towers_desc.txt
 extern const char emerald_towers_desc_data[];
 
-// empty_desc.txt
-extern const char empty_desc_data[];
-
 // execution_desc.txt
 extern const char execution_desc_data[];
 
