@@ -32,7 +32,6 @@ struct event_t event_queue_pop(void) {
 void event_queue_push(struct event_t event, const char* type_name) {
 	size_t next_head = (q_head + 1) % EVENT_QUEUE_LEN;
 	if (next_head == q_tail) {
-		printf("Warning: %s event dropped due to full queue\n", type_name);
 		return;
 	}
 	q_data[q_head] = event;
