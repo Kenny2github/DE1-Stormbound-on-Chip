@@ -206,19 +206,19 @@ void run_game() {
 			write_string(1, 1, "Cards:");
 			for (int i = 0; i < 30; ++i) {
 				if (in_deck[i]) continue;
-				draw_img_map((int)(i / 10) * 80, i % 10 * 12 + 12, *card_selection_box[card_data[i].faction]);
+				push_image((int)(i / 10) * 80, i % 10 * 12 + 12, card_selection_box[card_data[i].faction]);
 				write_string((int)(i / 10) * 20 + (20 - strlen(card_data[i].name)) / 2, i % 10 * 3 + 4, card_data[i].name);
 			}
 			// draw current cards in deck
 			write_string(61, 1, (player_state == P1) ? "P1 deck:" : "P2 deck:");
 			for (int i = 0; i < card_num; ++i) {
-				draw_img_map(240, i * 12 + 12, *card_selection_box[card_data[deck[player_state][i]].faction]);
+				push_image(240, i * 12 + 12, card_selection_box[card_data[deck[player_state][i]].faction]);
 				write_string(60 + (20 - strlen(card_data[deck[player_state][i]].name)) / 2, i * 3 + 4, card_data[deck[player_state][i]].name);
 			}
 			// draw button for if
-			if (card_num == 10) draw_img_map(SCREEN_W - 61, 156, cardbuilding_done);
+			if (card_num == 10) push_image(SCREEN_W - 61, 156, &cardbuilding_done);
 			// draw mouse
-			draw_rectangle(mouse_state.x, mouse_state.y, 2, 2, WHITE);
+			push_image(mouse_state.x, mouse_state.y, &mouse);
 
 
 			if (mouse_state.left_clicked) {
@@ -250,7 +250,7 @@ void run_game() {
 
 					int idx = (int)(mouse_state.x / 80) * 10 + (int)((mouse_state.y - 12) / 12);
 					if (!(in_deck[idx])) {
-						draw_img_map(20, 156, *card_data[idx].img);
+						push_image(20, 156, card_data[idx].img);
 						write_string(28, 43, card_data[idx].desc);
 					}
 
@@ -259,7 +259,7 @@ void run_game() {
 				 && mouse_state.y >= 12 && mouse_state.y < (card_num * 12 + 12)) {
 
 					int idx = (mouse_state.y - 12) / 12;
-					draw_img_map(20, 156, *card_data[deck[player_state][idx]].img);
+					push_image(20, 156, card_data[deck[player_state][idx]].img);
 					write_string(28, 43, card_data[deck[player_state][idx]].desc);
 
 				}
@@ -306,7 +306,7 @@ void run_game() {
 			fill_screen(BACKGROUND);
 			clear_char_screen();
 			write_string(1, 1, (player_state == P1) ? "P1 turn" : "P2 turn");
-			draw_img_map(0, 12, board);
+			push_image(0, 12, &board);
 			switch(turn_state) {
 				case PRETURN_BUILDING:
 					switch (move_state) {
@@ -380,10 +380,10 @@ void run_game() {
 
 				case SELECT_CARD:
 					// draw mouse
-					draw_rectangle(mouse_state.x, mouse_state.y, 2, 2, WHITE);
+					push_image(mouse_state.x, mouse_state.y, &mouse);
 					for (int i = 0; i < 4; ++i) {
 						if (!(cur_cards_played[i])) {
-							draw_img_map(i * 46 + 10, 166, *card_data[deck[player_state][i]].img);
+							push_image(i * 46 + 10, 166, card_data[deck[player_state][i]].img);
 						}
 					}
 
@@ -413,10 +413,10 @@ void run_game() {
 
 				case PLACE_CARD:
 					// draw mouse
-					draw_rectangle(mouse_state.x, mouse_state.y, 2, 2, WHITE);
+					push_image(mouse_state.x, mouse_state.y, &mouse);
 					for (int i = 0; i < 4; ++i) {
 						if (!(cur_cards_played[i])) {
-							draw_img_map(i * 46 + 10, 166, *card_data[deck[player_state][i]].img);
+							push_image(i * 46 + 10, 166, card_data[deck[player_state][i]].img);
 						}
 					}
 
