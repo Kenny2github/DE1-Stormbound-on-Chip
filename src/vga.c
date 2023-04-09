@@ -32,8 +32,8 @@ void fill_screen(uint16_t color) {
 }
 
 void draw_rectangle(int x, int y, int w, int h, uint16_t color) {
-	for (int xi = x; xi < x + w; ++xi) {
-		for (int yi = y; yi < y + h; ++yi) {
+	for (int yi = y; yi < y + h; ++yi) {
+		for (int xi = x; xi < x + w; ++xi) {
 			plot_pixel(xi, yi, color);
 		}
 	}
@@ -45,8 +45,8 @@ static void draw_character(int x, int y, char c) {
 
 
 void clear_char_screen() {
-	for (int x = 0; x < SCREEN_CHAR_W; ++x) {
-		for (int y = 0; y < SCREEN_CHAR_H; ++y) {
+	for (int y = 0; y < SCREEN_CHAR_H; ++y) {
+		for (int x = 0; x < SCREEN_CHAR_W; ++x) {
 			draw_character(x, y, 0);
 		}
 	}
