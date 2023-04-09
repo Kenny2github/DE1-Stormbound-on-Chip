@@ -4,6 +4,8 @@
 #include "assets.h"
 #include "image_data.h"
 
+#define NUM_CARDS 30
+
 /**** Structs and Enums ****/
 
 /**
@@ -223,6 +225,8 @@ int rand_num(int a, int b);
  * @param b Pointer to second int
  */
 void swap_int(int* a, int* b);
+
+void default_event_handlers(struct event_t event);
 
 /**
  * @brief Initialize game states
