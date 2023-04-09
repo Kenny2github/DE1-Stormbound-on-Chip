@@ -3,8 +3,14 @@
 
 #include "image_data.h"
 
-// board.png
-extern const struct image board;
+// board_p1.png
+extern const struct image board_p1;
+
+// board_p2.png
+extern const struct image board_p2;
+
+// board_tiles.png
+extern const struct image board_tiles;
 
 // cardbuilding_done.png
 extern const struct image cardbuilding_done;
@@ -41,6 +47,9 @@ extern const struct image emerald_p1;
 
 // emerald_p2.png
 extern const struct image emerald_p2;
+
+// empty_tile.png
+extern const struct image empty_tile;
 
 // frostling_p1.png
 extern const struct image frostling_p1;

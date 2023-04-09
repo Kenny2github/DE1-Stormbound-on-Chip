@@ -437,7 +437,9 @@ void run_game() {
 			fill_screen(BACKGROUND);
 			clear_char_screen();
 			write_string(1, 1, (player_state == P1) ? "P1 turn" : "P2 turn");
-			push_image(0, 12, &board);
+			push_image(0, 12, &board_p1);
+			push_image(55, 12, &board_tiles);
+			push_image(265, 12, &board_p2);
 			switch(turn_state) {
 				case PRETURN_BUILDING:
 					switch (move_state) {
