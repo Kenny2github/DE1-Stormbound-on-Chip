@@ -36,9 +36,9 @@ bool attack_sideways(void);
 void move_forward(void);
 
 /**
- * @brief additional movement logic just for TTE. fuck TTE
+ * @brief Additional movement logic just for Tode the Elevated.
  */
-void move_TTE(void);
+void move_tode_the_elevated(void);
 
 /**
  * @brief Return whether a card can be placed there

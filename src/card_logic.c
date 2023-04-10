@@ -9,27 +9,27 @@
 #include "health_status.h"
 #include "turn.h"
 
-#define FF_DMG -2
-#define VOTM_DMG -2
-#define ET_HEAL 2
-#define SM_SPAWN 1
-#define E_DMG -4
-#define BS_DMG -1
-#define DS_HEAL 2
-#define LM_SPAWN 1
-#define DB_SPAWN 1
-#define MA_HEAL 1
-#define HS_SPAWN 3
-#define DH_DMG -2
-#define WC_DMG -4
-#define FM_HEAL 6
-#define MP_HEAL 5
-#define IB_DMG -8
-#define MW_SPAWN 1
-#define UP_HEAL 1
-#define TTE_HEAL 2
-#define MAP_DMG -5
-#define MAP_SPAWN 5
+#define FELFLARES_DAMAGE -2
+#define VICTORS_OF_THE_MELEE_DAMAGE -2
+#define EMERALD_TOWERS_HEAL 2
+#define SUMMON_MILITIA_SPAWN 1
+#define EXECUTION_DAMAGE -4
+#define BLADESTORM_DAMAGE -1
+#define DANGEROUS_SUITORS_HEAL 2
+#define LUDIC_MATRIARCHEAD_START_SPAWN 1
+#define DOPPELBOCKS_SPAWN 1
+#define MOONLIT_AERIE_HEAL 1
+#define HEAD_START_SPAWN 3
+#define DARK_HARVEST_DAMAGE -2
+#define WISP_CLOUD_DAMAGE -4
+#define FLESHMENDERS_HEAL 6
+#define MOMENTS_PEACE_HEAL 5
+#define ICICLE_BURST_DAMAGE -8
+#define MECH_WORKSHOP_SPAWN 1
+#define UPGRADE_POINT_HEAL 1
+#define TODE_THE_ELEVATED_HEAL 2
+#define MARKED_AS_PREY_DAMAGE -5
+#define MARKED_AS_PREY_SPAWN 5
 
 void place_new_tile_asset(int r, int c, struct troop* new_troop) {
 	game_board[c][r] = new_troop;
@@ -129,7 +129,7 @@ void start_turn_action(int act_row, int act_col) {
 				health_change_list[++health_change_num] = (struct health_change){
 					0,
 					(player_state == P1 ? 5 : -1),
-					VOTM_DMG,
+					VICTORS_OF_THE_MELEE_DAMAGE,
 					0
 				};
 			}
@@ -141,7 +141,7 @@ void start_turn_action(int act_row, int act_col) {
 						health_change_list[++health_change_num] = (struct health_change){
 							j,
 							i,
-							VOTM_DMG,
+							VICTORS_OF_THE_MELEE_DAMAGE,
 							0
 						};
 					}
@@ -157,7 +157,7 @@ void start_turn_action(int act_row, int act_col) {
 					health_change_list[++health_change_num] = (struct health_change){
 						cur_col,
 						act_row,
-						ET_HEAL,
+						EMERALD_TOWERS_HEAL,
 						0
 					};
 				}
@@ -172,7 +172,7 @@ void start_turn_action(int act_row, int act_col) {
 						health_change_list[++health_change_num] = (struct health_change){
 							j,
 							i,
-							MA_HEAL,
+							MOONLIT_AERIE_HEAL,
 							0
 						};
 					}
@@ -189,7 +189,7 @@ void start_turn_action(int act_row, int act_col) {
 							health_change_list[++health_change_num] = (struct health_change){
 								j,
 								i,
-								WC_DMG,
+								WISP_CLOUD_DAMAGE,
 								0
 							};
 						}
@@ -197,13 +197,13 @@ void start_turn_action(int act_row, int act_col) {
 				}
 			}
 			break;
-		case MECH_WORKSHOP: ;
+		case MECH_WORKSHOP:
 			int spawn_col = act_col + (player_state == P1 ? 1 : -1);
 			if (spawn_col >= 0 && spawn_col <= 4 && game_board[spawn_col][act_row] == NULL) {
 				health_change_list[++health_change_num] = (struct health_change){
 					act_row,
 					spawn_col,
-					MW_SPAWN,
+					MECH_WORKSHOP_SPAWN,
 					CONSTRUCT
 				};
 			}
@@ -219,14 +219,14 @@ void start_turn_action(int act_row, int act_col) {
 						health_change_list[++health_change_num] = (struct health_change){
 							j,
 							i,
-							UP_HEAL,
+							UPGRADE_POINT_HEAL,
 							0
 						};
 					}
 				}
 			}
 			break;
-		case SOULCRUSHERS: ;
+		case SOULCRUSHERS:
 			int destroy_col = act_col + (player_state == P1 ? 1 : -1);
 			if (destroy_col >= 0
 			 && destroy_col <= 4
@@ -242,7 +242,7 @@ void start_turn_action(int act_row, int act_col) {
 				};
 			}
 			break;
-		case VENOMFALL_SPIRE: ;
+		case VENOMFALL_SPIRE:
 			int cur_rows[20], cur_cols[20], list_num = 0;
 			for (int i = 0; i < 5; ++i) {
 				for (int j = 0; j < 4; ++j) {
@@ -338,7 +338,7 @@ void move_forward(void) {
 	}
 }
 
-void move_TTE(void) {
+void move_tode_the_elevated(void) {
 	int cur_rows[20], cur_cols[20], list_num = 0;
 	for (int i = 0; i < 5; ++i) {
 		int jump_col = i - 1 + player_state*2;
@@ -354,7 +354,7 @@ void move_TTE(void) {
 	}
 	if (list_num > 0) {
 		int idx = rand_num(0, list_num - 1);
-		game_board[col][row]->health += TTE_HEAL;
+		game_board[col][row]->health += TODE_THE_ELEVATED_HEAL;
 		game_board[cur_cols[idx]][cur_rows[idx]] = game_board[col][row];
 		game_board[col][row] = NULL;
 	}
@@ -590,7 +590,7 @@ void play_card(void) {
 				health_change_list[++health_change_num] = (struct health_change){
 					cur_rows[idx],
 					cur_cols[idx],
-					FF_DMG,
+					FELFLARES_DAMAGE,
 					0
 				};
 			}
@@ -611,7 +611,7 @@ void play_card(void) {
 				health_change_list[++health_change_num] = (struct health_change){
 					cur_rows[idx],
 					cur_cols[idx],
-					SM_SPAWN,
+					SUMMON_MILITIA_SPAWN,
 					KNIGHT
 				};
 			}
@@ -621,7 +621,7 @@ void play_card(void) {
 			health_change_list[++health_change_num] = (struct health_change){
 				row,
 				col,
-				E_DMG,
+				EXECUTION_DAMAGE,
 				0
 			};
 			break;
@@ -633,7 +633,7 @@ void play_card(void) {
 						health_change_list[++health_change_num] = (struct health_change){
 							row,
 							col,
-							BS_DMG,
+							BLADESTORM_DAMAGE,
 							0
 						};
 					}
@@ -656,7 +656,7 @@ void play_card(void) {
 				health_change_list[++health_change_num] = (struct health_change){
 					row,
 					col,
-					DS_HEAL * heal,
+					DANGEROUS_SUITORS_HEAL * heal,
 					0
 				};
 			}
@@ -686,7 +686,7 @@ void play_card(void) {
 					if (game_board[cur_col][cur_row] == NULL) health_change_list[++health_change_num] = (struct health_change){
 						cur_row,
 						cur_col,
-						LM_SPAWN,
+						LUDIC_MATRIARCHEAD_START_SPAWN,
 						DRAGON
 					};
 					cur_col = adj_col+bordering_col[i];
@@ -694,7 +694,7 @@ void play_card(void) {
 					if (game_board[cur_col][cur_row] == NULL) health_change_list[++health_change_num] = (struct health_change){
 						cur_row,
 						cur_col,
-						LM_SPAWN,
+						LUDIC_MATRIARCHEAD_START_SPAWN,
 						DRAGON
 					};
 				}
@@ -709,7 +709,7 @@ void play_card(void) {
 				health_change_list[++health_change_num] = (struct health_change){
 					row,
 					check_col,
-					DB_SPAWN,
+					DOPPELBOCKS_SPAWN,
 					SATYR
 				};
 			}
@@ -726,7 +726,7 @@ void play_card(void) {
 				health_change_list[++health_change_num] = (struct health_change){
 					cur_rows[idx],
 					front_columns[player_state],
-					HS_SPAWN,
+					HEAD_START_SPAWN,
 					SATYR
 				};
 			}
@@ -748,7 +748,7 @@ void play_card(void) {
 								health_change_list[++health_change_num] = (struct health_change){
 									j,
 									i,
-									DH_DMG,
+									DARK_HARVEST_DAMAGE,
 									0
 								};
 								is_dmged = true;
@@ -797,7 +797,7 @@ void play_card(void) {
 				health_change_list[++health_change_num] = (struct health_change){
 					cur_rows[idx],
 					cur_cols[idx],
-					FM_HEAL,
+					FLESHMENDERS_HEAL,
 					0
 				};
 			}
@@ -807,7 +807,7 @@ void play_card(void) {
 			health_change_list[++health_change_num] = (struct health_change){
 				row,
 				col,
-				MP_HEAL,
+				MOMENTS_PEACE_HEAL,
 				0
 			};
 			for (int i = col - 1; i <= col + 1; ++i) {
@@ -838,7 +838,7 @@ void play_card(void) {
 				health_change_list[++health_change_num] = (struct health_change){
 					row,
 					col,
-					IB_DMG,
+					ICICLE_BURST_DAMAGE,
 					0
 				};
 			}
@@ -885,14 +885,14 @@ void play_card(void) {
 			health_change_list[++health_change_num] = (struct health_change){
 				row,
 				col,
-				MAP_DMG,
+				MARKED_AS_PREY_DAMAGE,
 				0
 			};
-			if (game_board[col][row]->health + MAP_DMG <= 0) {
+			if (game_board[col][row]->health + MARKED_AS_PREY_DAMAGE <= 0) {
 				health_change_list[++health_change_num] = (struct health_change){
 					row,
 					col,
-					MAP_SPAWN,
+					MARKED_AS_PREY_SPAWN,
 					TOAD
 				};
 			}

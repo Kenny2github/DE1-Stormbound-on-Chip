@@ -453,10 +453,10 @@ static void run_card_moving(void) {
 					if (!attack_sideways()) {
 						move_forward();
 					} else if (game_board[col][row]->card_id == TODE_THE_ELEVATED) {
-						move_TTE();
+						move_tode_the_elevated();
 					}
 				} else if (game_board[col][row]->card_id == TODE_THE_ELEVATED) {
-					move_TTE();
+					move_tode_the_elevated();
 				}
 			}
 			move_state = CARD_EFFECT;
