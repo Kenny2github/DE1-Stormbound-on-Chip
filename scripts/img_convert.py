@@ -1,5 +1,9 @@
+from __future__ import annotations
 import sys
-from typing import Optional, Literal
+try:
+    from typing import Optional, Literal
+except ImportError:
+    pass # only used in annotations
 from pathlib import Path
 from itertools import cycle
 from PIL import Image
