@@ -51,6 +51,9 @@ extern const struct image emerald_p2;
 // empty_tile.png
 extern const struct image empty_tile;
 
+// end_turn.png
+extern const struct image end_turn;
+
 // front_p1.png
 extern const struct image front_p1;
 
