@@ -14,6 +14,8 @@ const struct image* get_troop_img(enum card_name card, enum player_state player)
 
 void place_new_tile_asset(int r, int c, struct troop* new_troop);
 
+void add_new_tile_overlay_asset(int r, int c, const struct image* img);
+
 void remove_tile_asset(int r, int c);
 
 /**

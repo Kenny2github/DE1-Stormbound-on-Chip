@@ -107,8 +107,7 @@ void init_turn() {
 	}
 	cur_round = 0;
 	update_mana(3);
-	health_change_num = 0;
-	status_change_num = 0;
+	reset_health_status_changes();
 	write_string(1, 1, "P1 turn");
 	for (int i = 0; i < 5; ++i) {
 		for (int j = 0; j < 4; ++j) {
@@ -219,7 +218,7 @@ static void run_preturn_unit(void) {
 	switch (move_state) {
 		case CARD_EFFECT:
 			if (health_change_num == 0 && status_change_num == 0) {
-				while (game_board[col][row] == NULL || game_board[col][row]->type != UNIT) {
+				while (game_board[col][row] == NULL || game_board[col][row]->type != UNIT || game_board[col][row]->frozen) {
 					if (((player_state == P1) ? ++row : --row) == 4) {
 						if (player_state == P1) {
 							--col;
@@ -256,7 +255,12 @@ static void run_preturn_unit(void) {
 			break;
 
 		case CARD_MOVE:
-			move_to_tile(&row, &col, row, col+1-player_state*2);
+			if (game_board[col][row]->frozen) {
+				push_status_change(row, col, CLEAR_FROZEN);
+				change_statuses();
+			} else {
+				move_to_tile(&row, &col, row, col+1-player_state*2);
+			}
 			redraw_fronts();
 	}
 }
