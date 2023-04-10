@@ -66,7 +66,7 @@
 			if (__col == __from_col && __row == __from_row) continue;
 #define ENDFOR }}
 
-struct image* get_troop_img(enum card_name type, enum player_state player) {
+const struct image* get_troop_img(enum card_name type, enum player_state player) {
 	switch (type) {
 	case HEROIC_SOLDIERS:
 	case VICTORS_OF_THE_MELEE:
@@ -123,7 +123,7 @@ void place_new_tile_asset(int r, int c, struct troop* new_troop) {
 	tile_overlay_surf_num[c][r] = 0;
 }
 
-void add_new_tile_overlay_asset(int r, int c, struct image* img) {
+void add_new_tile_overlay_asset(int r, int c, const struct image* img) {
 	tile_overlay_surfs[c][r][tile_overlay_surf_num[c][r]] = (struct surface){
 		col2x(c),
 		row2y(r),
