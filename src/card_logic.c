@@ -129,7 +129,7 @@ void add_new_tile_overlay_asset(int r, int c, const struct image* img) {
 		row2y(r),
 		img
 	};
-	r_stack_push(tile_overlay_surfs[c][r][++tile_overlay_surf_num[c][r]]);
+	r_stack_push(tile_overlay_surfs[c][r][tile_overlay_surf_num[c][r]++]);
 }
 
 void remove_tile_asset(int r, int c) {
@@ -234,13 +234,13 @@ static bool of_same_type(int row, int col, int card_id) {
 }
 
 static void push_health_change(int row, int col, int change, enum card_name spawn_type) {
-	health_change_list[++health_change_num] = (struct health_change) {
+	health_change_list[health_change_num++] = (struct health_change) {
 		row, col, change, spawn_type
 	};
 }
 
 static void push_status_change(int row, int col, enum status_type change) {
-	status_change_list[++status_change_num] = (struct status_change) {
+	status_change_list[status_change_num++] = (struct status_change) {
 		row, col, change
 	};
 }

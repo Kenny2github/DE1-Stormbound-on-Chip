@@ -41,8 +41,10 @@ void rerender_affected_tile() {
 }
 
 void change_healths() {
-	if (health_change_num == 0) return; // nothing to do
-
+	if (health_change_idx == health_change_num) {
+		health_change_num = 0;
+		return;
+	}
 	struct health_change cur_change = health_change_list[health_change_idx];
 	if (cur_change.spawn_type >= KNIGHT) {
 		struct troop* new_troop = (struct troop*) malloc(sizeof(struct troop));
@@ -55,6 +57,7 @@ void change_healths() {
 			false, false, get_troop_img(cur_change.spawn_type, player_state)
 		};
 		place_new_tile_asset(cur_change.row, cur_change.col, new_troop);
+		rerender_needed = false;
 	} else {
 		char health_change_text[1];
 		if (cur_change.change < 0) {
@@ -82,6 +85,7 @@ void change_healths() {
 		affected_col = cur_change.col;
 		rerender_needed = true;
 	}
+	++health_change_idx;
 }
 
 void change_statuses() {
