@@ -56,6 +56,6 @@ void disable_timer(void);
  *
  * This disables interrupts and stops timer count down.
  */
-void disable_interval_timer(void);
+void disable_intval_timer(void);
 
 #endif

@@ -85,12 +85,17 @@ void default_event_handlers(struct event_t event) {
 		break;
 	case E_INTVAL_TIMER_RELOAD:
 		animation_waiting = false;
+		disable_interval_timer();
 		break;
 	default: ;
 	}
 }
 
 void init_game() {
+	volatile int* LEDR_ptr = (int*) LEDR_BASE;
+	*LEDR_ptr = 0;
+	volatile int* HEX30_ptr = (int*)HEX3_HEX0_BASE;
+	*HEX30_ptr = 0;
 	game_state = TITLE;
 	turn_state = PRETURN_BUILDING;
 	move_state = CARD_EFFECT;

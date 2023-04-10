@@ -4,6 +4,7 @@
 #include "states.h"
 #include "assets.h"
 #include "render.h"
+#include "timer.h"
 #include "card_logic.h"
 #include "health_status.h"
 #include "turn.h"
@@ -269,6 +270,25 @@ void start_turn_action(int act_row, int act_col) {
 	if (health_change_num != 0) move_state = CARD_EFFECT;
 }
 
+static void fight(int r, int c) {
+	if (game_board[c][r]->health <= game_board[col][row]->health) {	// attacking eliminates defending
+		if ((game_board[col][row]->health -= game_board[c][r]->health) <= 0) { // attacking gets eliminated
+			free(game_board[col][row]);
+			game_board[col][row] = NULL;
+		}
+		free(game_board[c][r]);
+		game_board[c][r] = NULL;
+		if (game_board[col][row] != NULL) {	// attacking not eliminated, move to tile
+			game_board[c][r] = game_board[col][row];
+			game_board[col][row] = NULL;
+		}
+	} else {
+		game_board[c][r]->health -= game_board[col][row]->health;
+		free(game_board[col][row]);
+		game_board[col][row] = NULL;
+	}
+}
+
 void move_forward(void) {
 	if ((col == 4 && player_state == P1) || (col == 0 && player_state == P2)) {
 		base_health[player_state] = base_health[player_state] <= game_board[col][row]->health ?
@@ -277,46 +297,41 @@ void move_forward(void) {
 		game_board[col][row] = NULL;
 	} else {
 		if (game_board[col + 1 - player_state * 2][row] != NULL) {
-			if (game_board[col + 1 - player_state * 2][row]->health <= game_board[col][row]->health) {
-				if ((game_board[col][row]->health -= game_board[col + 1 - player_state * 2][row]->health) <= 0) {
-					free(game_board[col][row]);
-					game_board[col][row] = NULL;
-				}
-				free(game_board[col + 1 - player_state * 2][row]);
-				game_board[col + 1 - player_state * 2][row] = NULL;
-				if (game_board[col][row] != NULL) {
-					if (game_board[col][row]->card_id == TODE_THE_ELEVATED) { // additional logic just for TTE. fuck TTE
-						int cur_rows[20], cur_cols[20], list_num = 0;
-						for (int i = 0; i < 5; ++i) {
-							int jump_col = i - 1 + player_state*2;
-							if (jump_col < 0 || jump_col > 4) continue;
-							for (int j = 0; j < 4; ++j) {
-								if (game_board[i][j] != NULL
-								&& game_board[i][j]->player != player_state
-								&& game_board[jump_col][j] == NULL) {
-									cur_rows[list_num] = j;
-									cur_cols[list_num++] = jump_col;
-								}
-							}
-						}
-						if (list_num > 0) {
-							int idx = rand_num(0, list_num - 1);
-							game_board[col][row]->health += TTE_HEAL;
-							game_board[cur_cols[idx]][cur_rows[idx]] = game_board[col][row];
-						} else {
-							game_board[col+1-player_state*2][row] = game_board[col][row];
-						}
-					} else {
-						game_board[col+1-player_state*2][row] = game_board[col][row];
-					}
-					game_board[col][row] = NULL;
-				}
-			} else {
-				game_board[col + 1 - player_state * 2][row]->health -= game_board[col][row]->health;
-				free(game_board[col][row]);
-				game_board[col][row] = NULL;
+			fight(col + 1 - player_state * 2, row);
+			enable_intval_timer_interrupt();
+		}
+	}
+}
+
+bool move_sideways(void) {
+	int r = row - 1 + player_state * 2;
+	if ((r >= 0 || r < 4)
+	 && game_board[col][r] != NULL
+	 && game_board[col][r]->player != player_state) {
+		fight(col, r);
+	}
+}
+
+void move_TTE(void) {	// additional logic just for TTE. fuck TTE
+	int cur_rows[20], cur_cols[20], list_num = 0;
+	for (int i = 0; i < 5; ++i) {
+		int jump_col = i - 1 + player_state*2;
+		if (jump_col < 0 || jump_col > 4) continue;
+		for (int j = 0; j < 4; ++j) {
+			if (game_board[i][j] != NULL
+			&& game_board[i][j]->player != player_state
+			&& game_board[jump_col][j] == NULL) {
+				cur_rows[list_num] = j;
+				cur_cols[list_num++] = jump_col;
 			}
 		}
+	}
+	if (list_num > 0) {
+		int idx = rand_num(0, list_num - 1);
+		game_board[col][row]->health += TTE_HEAL;
+		game_board[cur_cols[idx]][cur_rows[idx]] = game_board[col][row];
+	} else {
+		game_board[col+1-player_state*2][row] = game_board[col][row];
 	}
 }
 

@@ -9,6 +9,7 @@
 #include "event_types.h"
 #include "timer.h"
 #include "game.h"
+#include "card_logic.h"
 #include "health_status.h"
 
 bool cur_cards_played[4];
@@ -16,21 +17,25 @@ int cur_card_selected;
 int cur_card_displayed;
 bool cur_card_displaying;
 
+int moves_left;
+
 /* change mana to new_mana, and display mana value on HEX3-0 */
 void update_mana(int new_mana) {
 	int seg7[] = {0x3f, 0x06, 0x5b, 0x4f, 0x66, 0x6d, 0x7d, 0x07, 0x7f, 0x67, 0x063f};
 	volatile int* HEX30_ptr = (int*)HEX3_HEX0_BASE;
-	int HEX_bits = 0;
 	mana = new_mana;
-	int j = 1;
-	for (int i = 10; i < 10000 && new_mana != 0; i *= 10) {
-		if (new_mana < i) {
-			HEX_bits += seg7[(new_mana % i) / (i / 10)] *= j;
+	if (new_mana != 0) {
+		int HEX_bits = 0;
+		int j = 1;
+		for (int i = 10; i < 10000 && new_mana != 0; i *= 10) {
+			HEX_bits += seg7[(new_mana % i) / (i / 10)] * j;
 			new_mana -= new_mana % i;
 			j *= 0x100;
 		}
+		*HEX30_ptr = HEX_bits;
+	} else {
+		*HEX30_ptr = seg7[0];
 	}
-	*HEX30_ptr = HEX_bits;
 }
 
 void update_front(void) {
@@ -111,7 +116,6 @@ void init_turn() {
 	board_base_surfs[FRONT_P2] = (struct surface){222, 16, &front_p2};
 	for (int i = 0; i < 5; ++i) r_stack_push(board_base_surfs[i]);
 	enable_timer_interrupt();
-	printf("init done\n");
 }
 
 static void init_select_card(void) {
@@ -124,6 +128,22 @@ static void init_select_card(void) {
 	cur_card_displayed = 100;
 	cur_card_displaying = false;
 	turn_state = SELECT_CARD;
+}
+
+static void init_card_moving(void) {
+	play_card();
+	moves_left = card_data[deck[player_state][cur_card_selected]].init_move;
+	health_change_idx = 0;
+	status_change_idx = 0;
+	update_mana(mana - card_data[deck[player_state][cur_card_selected]].cost);
+	cur_cards_played[cur_card_selected] = true;
+	push_image(cur_card_deck_surfs[cur_card_selected].x, cur_card_deck_surfs[cur_card_selected].y, &clear_card);
+	swap_int(&deck[player_state][cur_card_selected], &deck[player_state][4]);
+	for (int i = 4; i < 9; ++i) swap_int(&deck[player_state][i], &deck[player_state][i+1]);
+	write_string(52, 43, empty_desc_data);
+	turn_state = CARD_MOVING;
+	move_state = CARD_EFFECT;
+	enable_intval_timer_interrupt();
 }
 
 static void run_preturn_building(void) {
@@ -315,9 +335,9 @@ static void select_card_rerendering(void) {
 			// this surf's rect
 			board_base_surfs[TILES].x, board_base_surfs[TILES].y,
 			board_base_surfs[TILES].data->width, board_base_surfs[TILES].data->height,
-				// previous mouse surf's rect
-				saved_mouse_states[j].x, saved_mouse_states[j].y,
-				mouse_clear.width, mouse_clear.height
+			// previous mouse surf's rect
+			saved_mouse_states[j].x, saved_mouse_states[j].y,
+			mouse_clear.width, mouse_clear.height
 		)) {
 			r_stack_push(board_base_surfs[TILES]);
 			r_stack_push(board_base_surfs[FRONT_P1]);
@@ -367,6 +387,25 @@ static void run_place_card(void) {
 
 		if (event.type == E_MOUSE_BUTTON_DOWN && event.data.mouse_button_down.left) {
 			select_card_click();
+			for (int i = 0; i < COL; ++i) {
+				for (int j = 0; j < ROW; ++j) {
+					if (rects_collide(
+						// this surf's rect
+						tile_base_surfs[i][j].x, tile_base_surfs[i][j].y,
+						tile_base_surfs[i][j].data->width, tile_base_surfs[i][j].data->height,
+						// previous mouse surf's rect
+						saved_mouse_states[0].x, saved_mouse_states[0].y,
+						mouse_clear.width, mouse_clear.height
+					)) {
+						row = j;
+						col = i;
+						if (valid_play_card()) {
+							init_card_moving();
+							break;
+						}
+					}
+				}
+			}
 		} else {
 			select_card_hover();
 		}
@@ -392,6 +431,30 @@ static void run_place_card(void) {
 	);
 }
 
+static void run_card_moving(void) {
+	if (animation_waiting) return;
+
+	switch (move_state) {
+		case CARD_EFFECT:
+			if (status_change_num == 0) {
+				if (health_change_num == 0) {
+					move_state = CARD_MOVE_FORWARD;
+				} else {
+					change_healths();
+				}
+			} else {
+				change_statuses();
+			}
+			break;
+
+		case CARD_MOVE_FORWARD:
+			if (moves_left != 0) {
+
+			}
+			move_state = CARD_EFFECT;
+	}
+}
+
 void run_turn(void) {
 	switch(turn_state) {
 		case PRETURN_BUILDING:
@@ -411,6 +474,7 @@ void run_turn(void) {
 			break;
 
 		case CARD_MOVING:
+			run_card_moving();
 			break;
 
 		case TURN_END:
