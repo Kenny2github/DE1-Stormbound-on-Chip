@@ -129,6 +129,7 @@ void init_turn() {
 	board_base_surfs[FRONT_P1] = (struct surface){96, 16, &front_p1};
 	board_base_surfs[FRONT_P2] = (struct surface){222, 16, &front_p2};
 	for (int i = 0; i < 5; ++i) r_stack_push(board_base_surfs[i]);
+	r_stack_push(new_turn_surf);
 	enable_timer_interrupt();
 }
 
@@ -162,6 +163,19 @@ static void init_card_moving(void) {
 	move_state = CARD_FIND_MOVE;
 }
 
+void new_turn(void) {
+	if (player_state == P1) ++cur_round;
+	player_state = player_state == P1 ? P2 : P1;
+	write_string(1, 1, player_state == P1 ? "P1 turn" : "P2 turn");
+	update_mana(cur_round + 3);
+	init_select_card();
+	reset_health_status_changes();
+	turn_state = PRETURN_BUILDING;
+	move_state = CARD_EFFECT;
+	row = (player_state == P1) ? 0 : 3;
+	col = (player_state == P1) ? 4 : 0;
+}
+
 static void run_preturn_building(void) {
 	while (!event_queue_empty()) {
 		struct event_t event = event_queue_pop();
@@ -172,8 +186,10 @@ static void run_preturn_building(void) {
 	switch (move_state) {
 		case CARD_EFFECT:
 			if (health_change_num == 0 && status_change_num == 0) {
-				while (game_board[col][row] == NULL || game_board[col][row]->type != BUILDING) {
-					if (((player_state == P1) ? ++row : --row) == 4) {
+				while (1) {
+					printf("col %d, row %d\n", col, row);
+					if (!(game_board[col][row] == NULL || game_board[col][row]->type != BUILDING)) break;
+					if ((player_state == P1) ? (++row == 4) : (--row == 0)) {
 						if (player_state == P1) {
 							--col;
 							row = 0;
@@ -261,6 +277,7 @@ static void run_preturn_unit(void) {
 	}
 }
 
+// called on click
 static void select_card_click(void) {
 	if (saved_mouse_states[0].y >= 166 && saved_mouse_states[0].y < 227) {
 		for (int i = 0; i < 4; ++i) {
@@ -286,6 +303,12 @@ static void select_card_click(void) {
 			}
 		}
 	}
+	if (rects_collide(
+		new_turn_surf.x, new_turn_surf.y,
+		new_turn_surf.data->width, new_turn_surf.data->height,
+		saved_mouse_states[0].x, saved_mouse_states[0].y,
+		mouse_clear.width, mouse_clear.height
+	)) turn_state = TURN_END;
 }
 
 static void select_card_hover(void) {
@@ -383,6 +406,16 @@ static void select_card_rerendering(void) {
 			r_stack_push(board_base_surfs[FRONT_P1]);
 			r_stack_push(board_base_surfs[FRONT_P2]);
 		}
+	}
+	for (int j = 1; j < NUM_MOUSE_STATES; ++j) {
+		if (rects_collide(
+			// end turn button
+			new_turn_surf.x, new_turn_surf.y,
+			new_turn_surf.data->width, new_turn_surf.data->height,
+			// mouse
+			saved_mouse_states[j].x, saved_mouse_states[j].y,
+			mouse_clear.width, mouse_clear.height
+		)) r_stack_push(new_turn_surf);
 	}
 }
 
@@ -549,6 +582,7 @@ void run_turn(void) {
 			break;
 
 		case TURN_END:
+			new_turn();
 			break;
 	}
 }
