@@ -120,6 +120,16 @@ void place_new_tile_asset(int r, int c, struct troop* new_troop) {
 		new_troop->img
 	};
 	r_stack_push(tile_base_surfs[c][r]);
+	tile_overlay_surf_num[c][r] = 0;
+}
+
+void add_new_tile_overlay_asset(int r, int c, struct image* img) {
+	tile_overlay_surfs[c][r][tile_overlay_surf_num[c][r]] = (struct surface){
+		col2x(c),
+		row2y(r),
+		img
+	};
+	r_stack_push(tile_overlay_surfs[c][r][++tile_overlay_surf_num[c][r]]);
 }
 
 void remove_tile_asset(int r, int c) {
@@ -130,6 +140,26 @@ void remove_tile_asset(int r, int c) {
 		&empty_tile
 	};
 	r_stack_push(tile_base_surfs[c][r]);
+	tile_overlay_surf_num[c][r] = 0;
+}
+
+void move_tile_asset(int prev_r, int prev_c, int new_r, int new_c) {
+	// update tile base surfs
+	tile_base_surfs[new_c][new_r].data = tile_base_surfs[prev_c][prev_r].data;
+	tile_base_surfs[prev_c][prev_r].data = &empty_tile;
+	r_stack_push(tile_base_surfs[prev_c][prev_r]);
+	r_stack_push(tile_base_surfs[new_c][new_r]);
+
+	// update tile overlay surfs
+	tile_overlay_surf_num[new_c][new_r] = 0;
+	for (int i = 0; i < tile_overlay_surf_num[prev_c][prev_r]; ++i) {
+		add_new_tile_overlay_asset(new_r, new_c, tile_overlay_surfs[prev_c][prev_r][i].data);
+	}
+	tile_overlay_surf_num[prev_c][prev_r] = 0;
+
+	if (game_board[new_c][new_r] != NULL) free(game_board[new_c][new_r]);
+	game_board[new_c][new_r] = game_board[prev_c][prev_r];
+	game_board[prev_c][prev_r] = 0;
 }
 
 /* determine whether card at location has same type as card_id */
@@ -383,22 +413,18 @@ bool move_to_tile(int* r, int* c, int new_r, int new_c) {
 		int base_player = new_c == -1 ? P1 : P2;
 		base_health[base_player] -= game_board[*c][*r]->health;
 		if (base_health[base_player] < 0) base_health[base_player] = 0;
-		free(game_board[*c][*r]);
-		game_board[*c][*r] = NULL;
+		remove_tile_asset(*r, *c);
 		return true;
 
 	} else if (game_board[new_c][new_r] != NULL
 	 && game_board[new_c][new_r]->player != player_state) {	// attacking enemy
 		if (game_board[new_c][new_r]->health <= game_board[*c][*r]->health) {	// attacking eliminates defending
 			if ((game_board[new_c][new_r]->health -= game_board[*c][*r]->health) <= 0) { // attacking gets eliminated
-				free(game_board[*c][*r]);
-				game_board[*c][*r] = NULL;
+				remove_tile_asset(*r, *c);
 			}
-			free(game_board[new_c][new_r]);
-			game_board[new_c][new_r] = NULL;
+			remove_tile_asset(new_r, new_c);
 			if (game_board[*c][*r] != NULL) {	// attacking not eliminated, move to tile
-				game_board[new_c][new_r] = game_board[*c][*r];
-				game_board[*c][*r] = NULL;
+				move_tile_asset(*r, *c, new_r, new_c);
 				if (turn_state == CARD_MOVING) {
 					*r = new_r;
 					*c = new_c;
@@ -407,14 +433,12 @@ bool move_to_tile(int* r, int* c, int new_r, int new_c) {
 			tile_base_surfs[new_c][new_r].data = game_board[new_c][new_r]->img;
 		} else {
 			game_board[new_c][new_r]->health -= game_board[*c][*r]->health;
-			free(game_board[*c][*r]);
-			game_board[*c][*r] = NULL;
+			remove_tile_asset(*r, *c);
 		}
 		return true;
 
 	} else if (game_board[new_c][new_r] == NULL) {	// move to empty tile
-		game_board[new_c][new_r] = game_board[*c][*r];
-		game_board[*c][*r] = NULL;
+		move_tile_asset(*r, *c, new_r, new_c);
 		if (turn_state == CARD_MOVING) {
 			*r = new_r;
 			*c = new_c;
@@ -505,6 +529,16 @@ void play_card(void) {
 	case VENOMFALL_SPIRE:
 		new_troop->type = BUILDING;
 		break;
+	case SUMMON_MILITIA:
+	case EXECUTION:
+	case BLADE_STORM:
+	case HEAD_START:
+	case DARK_HARVEST:
+	case MOMENTS_PEACE:
+	case ICICLE_BURST:
+	case MARKED_AS_PREY:
+		free(new_troop);
+		break;
 	}
 
 	// handle on-play abilities
@@ -513,11 +547,7 @@ void play_card(void) {
 		case WISP_CLOUD:
 		case SOULCRUSHERS:
 			place_new_tile_asset(row, col, new_troop);
-			tile_overlay_surfs[col][row][++tile_overlay_surf_num[col][row]] = (struct surface){
-				col2x(col),
-				row2y(row),
-				&on_attack
-			};
+			add_new_tile_overlay_asset(row, col, &on_attack);
 			break;
 
 		case FELFLARES:
@@ -650,11 +680,7 @@ void play_card(void) {
 
 		case SHADY_GHOUL:
 			place_new_tile_asset(row, col, new_troop);
-			tile_overlay_surfs[col][row][++tile_overlay_surf_num[col][row]] = (struct surface){
-				col2x(col),
-				row2y(row),
-				&on_death
-			};
+			add_new_tile_overlay_asset(row, col, &on_death);
 			break;
 
 		case DOPPELBOCKS:

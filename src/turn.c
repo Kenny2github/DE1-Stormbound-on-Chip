@@ -45,9 +45,9 @@ void update_mana(int new_mana) {
 void update_front(int player) {
 	int cur_front;
 
-	for (int i = 4; i > 0; --i) {
-		cur_front = player == P1 ? i : 4-i;
-		for (int j = 0; j < 4; ++j) {
+	for (int i = COL-1; i > 0; --i) {
+		cur_front = player == P1 ? i : COL-1-i;
+		for (int j = 0; j < ROW; ++j) {
 			if (game_board[cur_front][j] != NULL
 			 && game_board[cur_front][j]->player == player) {
 				if (player == P1 && cur_front == 4) cur_front = 3;
@@ -66,9 +66,9 @@ void redraw_fronts(void) {
 	update_front(P2);
 	if (front_columns[P1] != prev_front[P1] || front_columns[P2] != prev_front[P2]) {
 		r_stack_push(board_base_surfs[TILES]);
-		board_base_surfs[FRONT_P1].x = (front_columns[P1]) * 42 + 54;
+		board_base_surfs[FRONT_P1].x = (front_columns[P1] + 1) * 42 + 54;
 		r_stack_push(board_base_surfs[FRONT_P1]);
-		board_base_surfs[FRONT_P2].x = (front_columns[P2] - 1) * 42 + 54;
+		board_base_surfs[FRONT_P2].x = (front_columns[P2]) * 42 + 55;
 		r_stack_push(board_base_surfs[FRONT_P2]);
 	}
 }
