@@ -1,33 +1,31 @@
 #ifndef HEALTH_STATUS_H
 #define HEALTH_STATUS_H
 
+#include "game.h"
+
 /**** Structs ****/
 
 /**
- * @brief Info of health change
- *
- * @param row Row where health change occurs
- * @param col Column where health change occurs
- * @param change The amount of change to the tile
- * @param spawn_type If spawning a new unit, the type of unit
+ * @brief A queued up health change for a unit.
  */
 struct health_change {
-	int row;
-	int col;
+	// Position where health change occurs.
+	int row, col;
+	// Amount by which to change health.
 	int change;
-	int spawn_type;
+	// If there is no troop at that location,
+	// the health change will spawn one.
+	// This determines the type of troop to spawn.
+	enum card_name spawn_type;
 };
 
 /**
- * @brief Info of status effect change
- *
- * @param row Row where status effect change occurs
- * @param col Column where status effect change occurs
- * @param change The status effect to set the unit at the tile to
+ * @brief A queued up status effect change for a unit.
  */
 struct status_change {
-	int row;
-	int col;
+	// Position where status effect change occurs.
+	int row, col;
+	// Change to make (to be defined)
 	int change;
 };
 
@@ -68,12 +66,13 @@ extern struct status_change status_change_list[20];
 /**** Exported Functions ****/
 
 /**
- * @brief Goes through list of health changes and executes them
+ * @brief Process pending health changes.
  */
 void change_healths(void);
 
 /**
- * @brief Goes through list of status effect changes and executes them
+ * @brief Process pending status effect changes.
  */
 void change_statuses(void);
+
 #endif
