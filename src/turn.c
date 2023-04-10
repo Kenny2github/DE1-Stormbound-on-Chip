@@ -13,6 +13,8 @@
 #include "card_logic.h"
 #include "health_status.h"
 
+#define CARD_DESC_POS 52, 43
+
 bool cur_cards_played[4];
 int cur_card_selected;
 int cur_card_displayed;
@@ -69,10 +71,10 @@ void update_front(void) {
 
 static void t_display_card_info(int card_id) {
 	if (card_id != cur_card_displayed) {
-		write_string(52, 43, empty_desc_data);
-		write_string(52, 43, card_data[card_id].desc);
+		write_string(CARD_DESC_POS, empty_desc_data);
+		write_string(CARD_DESC_POS, card_data[card_id].desc);
 	} else if (!cur_card_displaying) {
-		write_string(52, 43, card_data[card_id].desc);
+		write_string(CARD_DESC_POS, card_data[card_id].desc);
 	}
 	cur_card_displaying = true;
 }
@@ -141,7 +143,7 @@ static void init_card_moving(void) {
 	push_image(cur_card_deck_surfs[cur_card_selected].x, cur_card_deck_surfs[cur_card_selected].y, &clear_card);
 	swap_int(&deck[player_state][cur_card_selected], &deck[player_state][4]);
 	for (int i = 4; i < 9; ++i) swap_int(&deck[player_state][i], &deck[player_state][i+1]);
-	write_string(52, 43, empty_desc_data);
+	write_string(CARD_DESC_POS, empty_desc_data);
 	turn_state = CARD_MOVING;
 	move_state = CARD_EFFECT;
 	enable_intval_timer_interrupt();
@@ -282,7 +284,7 @@ static void select_card_hover(void) {
 	}
 	if (cur_card_displaying) {
 		cur_card_displaying = false;
-		write_string(52, 43, empty_desc_data);
+		write_string(CARD_DESC_POS, empty_desc_data);
 	}
 }
 
