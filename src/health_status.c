@@ -1,3 +1,4 @@
+#include <stdlib.h>
 #include <stdbool.h>
 #include "game.h"
 #include "states.h"
@@ -17,71 +18,35 @@ int status_change_num;
 int status_change_idx;
 struct status_change status_change_list[20];
 
+static struct image* get_token_img(enum card_name type, enum player_state player) {
+	switch (type) {
+		case KNIGHT:
+			return (player == P1) ? &knight_p1 : &knight_p2;
+		case DRAGON:
+			return (player == P1) ? &dragon_p1 : &dragon_p2;
+		case SATYR:
+			return (player == P1) ? &satyr_p1 : &satyr_p2;
+		case CONSTRUCT:
+			return (player == P1) ? &construct_p1 : &construct_p2;
+		case TOAD:
+			return (player == P1) ? &toad_p1 : &toad_p2;
+	}
+}
+
 void change_healths() {
-	if (health_change_num == 0) return;
+	if (health_change_num == 0) return; // nothing to do
+
 	struct health_change cur_change = health_change_list[health_change_idx];
 	if (cur_change.spawn_type >= KNIGHT) {
 		struct troop* new_troop = (struct troop*) malloc(sizeof(struct troop));
-		switch(cur_change.spawn_type) {
-			case KNIGHT:
-				*new_troop = (struct troop){
-					cur_change.spawn_type,
-					UNIT,
-					player_state,
-					cur_change.change,
-					false,
-					false,
-					(player_state == P1) ? &knight_p1 : &knight_p2
-				};
-				break;
-
-			case DRAGON:
-				*new_troop = (struct troop){
-					cur_change.spawn_type,
-					UNIT,
-					player_state,
-					cur_change.change,
-					false,
-					false,
-					(player_state == P1) ? &dragon_p1 : &dragon_p2
-				};
-				break;
-
-			case SATYR:
-				*new_troop = (struct troop){
-					cur_change.spawn_type,
-					UNIT,
-					player_state,
-					cur_change.change,
-					false,
-					false,
-					(player_state == P1) ? &satyr_p1 : &satyr_p2
-				};
-				break;
-
-			case CONSTRUCT:
-				*new_troop = (struct troop){
-					cur_change.spawn_type,
-					UNIT,
-					player_state,
-					cur_change.change,
-					false,
-					false,
-					(player_state == P1) ? &construct_p1 : &construct_p2
-				};
-				break;
-
-			case TOAD:
-				*new_troop = (struct troop){
-					cur_change.spawn_type,
-					UNIT,
-					player_state,
-					cur_change.change,
-					false,
-					false,
-					(player_state == P1) ? &toad_p1 : &toad_p2
-				};
-		}
+		*new_troop = (struct troop){
+			// spawn new unit of given type belonging to current player
+			cur_change.spawn_type, UNIT, player_state,
+			// give it health equal to the change in health
+			cur_change.change,
+			// it is not frozen or poisoned; get its image by type and player
+			false, false, get_token_img(cur_change.spawn_type, player_state)
+		};
 		place_new_tile_asset(cur_change.row, cur_change.col, new_troop);
 	} else {
 		char health_change_text[1];
