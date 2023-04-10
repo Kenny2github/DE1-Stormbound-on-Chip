@@ -2,6 +2,7 @@
 #include <stdbool.h>
 #include "game.h"
 #include "states.h"
+#include "timer.h"
 #include "vga.h"
 #include "render.h"
 #include "turn.h"
@@ -40,9 +41,23 @@ void rerender_affected_tile() {
 	rerender_needed = false;
 }
 
-void change_healths() {
-	if (health_change_num == 0) return; // nothing to do
+void push_health_change(int row, int col, int change, enum card_name spawn_type) {
+	health_change_list[health_change_num++] = (struct health_change) {
+		row, col, change, spawn_type
+	};
+}
 
+void push_status_change(int row, int col, enum status_type change) {
+	status_change_list[status_change_num++] = (struct status_change) {
+		row, col, change
+	};
+}
+
+void change_healths() {
+	if (health_change_idx == health_change_num) {
+		health_change_num = 0;
+		return;
+	}
 	struct health_change cur_change = health_change_list[health_change_idx];
 	if (cur_change.spawn_type >= KNIGHT) {
 		struct troop* new_troop = (struct troop*) malloc(sizeof(struct troop));
@@ -55,6 +70,7 @@ void change_healths() {
 			false, false, get_troop_img(cur_change.spawn_type, player_state)
 		};
 		place_new_tile_asset(cur_change.row, cur_change.col, new_troop);
+		rerender_needed = false;
 	} else {
 		char health_change_text[1];
 		if (cur_change.change < 0) {
@@ -82,8 +98,37 @@ void change_healths() {
 		affected_col = cur_change.col;
 		rerender_needed = true;
 	}
+	++health_change_idx;
+	enable_intval_timer_interrupt();
 }
 
 void change_statuses() {
-	return;
+	if (status_change_idx == status_change_num) {
+		status_change_num = 0;
+		return;
+	}
+	struct status_change cur_change = status_change_list[status_change_idx];
+	switch(cur_change.change) {
+	case FREEZE:
+		add_new_tile_overlay_asset(cur_change.row, cur_change.col, &frozen);
+		game_board[cur_change.col][cur_change.row]->frozen = true;
+		break;
+	case CLEAR_FROZEN: ;	// assumes already frozen
+		int i;
+		for (i = 0; i < tile_overlay_surf_num[cur_change.col][cur_change.row]; ++i) {
+			if (tile_overlay_surfs[cur_change.col][cur_change.row][i].data == &frozen) break;
+		}
+		for (; i < tile_overlay_surf_num[cur_change.col][cur_change.row] - 1; ++i) {
+			tile_overlay_surfs[cur_change.col][cur_change.row][i].data = tile_overlay_surfs[cur_change.col][cur_change.row][i + 1].data;
+		}
+		--tile_overlay_surf_num[cur_change.col][cur_change.row];
+		game_board[cur_change.col][cur_change.row]->frozen = false;
+		break;
+	case POISON:
+		add_new_tile_overlay_asset(cur_change.row, cur_change.col, &poisoned);
+		game_board[cur_change.col][cur_change.row]->poisoned = true;
+		break;
+	}
+	++status_change_idx;
+	enable_intval_timer_interrupt();
 }

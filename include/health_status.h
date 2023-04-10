@@ -3,6 +3,13 @@
 
 #include "game.h"
 
+
+enum status_change_types {
+	FREEZE,
+	CLEAR_FROZEN,
+	POISON
+};
+
 /**** Structs ****/
 
 /**
@@ -76,6 +83,10 @@ void reset_health_status_changes(void);
  *
  */
 void rerender_affected_tile(void);
+
+void push_health_change(int row, int col, int change, enum card_name spawn_type);
+
+void push_status_change(int row, int col, enum status_type change);
 
 /**
  * @brief Process pending health changes.

@@ -22,6 +22,7 @@ bool cur_card_displaying;
 
 int moves_left;
 int next_mov_row, next_mov_col;
+bool await_next_move;
 
 struct surface tile_base_surfs[COL][ROW];
 struct surface tile_overlay_surfs[COL][ROW][4];
@@ -113,8 +114,7 @@ void init_turn() {
 	}
 	cur_round = 0;
 	update_mana(3);
-	health_change_num = 0;
-	status_change_num = 0;
+	reset_health_status_changes();
 	write_string(1, 1, "P1 turn");
 	for (int i = 0; i < 5; ++i) {
 		for (int j = 0; j < 4; ++j) {
@@ -146,9 +146,9 @@ static void init_select_card(void) {
 }
 
 static void init_card_moving(void) {
+	reset_health_status_changes();
 	play_card();
 	moves_left = card_data[deck[player_state][cur_card_selected]].init_move;
-	reset_health_status_changes();
 
 	update_mana(mana - card_data[deck[player_state][cur_card_selected]].cost);
 
@@ -205,9 +205,11 @@ static void run_preturn_building(void) {
 						break;
 					}
 				}
-				start_turn_action(row, col);
-				health_change_idx = 0;
-				status_change_idx = 0;
+				if (turn_state == PRETURN_BUILDING) {
+					start_turn_action(row, col);
+					health_change_idx = 0;
+					status_change_idx = 0;
+				}
 			}
 			if (turn_state == PRETURN_BUILDING) {
 				if (status_change_num == 0) {
@@ -238,23 +240,27 @@ static void run_preturn_unit(void) {
 
 	switch (move_state) {
 		case CARD_EFFECT:
-			while (game_board[col][row] == NULL || game_board[col][row]->type != UNIT) {
-				if (((player_state == P1) ? ++row : --row) == 4) {
-					if (player_state == P1) {
-						--col;
-						row = 0;
-					} else {
-						++col;
-						row = 3;
+			if (health_change_num == 0 && status_change_num == 0) {
+				while (game_board[col][row] == NULL || game_board[col][row]->type != UNIT || game_board[col][row]->frozen) {
+					if (((player_state == P1) ? ++row : --row) == 4) {
+						if (player_state == P1) {
+							--col;
+							row = 0;
+						} else {
+							++col;
+							row = 3;
+						}
+					}
+					if ((col == -1 && player_state == P1) || (col == 5 && player_state == P2)) {
+						init_select_card();
+						break;
 					}
 				}
-				if ((col == -1 && player_state == P1) || (col == 5 && player_state == P2)) {
-					init_select_card();
-					break;
+				if (turn_state == PRETURN_UNIT) {
+					start_turn_action(row, col);
+					health_change_idx = 0;
+					status_change_idx = 0;
 				}
-				start_turn_action(row, col);
-				health_change_idx = 0;
-				status_change_idx = 0;
 			}
 			if (turn_state == PRETURN_UNIT) {
 				if (status_change_num == 0) {
@@ -272,7 +278,12 @@ static void run_preturn_unit(void) {
 			break;
 
 		case CARD_MOVE:
-			move_to_tile(&row, &col, row, col+1-player_state*2);
+			if (game_board[col][row]->frozen) {
+				push_status_change(row, col, CLEAR_FROZEN);
+				change_statuses();
+			} else {
+				move_to_tile(&row, &col, row, col+1-player_state*2);
+			}
 			redraw_fronts();
 	}
 }
@@ -521,20 +532,25 @@ static void run_card_moving(void) {
 
 	switch (move_state) {
 		case CARD_FIND_MOVE:
-			if (game_board[col][row] != NULL && moves_left-- != 0) {
+			if (health_change_num != 0 || status_change_num != 0) {
+				move_state = CARD_EFFECT;
+				await_next_move = false;
+			} else if (game_board[col][row] != NULL && moves_left-- != 0) {
 				find_next_move(row, col, &next_mov_row, &next_mov_col);
+				await_next_move = true;
+				move_state = CARD_EFFECT;
 				enable_intval_timer_interrupt();
 			} else {
 				turn_state = SELECT_CARD;
 			}
-			move_state = CARD_EFFECT;
 			break;
 
 		case CARD_EFFECT:
 			rerender_affected_tile();
 			if (status_change_num == 0) {
 				if (health_change_num == 0) {
-					move_state = CARD_MOVE;
+					if (await_next_move) move_state = CARD_MOVE;
+					else move_state = CARD_FIND_MOVE;
 				} else {
 					change_healths();
 					redraw_fronts();
@@ -553,6 +569,7 @@ static void run_card_moving(void) {
 				move_state = CARD_FIND_MOVE;
 			}
 			redraw_fronts();
+			await_next_move = false;
 			enable_intval_timer_interrupt();
 			break;
 
