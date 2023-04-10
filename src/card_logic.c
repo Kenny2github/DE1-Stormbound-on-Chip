@@ -122,28 +122,40 @@ static bool of_same_type(int row, int col, int card_id) {
 	}
 }
 
+static void push_health_change(int row, int col, int change, enum card_name spawn_type) {
+	health_change_list[++health_change_num] = (struct health_change) {
+		row, col, change, spawn_type
+	};
+}
+
+static void push_status_change(int row, int col, enum status_type change) {
+	status_change_list[++status_change_num] = (struct status_change) {
+		row, col, change
+	};
+}
+
 void start_turn_action(int act_row, int act_col) {
 	switch (game_board[act_col][act_row]->card_id) {
 		case VICTORS_OF_THE_MELEE:
 			if ((act_col == 4 && player_state == P1) || (act_col == 0 && player_state == P2)) {
-				health_change_list[++health_change_num] = (struct health_change){
+				push_health_change(
 					0,
 					(player_state == P1 ? 5 : -1),
 					VICTORS_OF_THE_MELEE_DAMAGE,
 					0
-				};
+				);
 			}
 			for (int i = act_col - 1; i <= act_col + 1; ++i) {
 				if (i < 0 || i > 4) continue;
 				for (int j = act_row - 1; j <= act_row + 1; ++j) {
 					if (j < 0 || j > 3 || (i == act_col && j == act_row)) continue;
 					if (game_board[i][j] != NULL && game_board[i][j]->player != player_state) {
-						health_change_list[++health_change_num] = (struct health_change){
+						push_health_change(
 							j,
 							i,
 							VICTORS_OF_THE_MELEE_DAMAGE,
 							0
-						};
+						);
 					}
 				}
 			}
@@ -154,12 +166,12 @@ void start_turn_action(int act_row, int act_col) {
 				if (game_board[cur_col][act_row] != NULL
 				 && game_board[cur_col][act_row]->player == player_state
 				 && game_board[cur_col][act_row]->type == UNIT) {
-					health_change_list[++health_change_num] = (struct health_change){
+					push_health_change(
 						cur_col,
 						act_row,
 						EMERALD_TOWERS_HEAL,
 						0
-					};
+					);
 				}
 			}
 			break;
@@ -169,12 +181,12 @@ void start_turn_action(int act_row, int act_col) {
 					if (game_board[i][j] != NULL
 					 && game_board[i][j]->player == player_state
 					 && of_same_type(j, i, SATYR)) {
-						health_change_list[++health_change_num] = (struct health_change){
+						push_health_change(
 							j,
 							i,
 							MOONLIT_AERIE_HEAL,
 							0
-						};
+						);
 					}
 				}
 			}
@@ -186,12 +198,12 @@ void start_turn_action(int act_row, int act_col) {
 					for (int j = act_row - 1; j <= act_row + 1; ++j) {
 						if (j < 0 || j > 3 || (i == act_col && j == act_row)) continue;
 						if (game_board[i][j] != NULL && game_board[i][j]->frozen) {
-							health_change_list[++health_change_num] = (struct health_change){
+							push_health_change(
 								j,
 								i,
 								WISP_CLOUD_DAMAGE,
 								0
-							};
+							);
 						}
 					}
 				}
@@ -200,12 +212,12 @@ void start_turn_action(int act_row, int act_col) {
 		case MECH_WORKSHOP:
 			int spawn_col = act_col + (player_state == P1 ? 1 : -1);
 			if (spawn_col >= 0 && spawn_col <= 4 && game_board[spawn_col][act_row] == NULL) {
-				health_change_list[++health_change_num] = (struct health_change){
+				push_health_change(
 					act_row,
 					spawn_col,
 					MECH_WORKSHOP_SPAWN,
 					CONSTRUCT
-				};
+				);
 			}
 			break;
 		case UPGRADE_POINT:
@@ -216,12 +228,12 @@ void start_turn_action(int act_row, int act_col) {
 					if (game_board[i][j] != NULL
 					 && game_board[i][j]->player == player_state
 					 && of_same_type(j, i, CONSTRUCT)) {
-						health_change_list[++health_change_num] = (struct health_change){
+						push_health_change(
 							j,
 							i,
 							UPGRADE_POINT_HEAL,
 							0
-						};
+						);
 					}
 				}
 			}
@@ -234,12 +246,12 @@ void start_turn_action(int act_row, int act_col) {
 			 && game_board[destroy_col][act_row]->player != player_state
 			 && game_board[destroy_col][act_row]->type == UNIT
 			 && game_board[destroy_col][act_row]->health < game_board[act_col][act_row]->health) {
-				health_change_list[++health_change_num] = (struct health_change){
+				push_health_change(
 					act_row,
 					destroy_col,
 					-game_board[destroy_col][act_row]->health,
 					0
-				};
+				);
 			}
 			break;
 		case VENOMFALL_SPIRE:
@@ -256,11 +268,11 @@ void start_turn_action(int act_row, int act_col) {
 			}
 			if (list_num > 0) {
 				int idx = rand_num(0, list_num - 1);
-				status_change_list[++status_change_num] = (struct status_change){
+				push_status_change(
 					cur_rows[idx],
 					cur_cols[idx],
 					POISONED
-				};
+				);
 			}
 			break;
 		default:
@@ -587,12 +599,12 @@ void play_card(void) {
 			}
 			if (list_num > 0) {
 				int idx = rand_num(0, list_num - 1);
-				health_change_list[++health_change_num] = (struct health_change){
+				push_health_change(
 					cur_rows[idx],
 					cur_cols[idx],
 					FELFLARES_DAMAGE,
 					0
-				};
+				);
 			}
 			break;
 
@@ -608,34 +620,34 @@ void play_card(void) {
 			}
 			if (list_num > 0) {
 				int idx = rand_num(0, list_num - 1);
-				health_change_list[++health_change_num] = (struct health_change){
+				push_health_change(
 					cur_rows[idx],
 					cur_cols[idx],
 					SUMMON_MILITIA_SPAWN,
 					KNIGHT
-				};
+				);
 			}
 			break;
 
 		case EXECUTION:
-			health_change_list[++health_change_num] = (struct health_change){
+			push_health_change(
 				row,
 				col,
 				EXECUTION_DAMAGE,
 				0
-			};
+			);
 			break;
 
 		case BLADE_STORM:
 			for (int i = 0; i < 5; ++i) {
 				for (int j = 0; j < 4; ++j) {
 					if (game_board[i][j] != NULL && game_board[i][j]->player != player_state) {
-						health_change_list[++health_change_num] = (struct health_change){
+						push_health_change(
 							row,
 							col,
 							BLADESTORM_DAMAGE,
 							0
-						};
+						);
 					}
 				}
 			}
@@ -653,12 +665,12 @@ void play_card(void) {
 				}
 			}
 			if (heal != 0) {
-				health_change_list[++health_change_num] = (struct health_change){
+				push_health_change(
 					row,
 					col,
 					DANGEROUS_SUITORS_HEAL * heal,
 					0
-				};
+				);
 			}
 			break;
 
@@ -683,20 +695,20 @@ void play_card(void) {
 				for (int i = 0; i < 4; ++i) {
 					int cur_col = col+bordering_col[i];
 					int cur_row = row+bordering_row[i];
-					if (game_board[cur_col][cur_row] == NULL) health_change_list[++health_change_num] = (struct health_change){
+					if (game_board[cur_col][cur_row] == NULL) push_health_change(
 						cur_row,
 						cur_col,
 						LUDIC_MATRIARCHEAD_START_SPAWN,
 						DRAGON
-					};
+					);
 					cur_col = adj_col+bordering_col[i];
 					cur_row = adj_row+bordering_row[i];
-					if (game_board[cur_col][cur_row] == NULL) health_change_list[++health_change_num] = (struct health_change){
+					if (game_board[cur_col][cur_row] == NULL) push_health_change(
 						cur_row,
 						cur_col,
 						LUDIC_MATRIARCHEAD_START_SPAWN,
 						DRAGON
-					};
+					);
 				}
 			}
 			break;
@@ -706,12 +718,12 @@ void play_card(void) {
 			int check_col = col+1-player_state*2;
 			if (check_col >= 0 && check_col <= 4
 			 && game_board[check_col][row] == NULL) {
-				health_change_list[++health_change_num] = (struct health_change){
+				push_health_change(
 					row,
 					check_col,
 					DOPPELBOCKS_SPAWN,
 					SATYR
-				};
+				);
 			}
 			break;
 
@@ -723,12 +735,12 @@ void play_card(void) {
 			}
 			if (list_num > 0) {
 				int idx = rand_num(0, list_num - 1);
-				health_change_list[++health_change_num] = (struct health_change){
+				push_health_change(
 					cur_rows[idx],
 					front_columns[player_state],
 					HEAD_START_SPAWN,
 					SATYR
-				};
+				);
 			}
 			break;
 
@@ -745,12 +757,12 @@ void play_card(void) {
 							if (game_board[k][l] != NULL
 							 && game_board[k][l]->player == player_state
 							 && game_board[k][l]->type == UNIT) {
-								health_change_list[++health_change_num] = (struct health_change){
+								push_health_change(
 									j,
 									i,
 									DARK_HARVEST_DAMAGE,
 									0
-								};
+								);
 								is_dmged = true;
 								break;
 							}
@@ -771,11 +783,11 @@ void play_card(void) {
 				if (game_board[check_col][check_row] != NULL
 				 && game_board[check_col][check_row]->player != player_state
 				 && game_board[check_col][check_row]->type == UNIT) {
-					status_change_list[++status_change_num] = (struct status_change){
+					push_status_change(
 						check_row,
 						check_col,
 						FROZEN
-					};
+					);
 				}
 			}
 			break;
@@ -794,22 +806,22 @@ void play_card(void) {
 			}
 			if (list_num > 0) {
 				int idx = rand_num(0, list_num - 1);
-				health_change_list[++health_change_num] = (struct health_change){
+				push_health_change(
 					cur_rows[idx],
 					cur_cols[idx],
 					FLESHMENDERS_HEAL,
 					0
-				};
+				);
 			}
 			break;
 
 		case MOMENTS_PEACE:
-			health_change_list[++health_change_num] = (struct health_change){
+			push_health_change(
 				row,
 				col,
 				MOMENTS_PEACE_HEAL,
 				0
-			};
+			);
 			for (int i = col - 1; i <= col + 1; ++i) {
 				if (i < 0 || i > 4) continue;
 				for (int j = row - 1; j <= row + 1; ++j) {
@@ -817,11 +829,11 @@ void play_card(void) {
 					if (game_board[i][j] != NULL
 					 && game_board[i][j]->player != player_state
 					 && game_board[i][j]->type == UNIT) {
-						status_change_list[++status_change_num] = (struct status_change){
+						push_status_change(
 							j,
 							i,
 							FROZEN
-						};
+						);
 					}
 				}
 			}
@@ -829,18 +841,18 @@ void play_card(void) {
 
 		case ICICLE_BURST:
 			if (!game_board[col][row]->frozen) {
-				status_change_list[++status_change_num] = (struct status_change){
+				push_status_change(
 					row,
 					col,
 					FROZEN
-				};
+				);
 			} else {
-				health_change_list[++health_change_num] = (struct health_change){
+				push_health_change(
 					row,
 					col,
 					ICICLE_BURST_DAMAGE,
 					0
-				};
+				);
 			}
 			break;
 
@@ -873,28 +885,28 @@ void play_card(void) {
 			}
 			if (list_num > 0) {
 				int idx = rand_num(0, list_num - 1);
-				status_change_list[++status_change_num] = (struct status_change){
+				push_status_change(
 					cur_rows[idx],
 					cur_cols[idx],
 					POISONED
-				};
+				);
 			}
 			break;
 
 		case MARKED_AS_PREY:
-			health_change_list[++health_change_num] = (struct health_change){
+			push_health_change(
 				row,
 				col,
 				MARKED_AS_PREY_DAMAGE,
 				0
-			};
+			);
 			if (game_board[col][row]->health + MARKED_AS_PREY_DAMAGE <= 0) {
-				health_change_list[++health_change_num] = (struct health_change){
+				push_health_change(
 					row,
 					col,
 					MARKED_AS_PREY_SPAWN,
 					TOAD
-				};
+				);
 			}
 			break;
 
