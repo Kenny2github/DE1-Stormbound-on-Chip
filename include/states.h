@@ -26,6 +26,7 @@ enum turn_state {
  * @brief Enum of states of a card move
  */
 enum move_state {
+	CARD_FIND_MOVE,
 	CARD_EFFECT,
 	CARD_MOVE_FORWARD
 };

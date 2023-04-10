@@ -25,28 +25,30 @@ void remove_tile_asset(int r, int c);
 void start_turn_action(int act_row, int act_col);
 
 /**
- * @brief Attacks the troop directly in front
+ * @brief Determine next tile troop moves to based on FIO
  *
- * @return Whether an attack was performed
+ * @param r Row troop is currently on
+ * @param c Column troop is currently on
+ * @param next_r Pointer to row troop will move to
+ * @param next_c Pointer to column troop will move to
  */
-bool attack_forward(void);
+void find_next_move(int r, int c, int* next_r, int* next_c);
 
 /**
- * @brief Attacks the troop on the side
+ * @brief Move troop to new tile, dealing damage if necessary
  *
  * @return Whether an attack was performed
+ * @param r Pointer to row troop is currently on
+ * @param c Pointer to column troop is currently on
+ * @param new_r Row troop will move to
+ * @param new_c Column troop will move to
  */
-bool attack_sideways(void);
-
-/**
- * @brief Move troop forward
- */
-void move_forward(void);
+bool move_to_tile(int* r, int* c, int new_r, int new_c);
 
 /**
  * @brief Additional movement logic just for Tode the Elevated.
  */
-void move_tode_the_elevated(void);
+void find_tode_the_elevated_jump(int r, int c, int* next_r, int* next_c);
 
 /**
  * @brief Return whether a card can be placed there

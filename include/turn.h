@@ -31,7 +31,7 @@ struct surface cur_card_deck_surfs[4];
 /**** Exported Functions ****/
 
 void update_mana(int new_mana);
-void update_front(void);
+void update_front(int player);
 void init_turn(void);
 void run_turn(void);
 

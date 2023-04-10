@@ -21,6 +21,7 @@ int cur_card_displayed;
 bool cur_card_displaying;
 
 int moves_left;
+int next_mov_row, next_mov_col;
 
 /* change mana to new_mana, and display mana value on HEX3-0 */
 void update_mana(int new_mana) {
@@ -41,31 +42,34 @@ void update_mana(int new_mana) {
 	}
 }
 
-void update_front(void) {
+void update_front(int player) {
 	int cur_front;
+
 	for (int i = 4; i > 0; --i) {
-		cur_front = player_state == P1 ? i : 4-i;
+		cur_front = player == P1 ? i : 4-i;
 		for (int j = 0; j < 4; ++j) {
 			if (game_board[cur_front][j] != NULL
-			 && game_board[cur_front][j]->player) {
-				if (player_state == P1 && cur_front == 4) cur_front = 3;
-				else if (player_state == P2 && cur_front == 0) cur_front = 1;
-				else front_columns[player_state] = cur_front;
-
-				if (front_columns[player_state] != cur_front) {
-					r_stack_push(board_base_surfs[TILES]);
-					board_base_surfs[FRONT_P1 + player_state].x = (cur_front - player_state) * 42 + 54;
-					r_stack_push(board_base_surfs[FRONT_P1 + player_state]);
-				}
+			 && game_board[cur_front][j]->player == player) {
+				if (player == P1 && cur_front == 4) cur_front = 3;
+				else if (player == P2 && cur_front == 0) cur_front = 1;
+				front_columns[player] = cur_front;
 				return;
 			}
 		}
 	}
-	cur_front = player_state == P1 ? 0 : 4;
-	if (front_columns[player_state] != cur_front) {
+	front_columns[player] = player == P1 ? 0 : 4;
+}
+
+void redraw_fronts(void) {
+	int prev_front[] = {front_columns[P1], front_columns[P2]};
+	update_front(P1);
+	update_front(P2);
+	if (front_columns[P1] != prev_front[P1] || front_columns[P2] != prev_front[P2]) {
 		r_stack_push(board_base_surfs[TILES]);
-		board_base_surfs[FRONT_P1 + player_state].x = (cur_front - player_state) * 42 + 54;
-		r_stack_push(board_base_surfs[FRONT_P1 + player_state]);
+		board_base_surfs[FRONT_P1].x = (front_columns[P1]) * 42 + 54;
+		r_stack_push(board_base_surfs[FRONT_P1]);
+		board_base_surfs[FRONT_P2].x = (front_columns[P2] - 1) * 42 + 54;
+		r_stack_push(board_base_surfs[FRONT_P2]);
 	}
 }
 
@@ -172,15 +176,22 @@ static void run_preturn_building(void) {
 						break;
 					}
 				}
-				if (turn_state == PRETURN_BUILDING) {
-					if (health_change_num == 0 && status_change_num == 0) {
-						start_turn_action(row, col);
-						health_change_idx = 0;
-						status_change_idx = 0;
+				start_turn_action(row, col);
+				health_change_idx = 0;
+				status_change_idx = 0;
+			}
+			if (turn_state == PRETURN_BUILDING) {
+				if (status_change_num == 0) {
+					if (health_change_num == 0) {
+						move_state = CARD_MOVE_FORWARD;
+					} else {
+						change_healths();
+						redraw_fronts();
 					}
+				} else {
 					change_statuses();
-					if (status_change_num == 0) change_healths();
 				}
+				break;
 			}
 			break;
 
@@ -208,19 +219,28 @@ static void run_preturn_unit(void) {
 					init_select_card();
 					break;
 				}
+				start_turn_action(row, col);
+				health_change_idx = 0;
+				status_change_idx = 0;
 			}
 			if (turn_state == PRETURN_UNIT) {
-				health_change_num = 0;
-				status_change_num = 0;
-				start_turn_action(row, col);
-				change_healths();
-				change_statuses();
+				if (status_change_num == 0) {
+					if (health_change_num == 0) {
+						move_state = CARD_MOVE_FORWARD;
+					} else {
+						change_healths();
+						redraw_fronts();
+					}
+				} else {
+					change_statuses();
+				}
+				break;
 			}
 			break;
 
 		case CARD_MOVE_FORWARD:
-			move_forward();
-			update_front();
+			move_to_tile(&row, &col, row, col+1-player_state*2);
+			redraw_fronts();
 	}
 }
 
@@ -438,12 +458,23 @@ static void run_card_moving(void) {
 	if (animation_waiting) return;
 
 	switch (move_state) {
+		case CARD_FIND_MOVE:
+			if (game_board[col][row] != NULL && moves_left-- != 0) {
+				find_next_move(row, col, &next_mov_row, &next_mov_col);
+				enable_intval_timer_interrupt();
+			} else {
+				turn_state = SELECT_CARD;
+			}
+			move_state = CARD_EFFECT;
+			break;
+
 		case CARD_EFFECT:
 			if (status_change_num == 0) {
 				if (health_change_num == 0) {
 					move_state = CARD_MOVE_FORWARD;
 				} else {
 					change_healths();
+					redraw_fronts();
 				}
 			} else {
 				change_statuses();
@@ -451,18 +482,17 @@ static void run_card_moving(void) {
 			break;
 
 		case CARD_MOVE_FORWARD:
-			if (moves_left-- != 0 && game_board[col][row] != NULL) {
-				if (!attack_forward()) {
-					if (!attack_sideways()) {
-						move_forward();
-					} else if (game_board[col][row]->card_id == TODE_THE_ELEVATED) {
-						move_tode_the_elevated();
-					}
-				} else if (game_board[col][row]->card_id == TODE_THE_ELEVATED) {
-					move_tode_the_elevated();
-				}
+			if (move_to_tile(&row, &col, next_mov_row, next_mov_col)
+			 && game_board[col][row] != NULL
+			 && game_board[col][row]->card_id == TODE_THE_ELEVATED) {
+				find_tode_the_elevated_jump(row, col, &next_mov_row, &next_mov_col);
+			} else {
+				move_state = CARD_FIND_MOVE;
 			}
-			move_state = CARD_EFFECT;
+			redraw_fronts();
+			enable_intval_timer_interrupt();
+			break;
+
 	}
 }
 
