@@ -597,7 +597,7 @@ void play_card(void) {
 			break;
 
 		case SUMMON_MILITIA:
-			for (int i = 0; i <= (player_state == P1 ? front[P1] : 5-front[P2]); ++i) {
+			for (int i = 0; i <= (player_state == P1 ? front_columns[P1] : 5-front_columns[P2]); ++i) {
 				int cur_col = player_state == P1 ? i : 5-i;
 				for (int j = 0; j < 4; ++j) {
 					if (game_board[cur_col][j] != NULL && game_board[cur_col][j]->player != player_state) {
@@ -717,7 +717,7 @@ void play_card(void) {
 
 		case HEAD_START:
 			for (int i = 0; i < 4; ++i) {
-				if (game_board[front[player_state]][i] == NULL) {
+				if (game_board[front_columns[player_state]][i] == NULL) {
 					cur_rows[list_num++] = i;
 				}
 			}
@@ -725,7 +725,7 @@ void play_card(void) {
 				int idx = rand_num(0, list_num - 1);
 				health_change_list[++health_change_num] = (struct health_change){
 					cur_rows[idx],
-					front[player_state],
+					front_columns[player_state],
 					HS_SPAWN,
 					SATYR
 				};

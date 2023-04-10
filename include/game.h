@@ -208,7 +208,7 @@ extern int row, col;
 /**
  * @brief Current front of each player
  */
-extern int front[2];
+extern int front_columns[2];
 
 extern int cur_round;
 

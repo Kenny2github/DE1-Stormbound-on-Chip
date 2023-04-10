@@ -47,9 +47,9 @@ void update_front(void) {
 			 && game_board[cur_front][j]->player) {
 				if (player_state == P1 && cur_front == 4) cur_front = 3;
 				else if (player_state == P2 && cur_front == 0) cur_front = 1;
-				else front[player_state] = cur_front;
+				else front_columns[player_state] = cur_front;
 
-				if (front[player_state] != cur_front) {
+				if (front_columns[player_state] != cur_front) {
 					r_stack_push(board_base_surfs[TILES]);
 					board_base_surfs[FRONT_P1 + player_state].x = (cur_front - player_state) * 42 + 54;
 					r_stack_push(board_base_surfs[FRONT_P1 + player_state]);
@@ -59,7 +59,7 @@ void update_front(void) {
 		}
 	}
 	cur_front = player_state == P1 ? 0 : 4;
-	if (front[player_state] != cur_front) {
+	if (front_columns[player_state] != cur_front) {
 		r_stack_push(board_base_surfs[TILES]);
 		board_base_surfs[FRONT_P1 + player_state].x = (cur_front - player_state) * 42 + 54;
 		r_stack_push(board_base_surfs[FRONT_P1 + player_state]);
@@ -85,8 +85,8 @@ void init_turn() {
 	move_state = CARD_EFFECT;
 	row = 0;
 	col = 4;
-	front[P1] = 0;
-	front[P2] = 4;
+	front_columns[P1] = 0;
+	front_columns[P2] = 4;
 	// shuffle both decks
 	for (int i = 0; i < 10; ++i) {
 		swap_int(&deck[P1][i], &deck[P1][rand_num(0, 9)]);

@@ -28,7 +28,7 @@ int mana;
 
 struct troop* game_board[5][4];
 int row, col;
-int front[2];
+int front_columns[2];
 
 /**** Exported functions ****/
 
