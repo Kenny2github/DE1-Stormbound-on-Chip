@@ -85,7 +85,7 @@ void default_event_handlers(struct event_t event) {
 		break;
 	case E_INTVAL_TIMER_RELOAD:
 		animation_waiting = false;
-		disable_interval_timer();
+		disable_intval_timer();
 		break;
 	default: ;
 	}
