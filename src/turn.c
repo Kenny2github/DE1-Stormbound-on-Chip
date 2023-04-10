@@ -448,8 +448,16 @@ static void run_card_moving(void) {
 			break;
 
 		case CARD_MOVE_FORWARD:
-			if (moves_left != 0) {
-
+			if (moves_left-- != 0 && game_board[col][row] != NULL) {
+				if (!attack_forward()) {
+					if (!attack_sideways()) {
+						move_forward();
+					} else if (game_board[col][row]->card_id == TODE_THE_ELEVATED) {
+						move_TTE();
+					}
+				} else if (game_board[col][row]->card_id == TODE_THE_ELEVATED) {
+					move_TTE();
+				}
 			}
 			move_state = CARD_EFFECT;
 	}
