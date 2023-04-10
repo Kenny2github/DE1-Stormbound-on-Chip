@@ -1,3 +1,4 @@
+#include <stdlib.h>
 #include "turn.h"
 #include "address_map_arm.h"
 #include "vga.h"
