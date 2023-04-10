@@ -156,6 +156,10 @@ static void init_card_moving(void) {
 }
 
 static void run_preturn_building(void) {
+	while (!event_queue_empty()) {
+		struct event_t event = event_queue_pop();
+		default_event_handlers(event);
+	}
 	if (animation_waiting) return;
 
 	switch (move_state) {
@@ -203,6 +207,10 @@ static void run_preturn_building(void) {
 }
 
 static void run_preturn_unit(void) {
+	while (!event_queue_empty()) {
+		struct event_t event = event_queue_pop();
+		default_event_handlers(event);
+	}
 	if (animation_waiting) return;
 
 	switch (move_state) {
@@ -464,6 +472,11 @@ static void run_place_card(void) {
 }
 
 static void run_card_moving(void) {
+	while (!event_queue_empty()) {
+		struct event_t event = event_queue_pop();
+		default_event_handlers(event);
+	}
+
 	if (animation_waiting) return;
 
 	switch (move_state) {

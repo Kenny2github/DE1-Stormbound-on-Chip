@@ -20,12 +20,12 @@ void enable_timer_interrupt(void) {
 
 void enable_intval_timer_interrupt(void) {
 	volatile int* intval_timer_ptr = (int*)TIMER_BASE;
-	// set countdown to be from 100M cycles
-	// on the timer (100MHz) it is 1 seconds
-	*(intval_timer_ptr + 2) = (int)(100E6 * 1) % 0x10000;
-	*(intval_timer_ptr + 3) = (int)(100E6 * 1) / 0x10000;
+	// set countdown to be from 50M cycles
+	// on the timer (100MHz) it is .5 seconds
+	*(intval_timer_ptr + 2) = (int)(100E6 * .5) % 0x10000;
+	*(intval_timer_ptr + 3) = (int)(100E6 * .5) / 0x10000;
 	// enable interrupts, auto-reload and countdown
-	*(intval_timer_ptr + 1) = 0b111;
+	*(intval_timer_ptr + 1) = 0b0101;
 	struct event_t event = {E_TIMER_ENABLE, {.timer_enable = {}}};
 	event_queue_push(event, "timer enabled");
 }
@@ -67,5 +67,5 @@ void disable_timer(void) {
 void disable_intval_timer(void) {
 	volatile int* intval_timer_ptr = (int*)TIMER_BASE;
 	// disable interrupts, auto-reload and countdown
-	*(intval_timer_ptr + 1) = 0b000;
+	*(intval_timer_ptr + 1) = 0b1000;
 }
