@@ -6,6 +6,14 @@
 #include "events.h"
 #include "event_types.h"
 
+static const struct surface intro_surfs[] = {
+	{64, 5, &stormbound},
+	{38, 120, &felflares},
+	{148, 120, &emerald_towers},
+	{248, 120, &summon_militia},
+};
+#define NUM_INTRO_SURFS (sizeof(intro_surfs) / sizeof(intro_surfs[0]))
+
 void draw_intro(void) {
 	fill_screen(BACKGROUND);
 	// write instructions

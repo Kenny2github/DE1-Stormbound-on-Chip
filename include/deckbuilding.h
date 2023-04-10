@@ -6,9 +6,7 @@
 
 /**** Constatns ****/
 
-const char empty_card_name_data[] =
-	"                    "
-;
+extern const char* empty_card_name_data;
 
 /**** Globals ****/
 
