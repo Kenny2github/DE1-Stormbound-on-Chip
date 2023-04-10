@@ -273,7 +273,7 @@ void start_turn_action(int act_row, int act_col) {
 				} ENDFOR
 			}
 			break;
-		case MECH_WORKSHOP:
+		case MECH_WORKSHOP: ;
 			int spawn_col = act_col + (player_state == P1 ? 1 : -1);
 			if (spawn_col >= 0 && spawn_col <= 4 && game_board[spawn_col][act_row] == NULL) {
 				push_health_change(
@@ -293,7 +293,7 @@ void start_turn_action(int act_row, int act_col) {
 				) push_health_change(j, i, UPGRADE_POINT_HEAL, 0);
 			} ENDFOR
 			break;
-		case SOULCRUSHERS:
+		case SOULCRUSHERS: ;
 			int destroy_col = act_col + (player_state == P1 ? 1 : -1);
 			if (destroy_col >= 0
 			 && destroy_col <= 4
@@ -309,7 +309,7 @@ void start_turn_action(int act_row, int act_col) {
 				);
 			}
 			break;
-		case VENOMFALL_SPIRE:
+		case VENOMFALL_SPIRE: ;
 			int cur_rows[20], cur_cols[20], list_num = 0;
 			FOR_EACH_TILE(i, j) {
 				if (
