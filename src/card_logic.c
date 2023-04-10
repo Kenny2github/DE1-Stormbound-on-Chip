@@ -65,6 +65,52 @@
 			if (__col == __from_col && __row == __from_row) continue;
 #define ENDFOR }}
 
+struct image* get_troop_img(enum card_name type, enum player_state player) {
+	switch (type) {
+	case HEROIC_SOLDIERS:
+	case VICTORS_OF_THE_MELEE:
+	case FLESHMENDERS:
+	case KNIGHT:
+		return (player == P1) ? &knight_p1 : &knight_p2;
+	case DANGEROUS_SUITORS:
+	case LUDIC_MATRIARCHS:
+	case DRAGON:
+		return (player == P1) ? &dragon_p1 : &dragon_p2;
+	case LAWLESS_HERD:
+	case SHADY_GHOUL:
+	case DOPPELBOCKS:
+	case SATYR:
+		return (player == P1) ? &satyr_p1 : &satyr_p2;
+	case OPERATORS:
+	case CONSTRUCT:
+		return (player == P1) ? &construct_p1 : &construct_p2;
+	case COPPERSKIN_RANGER:
+	case TODE_THE_ELEVATED:
+	case TOAD:
+		return (player == P1) ? &toad_p1 : &toad_p2;
+	case FELFLARES:
+	case FROSTHEXERS:
+	case WISP_CLOUD:
+		return (player == P1) ? &frostling_p1 : &frostling_p2;
+	case DR_MIA:
+	case AGENTS_IN_CHARGE:
+	case SOULCRUSHERS:
+		return (player == P1) ? &rodent_p1 : &rodent_p2;
+	case EMERALD_TOWERS:
+		return (player == P1) ? &emerald_p1 : &emerald_p2;
+	case MOONLIT_AERIE:
+		return (player == P1) ? &moonlit_p1 : &moonlit_p2;
+	case MECH_WORKSHOP:
+		return (player == P1) ? &workshop_p1 : &workshop_p2;
+	case UPGRADE_POINT:
+		return (player == P1) ? &upgrade_p1 : &upgrade_p2;
+	case VENOMFALL_SPIRE:
+		return (player == P1) ? &venomfall_p1 : &venomfall_p2;
+	default:
+		return NULL;
+	}
+}
+
 void place_new_tile_asset(int r, int c, struct troop* new_troop) {
 	game_board[c][r] = new_troop;
 	tile_base_surfs[c][r] = (struct surface){
@@ -428,165 +474,26 @@ void play_card(void) {
 	struct troop* new_troop = (struct troop*) malloc(sizeof(struct troop));
 	int cur_rows[20], cur_cols[20], list_num = 0;
 	/* create new troop object */
+	*new_troop = (struct troop){
+		// spawn new troop (UNIT may be overwritten later) of given type
+		card_id, UNIT,
+		// belonging to current player with initial health of given type
+		player_state, card_data[card_id].init_health,
+		// it is not frozen or poisoned; get its image by type and player
+		false, false, get_troop_img(card_id, player_state)
+	};
+
 	switch(card_id) {
-		case LAWLESS_HERD:
-		case SHADY_GHOUL:
-		case DOPPELBOCKS:
-			*new_troop = (struct troop){
-				card_id,
-				UNIT,
-				player_state,
-				card_data[card_id].init_health,
-				false,
-				false,
-				(player_state == P1) ? &satyr_p1 : &satyr_p2
-			};
-			break;
-
-		case FELFLARES:
-		case FROSTHEXERS:
-		case WISP_CLOUD:
-			*new_troop = (struct troop){
-				card_id,
-				UNIT,
-				player_state,
-				card_data[card_id].init_health,
-				false,
-				false,
-				(player_state == P1) ? &frostling_p1 : &frostling_p2
-			};
-			break;
-
-		case HEROIC_SOLDIERS:
-		case VICTORS_OF_THE_MELEE:
-		case FLESHMENDERS:
-			*new_troop = (struct troop){
-				card_id,
-				UNIT,
-				player_state,
-				card_data[card_id].init_health,
-				false,
-				false,
-				(player_state == P1) ? &knight_p1 : &knight_p2
-			};
-			break;
-
-		case DANGEROUS_SUITORS:
-		case LUDIC_MATRIARCHS:
-			*new_troop = (struct troop){
-				card_id,
-				UNIT,
-				player_state,
-				card_data[card_id].init_health,
-				false,
-				false,
-				(player_state == P1) ? &dragon_p1 : &dragon_p2
-			};
-			break;
-
-		case OPERATORS:
-			*new_troop = (struct troop){
-				card_id,
-				UNIT,
-				player_state,
-				card_data[card_id].init_health,
-				false,
-				false,
-				(player_state == P1) ? &construct_p1 : &construct_p2
-			};
-			break;
-
-		case DR_MIA:
-		case AGENTS_IN_CHARGE:
-		case SOULCRUSHERS:
-			*new_troop = (struct troop){
-				card_id,
-				UNIT,
-				player_state,
-				card_data[card_id].init_health,
-				false,
-				false,
-				(player_state == P1) ? &rodent_p1 : &rodent_p2
-			};
-			break;
-
-		case COPPERSKIN_RANGER:
-		case TODE_THE_ELEVATED:
-			*new_troop = (struct troop){
-				card_id,
-				UNIT,
-				player_state,
-				card_data[card_id].init_health,
-				false,
-				false,
-				(player_state == P1) ? &toad_p1 : &toad_p2
-			};
-			break;
-
-		case EMERALD_TOWERS:
-			*new_troop = (struct troop){
-				card_id,
-				BUILDING,
-				player_state,
-				card_data[card_id].init_health,
-				false,
-				false,
-				(player_state == P1) ? &emerald_p1 : &emerald_p2
-			};
-			break;
-
-		case MOONLIT_AERIE:
-			*new_troop = (struct troop){
-				card_id,
-				BUILDING,
-				player_state,
-				card_data[card_id].init_health,
-				false,
-				false,
-				(player_state == P1) ? &moonlit_p1 : &moonlit_p2
-			};
-			break;
-
-		case MECH_WORKSHOP:
-			*new_troop = (struct troop){
-				card_id,
-				BUILDING,
-				player_state,
-				card_data[card_id].init_health,
-				false,
-				false,
-				(player_state == P1) ? &workshop_p1 : &workshop_p2
-			};
-			break;
-
-		case UPGRADE_POINT:
-			*new_troop = (struct troop){
-				card_id,
-				BUILDING,
-				player_state,
-				card_data[card_id].init_health,
-				false,
-				false,
-				(player_state == P1) ? &upgrade_p1 : &upgrade_p2
-			};
-			break;
-
-		case VENOMFALL_SPIRE:
-			*new_troop = (struct troop){
-				card_id,
-				BUILDING,
-				player_state,
-				card_data[card_id].init_health,
-				false,
-				false,
-				(player_state == P1) ? &venomfall_p1 : &venomfall_p2
-			};
-			break;
-
-		default:
-			free(new_troop);
+	case EMERALD_TOWERS:
+	case MOONLIT_AERIE:
+	case MECH_WORKSHOP:
+	case UPGRADE_POINT:
+	case VENOMFALL_SPIRE:
+		new_troop->type = BUILDING;
+		break;
 	}
 
+	// handle on-play abilities
 	switch(card_id) {
 		case VICTORS_OF_THE_MELEE:
 		case WISP_CLOUD:
