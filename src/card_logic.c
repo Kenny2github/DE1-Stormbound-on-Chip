@@ -369,6 +369,7 @@ void find_next_move(int r, int c, int* next_r, int* next_c) {
 	}
 
 	if (game_board[*next_c][*next_r] != NULL) {
+		reset_health_status_changes();
 		if (game_board[c][r]->card_id == VICTORS_OF_THE_MELEE
 		 || game_board[c][r]->card_id == WISP_CLOUD
 		 || game_board[c][r]->card_id == SOULCRUSHERS) {

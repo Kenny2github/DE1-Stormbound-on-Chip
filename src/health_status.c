@@ -18,6 +18,13 @@ int status_change_num;
 int status_change_idx;
 struct status_change status_change_list[20];
 
+void reset_health_status_changes(void) {
+	health_change_idx = 0;
+	health_change_num = 0;
+	status_change_idx = 0;
+	status_change_num = 0;
+}
+
 void change_healths() {
 	if (health_change_num == 0) return; // nothing to do
 

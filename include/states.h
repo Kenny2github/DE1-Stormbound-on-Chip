@@ -28,7 +28,7 @@ enum turn_state {
 enum move_state {
 	CARD_FIND_MOVE,
 	CARD_EFFECT,
-	CARD_MOVE_FORWARD
+	CARD_MOVE
 };
 
 /**

@@ -140,17 +140,19 @@ static void init_select_card(void) {
 static void init_card_moving(void) {
 	play_card();
 	moves_left = card_data[deck[player_state][cur_card_selected]].init_move;
-	health_change_idx = 0;
-	status_change_idx = 0;
+	reset_health_status_changes();
+
 	update_mana(mana - card_data[deck[player_state][cur_card_selected]].cost);
+
 	cur_cards_played[cur_card_selected] = true;
 	push_image(cur_card_deck_surfs[cur_card_selected].x, cur_card_deck_surfs[cur_card_selected].y, &clear_card);
 	swap_int(&deck[player_state][cur_card_selected], &deck[player_state][4]);
 	for (int i = 4; i < 9; ++i) swap_int(&deck[player_state][i], &deck[player_state][i+1]);
+	cur_card_displaying = false;
 	write_string(CARD_DESC_POS, empty_desc_data);
+
 	turn_state = CARD_MOVING;
-	move_state = CARD_EFFECT;
-	enable_intval_timer_interrupt();
+	move_state = CARD_FIND_MOVE;
 }
 
 static void run_preturn_building(void) {
@@ -183,7 +185,7 @@ static void run_preturn_building(void) {
 			if (turn_state == PRETURN_BUILDING) {
 				if (status_change_num == 0) {
 					if (health_change_num == 0) {
-						move_state = CARD_MOVE_FORWARD;
+						move_state = CARD_MOVE;
 					} else {
 						change_healths();
 						redraw_fronts();
@@ -195,7 +197,7 @@ static void run_preturn_building(void) {
 			}
 			break;
 
-		case CARD_MOVE_FORWARD:
+		case CARD_MOVE:
 			move_state = CARD_EFFECT;
 	}
 }
@@ -226,7 +228,7 @@ static void run_preturn_unit(void) {
 			if (turn_state == PRETURN_UNIT) {
 				if (status_change_num == 0) {
 					if (health_change_num == 0) {
-						move_state = CARD_MOVE_FORWARD;
+						move_state = CARD_MOVE;
 					} else {
 						change_healths();
 						redraw_fronts();
@@ -238,7 +240,7 @@ static void run_preturn_unit(void) {
 			}
 			break;
 
-		case CARD_MOVE_FORWARD:
+		case CARD_MOVE:
 			move_to_tile(&row, &col, row, col+1-player_state*2);
 			redraw_fronts();
 	}
@@ -248,8 +250,9 @@ static void select_card_click(void) {
 	if (saved_mouse_states[0].y >= 166 && saved_mouse_states[0].y < 227) {
 		for (int i = 0; i < 4; ++i) {
 			if (saved_mouse_states[0].x >= i * 46 + 10 && saved_mouse_states[0].x < i * 46 + 51) {
-				if (i != cur_card_selected) {
-					if (cur_card_selected >= 0 && cur_card_selected < 4) {
+				if (!cur_cards_played[i] && i != cur_card_selected) {
+					if (!cur_cards_played[cur_card_selected]
+					 && cur_card_selected >= 0 && cur_card_selected < 4) {
 						// clear card image
 						push_image(cur_card_selected * 46 + 10, 146, &clear_card);
 						// redraw but slightly higher
@@ -265,7 +268,6 @@ static void select_card_click(void) {
 					turn_state = PLACE_CARD;
 					break;
 				}
-
 			}
 		}
 	}
@@ -273,7 +275,7 @@ static void select_card_click(void) {
 
 static void select_card_hover(void) {
 	for (int i = 0; i < 4; ++i) {
-		if (rects_collide(
+		if (!cur_cards_played[i] && rects_collide(
 			// this surf's rect
 			cur_card_deck_surfs[i].x, cur_card_deck_surfs[i].y,
 			cur_card_deck_surfs[i].data->width, cur_card_deck_surfs[i].data->height,
@@ -312,7 +314,7 @@ static void select_card_rerendering(void) {
 	// re-render affected surfaces
 	for (int i = 0; i < 4; ++i) {	// cards
 		for (int j = 1; j < NUM_MOUSE_STATES; ++j) {
-			if (rects_collide(
+			if (!cur_cards_played[i] && rects_collide(
 				// this surf's rect
 				cur_card_deck_surfs[i].x, cur_card_deck_surfs[i].y,
 				cur_card_deck_surfs[i].data->width, cur_card_deck_surfs[i].data->height,
@@ -375,7 +377,10 @@ static void run_select_card(void) {
 		struct event_t event = event_queue_pop();
 		default_event_handlers(event);
 
-		if (event.type == E_MOUSE_BUTTON_DOWN && event.data.mouse_button_down.left) {
+		if (event.type == E_TIMER_RELOAD && time_left == 0) {
+			turn_state = TURN_END;
+
+		} else if (event.type == E_MOUSE_BUTTON_DOWN && event.data.mouse_button_down.left) {
 			select_card_click();
 		} else {
 			select_card_hover();
@@ -408,7 +413,10 @@ static void run_place_card(void) {
 		struct event_t event = event_queue_pop();
 		default_event_handlers(event);
 
-		if (event.type == E_MOUSE_BUTTON_DOWN && event.data.mouse_button_down.left) {
+		if (event.type == E_TIMER_RELOAD && time_left == 0) {
+			turn_state = TURN_END;
+
+		} else if (event.type == E_MOUSE_BUTTON_DOWN && event.data.mouse_button_down.left) {
 			select_card_click();
 			for (int i = 0; i < COL; ++i) {
 				for (int j = 0; j < ROW; ++j) {
@@ -428,6 +436,7 @@ static void run_place_card(void) {
 						}
 					}
 				}
+				if (turn_state != PLACE_CARD) break;
 			}
 		} else {
 			select_card_hover();
@@ -471,7 +480,7 @@ static void run_card_moving(void) {
 		case CARD_EFFECT:
 			if (status_change_num == 0) {
 				if (health_change_num == 0) {
-					move_state = CARD_MOVE_FORWARD;
+					move_state = CARD_MOVE;
 				} else {
 					change_healths();
 					redraw_fronts();
@@ -481,7 +490,7 @@ static void run_card_moving(void) {
 			}
 			break;
 
-		case CARD_MOVE_FORWARD:
+		case CARD_MOVE:
 			if (move_to_tile(&row, &col, next_mov_row, next_mov_col)
 			 && game_board[col][row] != NULL
 			 && game_board[col][row]->card_id == TODE_THE_ELEVATED) {

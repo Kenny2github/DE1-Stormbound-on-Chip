@@ -66,6 +66,12 @@ extern struct status_change status_change_list[20];
 /**** Exported Functions ****/
 
 /**
+ * @brief Reset total number of health/status changes
+ * and respective indices to 0
+ */
+void reset_health_status_changes(void);
+
+/**
  * @brief Process pending health changes.
  */
 void change_healths(void);
