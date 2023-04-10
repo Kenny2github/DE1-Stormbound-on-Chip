@@ -18,11 +18,26 @@ int status_change_num;
 int status_change_idx;
 struct status_change status_change_list[20];
 
+int affected_row, affected_col;
+bool rerender_needed;
+
 void reset_health_status_changes(void) {
 	health_change_idx = 0;
 	health_change_num = 0;
 	status_change_idx = 0;
 	status_change_num = 0;
+	rerender_needed = false;
+}
+
+void rerender_affected_tile() {
+	if (!rerender_needed) return;
+
+	r_stack_push(tile_base_surfs[affected_col][affected_row]);
+	for (int i = 0; i < tile_overlay_surf_num[affected_col][affected_row]; ++i) {
+		r_stack_push(tile_overlay_surfs[affected_col][affected_row][i]);
+	}
+
+	rerender_needed = false;
 }
 
 void change_healths() {
@@ -43,32 +58,29 @@ void change_healths() {
 	} else {
 		char health_change_text[1];
 		if (cur_change.change < 0) {
-			tile_overlay_surfs[cur_change.col]
-							   [cur_change.row]
-							   [++tile_overlay_surf_num[cur_change.col][cur_change.row]]
-			= (struct surface){
+			push_image(
 				col2x(cur_change.col),
 				row2y(cur_change.row),
 				&damage
-			};
+			);
 			if (cur_change.change + game_board[cur_change.col][cur_change.row]->health < 0) {
 				cur_change.change = -game_board[col][cur_change.row]->health;
 			}
 		} else {
-			tile_overlay_surfs[cur_change.col]
-							   [cur_change.row]
-							   [++tile_overlay_surf_num[cur_change.col][cur_change.row]]
-			= (struct surface){
+			push_image(
 				col2x(cur_change.col),
 				row2y(cur_change.row),
 				&heal
-			};
+			);
 			if (cur_change.change + game_board[cur_change.col][cur_change.row]->health > 99) {
 				cur_change.change = 99 - game_board[col][cur_change.row]->health;
 			}
 		}
 		health_change_text[0] = abs(cur_change.change) + '0';
 		write_string((col2x(cur_change.col) + 40) / 4, (row2y(cur_change.row) + 26) / 4, health_change_text);
+		affected_row = cur_change.row;
+		affected_col = cur_change.col;
+		rerender_needed = true;
 	}
 }
 

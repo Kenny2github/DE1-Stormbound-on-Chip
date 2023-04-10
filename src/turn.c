@@ -491,6 +491,7 @@ static void run_card_moving(void) {
 			break;
 
 		case CARD_EFFECT:
+			rerender_affected_tile();
 			if (status_change_num == 0) {
 				if (health_change_num == 0) {
 					move_state = CARD_MOVE;

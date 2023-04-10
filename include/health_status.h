@@ -72,6 +72,12 @@ extern struct status_change status_change_list[20];
 void reset_health_status_changes(void);
 
 /**
+ * @brief Rerender an tile that had the health change sprite covering it
+ *
+ */
+void rerender_affected_tile(void);
+
+/**
  * @brief Process pending health changes.
  */
 void change_healths(void);
