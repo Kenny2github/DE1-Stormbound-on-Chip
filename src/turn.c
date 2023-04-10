@@ -189,7 +189,7 @@ static void run_preturn_building(void) {
 				while (1) {
 					printf("col %d, row %d\n", col, row);
 					if (!(game_board[col][row] == NULL || game_board[col][row]->type != BUILDING)) break;
-					if ((player_state == P1) ? (++row == 4) : (--row == 0)) {
+					if ((player_state == P1) ? (++row == 4) : (--row == -1)) {
 						if (player_state == P1) {
 							--col;
 							row = 0;
@@ -242,7 +242,7 @@ static void run_preturn_unit(void) {
 		case CARD_EFFECT:
 			if (health_change_num == 0 && status_change_num == 0) {
 				while (game_board[col][row] == NULL || game_board[col][row]->type != UNIT || game_board[col][row]->frozen) {
-					if (((player_state == P1) ? ++row : --row) == 4) {
+					if ((player_state == P1) ? (++row == 4) : (--row == -1)) {
 						if (player_state == P1) {
 							--col;
 							row = 0;
