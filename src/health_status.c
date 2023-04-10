@@ -86,9 +86,9 @@ void change_healths() {
 	} else {
 		char health_change_text[1];
 		if (cur_change.change < 0) {
-			board_overlay_surfs[cur_change.col]
+			tile_overlay_surfs[cur_change.col]
 							   [cur_change.row]
-							   [++board_overlay_surf_num[cur_change.col][cur_change.row]]
+							   [++tile_overlay_surf_num[cur_change.col][cur_change.row]]
 			= (struct surface){
 				col2x(cur_change.col),
 				row2y(cur_change.row),
@@ -98,9 +98,9 @@ void change_healths() {
 				cur_change.change = -game_board[col][cur_change.row]->health;
 			}
 		} else {
-			board_overlay_surfs[cur_change.col]
+			tile_overlay_surfs[cur_change.col]
 							   [cur_change.row]
-							   [++board_overlay_surf_num[cur_change.col][cur_change.row]]
+							   [++tile_overlay_surf_num[cur_change.col][cur_change.row]]
 			= (struct surface){
 				col2x(cur_change.col),
 				row2y(cur_change.row),

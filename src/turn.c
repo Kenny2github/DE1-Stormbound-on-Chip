@@ -34,19 +34,31 @@ void update_mana(int new_mana) {
 }
 
 void update_front(void) {
+	int cur_front;
 	for (int i = 4; i > 0; --i) {
-		int cur_front = player_state == P1 ? i : 4-i;
+		cur_front = player_state == P1 ? i : 4-i;
 		for (int j = 0; j < 4; ++j) {
 			if (game_board[cur_front][j] != NULL
 			 && game_board[cur_front][j]->player) {
-				if (player_state == P1 && cur_front == 4) front[player_state] = 3;
-				else if (player_state == P2 && cur_front == 0) front[player_state] = 1;
+				if (player_state == P1 && cur_front == 4) cur_front = 3;
+				else if (player_state == P2 && cur_front == 0) cur_front = 1;
 				else front[player_state] = cur_front;
+
+				if (front[player_state] != cur_front) {
+					r_stack_push(board_base_surfs[TILES]);
+					board_base_surfs[FRONT_P1 + player_state].x = (cur_front - player_state) * 42 + 54;
+					r_stack_push(board_base_surfs[FRONT_P1 + player_state]);
+				}
 				return;
 			}
 		}
 	}
-	front[player_state] = player_state == P1 ? 0 : 4;
+	cur_front = player_state == P1 ? 0 : 4;
+	if (front[player_state] != cur_front) {
+		r_stack_push(board_base_surfs[TILES]);
+		board_base_surfs[FRONT_P1 + player_state].x = (cur_front - player_state) * 42 + 54;
+		r_stack_push(board_base_surfs[FRONT_P1 + player_state]);
+	}
 }
 
 static void t_display_card_info(int card_id) {
@@ -87,15 +99,17 @@ void init_turn() {
 	write_string(1, 1, "P1 turn");
 	for (int i = 0; i < 5; ++i) {
 		for (int j = 0; j < 4; ++j) {
-			board_base_surfs[i][j] = (struct surface){col2x(i), row2y(j), &empty_tile};
-			r_stack_push(board_base_surfs[i][j]);
-			board_overlay_surf_num[i][j] = 0;
+			tile_base_surfs[i][j] = (struct surface){col2x(i), row2y(j), &empty_tile};
+			r_stack_push(tile_base_surfs[i][j]);
+			tile_overlay_surf_num[i][j] = 0;
 		}
 	}
-	board_base_surfs[5][0] = (struct surface){0, 12, &board_p1};
-	board_base_surfs[6][0] = (struct surface){55, 12, &board_tiles};
-	board_base_surfs[7][0] = (struct surface){265, 12, &board_p2};
-	for (int i = 0; i < 3; ++i) r_stack_push(board_base_surfs[i+5][0]);
+	board_base_surfs[BASE_P1] = (struct surface){0, 12, &board_p1};
+	board_base_surfs[BASE_P2] = (struct surface){265, 12, &board_p2};
+	board_base_surfs[TILES] = (struct surface){55, 12, &board_tiles};
+	board_base_surfs[FRONT_P1] = (struct surface){96, 16, &front_p1};
+	board_base_surfs[FRONT_P2] = (struct surface){222, 16, &front_p2};
+	for (int i = 0; i < 5; ++i) r_stack_push(board_base_surfs[i]);
 	enable_timer_interrupt();
 	printf("init done\n");
 }
@@ -233,8 +247,8 @@ static void select_card_hover(void) {
 		for (int j = 0; j < ROW; ++j) {
 			if (game_board[i][j] != NULL && rects_collide(
 				// this surf's rect
-				board_base_surfs[i][j].x, board_base_surfs[i][j].y,
-				board_base_surfs[i][j].data->width, board_base_surfs[i][j].data->height,
+				tile_base_surfs[i][j].x, tile_base_surfs[i][j].y,
+				tile_base_surfs[i][j].data->width, tile_base_surfs[i][j].data->height,
 				// previous mouse surf's rect
 				saved_mouse_states[0].x, saved_mouse_states[0].y,
 				mouse_clear.width, mouse_clear.height
@@ -270,30 +284,44 @@ static void select_card_rerendering(void) {
 			for (int k = 1; k < NUM_MOUSE_STATES; ++k) {
 				if (rects_collide(
 					// this surf's rect
-					board_base_surfs[i][j].x, board_base_surfs[i][j].y,
-					board_base_surfs[i][j].data->width, board_base_surfs[i][j].data->height,
+					tile_base_surfs[i][j].x, tile_base_surfs[i][j].y,
+					tile_base_surfs[i][j].data->width, tile_base_surfs[i][j].data->height,
 					// previous mouse surf's rect
 					saved_mouse_states[k].x, saved_mouse_states[k].y,
 					mouse_clear.width, mouse_clear.height
 				)) {
-					r_stack_push(board_base_surfs[i][j]);
-					for (int l = 0; l < board_overlay_surf_num[i][j]; ++l) {
-						r_stack_push(board_overlay_surfs[i][j][l]);
+					r_stack_push(tile_base_surfs[i][j]);
+					for (int l = 0; l < tile_overlay_surf_num[i][j]; ++l) {
+						r_stack_push(tile_overlay_surfs[i][j][l]);
 					}
 				}
 			}
 		}
 	}
-	for (int i = 5; i < 8; ++i) {	// board
+	for (int i = 0; i < 2; ++i) {	// board
 		for (int j = 1; j < NUM_MOUSE_STATES; ++j) {
 			if (rects_collide(
 				// this surf's rect
-				board_base_surfs[i][0].x, board_base_surfs[i][0].y,
-				board_base_surfs[i][0].data->width, board_base_surfs[i][0].data->height,
+				board_base_surfs[i].x, board_base_surfs[i].y,
+				board_base_surfs[i].data->width, board_base_surfs[i].data->height,
 				// previous mouse surf's rect
 				saved_mouse_states[j].x, saved_mouse_states[j].y,
 				mouse_clear.width, mouse_clear.height
-			)) r_stack_push(board_base_surfs[i][0]);
+			)) r_stack_push(board_base_surfs[i]);
+		}
+	}
+	for (int j = 1; j < NUM_MOUSE_STATES; ++j) {
+		if (rects_collide(
+			// this surf's rect
+			board_base_surfs[TILES].x, board_base_surfs[TILES].y,
+			board_base_surfs[TILES].data->width, board_base_surfs[TILES].data->height,
+				// previous mouse surf's rect
+				saved_mouse_states[j].x, saved_mouse_states[j].y,
+				mouse_clear.width, mouse_clear.height
+		)) {
+			r_stack_push(board_base_surfs[TILES]);
+			r_stack_push(board_base_surfs[FRONT_P1]);
+			r_stack_push(board_base_surfs[FRONT_P2]);
 		}
 	}
 }

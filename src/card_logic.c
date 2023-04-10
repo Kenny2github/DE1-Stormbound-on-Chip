@@ -32,22 +32,22 @@
 
 void place_new_tile_asset(int r, int c, struct troop* new_troop) {
 	game_board[c][r] = new_troop;
-	board_base_surfs[c][r] = (struct surface){
+	tile_base_surfs[c][r] = (struct surface){
 		col2x(c),
 		row2y(r),
 		new_troop->img
 	};
-	r_stack_push(board_base_surfs[c][r]);
+	r_stack_push(tile_base_surfs[c][r]);
 }
 
 void remove_tile_asset(int r, int c) {
 	free(game_board[c][r]);
-	board_base_surfs[c][r] = (struct surface){
+	tile_base_surfs[c][r] = (struct surface){
 		col2x(c),
 		row2y(r),
 		&empty_tile
 	};
-	r_stack_push(board_base_surfs[c][r]);
+	r_stack_push(tile_base_surfs[c][r]);
 }
 
 /* determine whether card at location has same type as card_id */
@@ -524,7 +524,7 @@ void play_card(void) {
 		case SOULCRUSHERS:
 			// same as start turn action
 			place_new_tile_asset(row, col, new_troop);
-			board_overlay_surfs[col][row][++board_overlay_surf_num[col][row]] = (struct surface){
+			tile_overlay_surfs[col][row][++tile_overlay_surf_num[col][row]] = (struct surface){
 				col2x(col),
 				row2y(row),
 				&on_attack
