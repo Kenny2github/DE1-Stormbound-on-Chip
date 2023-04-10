@@ -16,7 +16,7 @@
 #define EXECUTION_DAMAGE -4
 #define BLADESTORM_DAMAGE -1
 #define DANGEROUS_SUITORS_HEAL 2
-#define LUDIC_MATRIARCHEAD_START_SPAWN 1
+#define LUDIC_MATRIARCHS_SPAWN 1
 #define DOPPELBOCKS_SPAWN 1
 #define MOONLIT_AERIE_HEAL 1
 #define HEAD_START_SPAWN 3
@@ -715,7 +715,7 @@ void play_card(void) {
 					if (game_board[cur_col][cur_row] == NULL) push_health_change(
 						cur_row,
 						cur_col,
-						LUDIC_MATRIARCHEAD_START_SPAWN,
+						LUDIC_MATRIARCHS_SPAWN,
 						DRAGON
 					);
 					cur_col = adj_col+bordering_col[i];
@@ -723,7 +723,7 @@ void play_card(void) {
 					if (game_board[cur_col][cur_row] == NULL) push_health_change(
 						cur_row,
 						cur_col,
-						LUDIC_MATRIARCHEAD_START_SPAWN,
+						LUDIC_MATRIARCHS_SPAWN,
 						DRAGON
 					);
 				}
