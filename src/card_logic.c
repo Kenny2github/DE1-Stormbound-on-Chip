@@ -31,6 +31,40 @@
 #define MARKED_AS_PREY_DAMAGE -5
 #define MARKED_AS_PREY_SPAWN 5
 
+/**
+ * @brief Macro to loop over every tile in the board.
+ * ALWAYS use this as follows:
+ * FOR_EACH_TILE(col, row) {
+ *		// do something with col and row
+ * } ENDFOR
+ *
+ * @param __col Column variable name
+ * @param __row Row variable name
+ */
+#define FOR_EACH_TILE(__col, __row) for (int __col = 0; __col < 5; ++__col) { \
+	for (int __row = 0; __row < 4; ++__row) {
+
+/**
+ * @brief Hacky macro to loop over every tile surrounding a tile,
+ * skipping tiles out of bounds and the tile itself.
+ * ALWAYS use this as follows:
+ * FOR_EACH_SURROUNDING_TILE(col, row, from_col, from_row) {
+ *		// do something with col and row
+ * } ENDFOR
+ *
+ * @param __col Column variable name
+ * @param __row Row variable name
+ * @param __from_col Column of tile being surrounded
+ * @param __from_row Row of tile being surrounded
+ */
+#define FOR_EACH_SURROUNDING_TILE(__col, __row, __from_col, __from_row) \
+	for (int __col = __from_col - 1; __col <= __from_col + 1; ++__col) { \
+		if (__col < 0 || __col > 4) continue; \
+		for (int __row = __from_row - 1; __row <= __from_row + 1; ++__row) { \
+			if (__row < 0 || __row > 3) continue; \
+			if (__col == __from_col && __row == __from_row) continue;
+#define ENDFOR }}
+
 void place_new_tile_asset(int r, int c, struct troop* new_troop) {
 	game_board[c][r] = new_troop;
 	tile_base_surfs[c][r] = (struct surface){
@@ -176,37 +210,21 @@ void start_turn_action(int act_row, int act_col) {
 			}
 			break;
 		case MOONLIT_AERIE:
-			for (int i = 0; i < 5; ++i) {
-				for (int j = 0; j < 4; ++j) {
-					if (game_board[i][j] != NULL
-					 && game_board[i][j]->player == player_state
-					 && of_same_type(j, i, SATYR)) {
-						push_health_change(
-							j,
-							i,
-							MOONLIT_AERIE_HEAL,
-							0
-						);
-					}
-				}
-			}
+			FOR_EACH_TILE(i, j) {
+				if (
+					game_board[i][j] != NULL
+					&& game_board[i][j]->player == player_state
+					&& of_same_type(j, i, SATYR)
+				) push_health_change(j, i, MOONLIT_AERIE_HEAL, 0);
+			} ENDFOR
 			break;
 		case WISP_CLOUD:
 			if (game_board[act_col+1-player_state*2][act_row]->frozen) {
-				for (int i = act_col - 1; i <= act_col + 1; ++i) {
-					if (i < 0 || i > 4) continue;
-					for (int j = act_row - 1; j <= act_row + 1; ++j) {
-						if (j < 0 || j > 3 || (i == act_col && j == act_row)) continue;
-						if (game_board[i][j] != NULL && game_board[i][j]->frozen) {
-							push_health_change(
-								j,
-								i,
-								WISP_CLOUD_DAMAGE,
-								0
-							);
-						}
+				FOR_EACH_SURROUNDING_TILE(i, j, act_col, act_row) {
+					if (game_board[i][j] != NULL && game_board[i][j]->frozen) {
+						push_health_change(j, i, WISP_CLOUD_DAMAGE, 0);
 					}
-				}
+				} ENDFOR
 			}
 			break;
 		case MECH_WORKSHOP:
@@ -221,22 +239,13 @@ void start_turn_action(int act_row, int act_col) {
 			}
 			break;
 		case UPGRADE_POINT:
-			for (int i = act_col - 1; i <= act_col + 1; ++i) {
-				if (i < 0 || i > 4) continue;
-				for (int j = act_row - 1; j <= act_row + 1; ++j) {
-					if (j < 0 || j > 3 || (i == act_col && j == act_row)) continue;
-					if (game_board[i][j] != NULL
-					 && game_board[i][j]->player == player_state
-					 && of_same_type(j, i, CONSTRUCT)) {
-						push_health_change(
-							j,
-							i,
-							UPGRADE_POINT_HEAL,
-							0
-						);
-					}
-				}
-			}
+			FOR_EACH_SURROUNDING_TILE(i, j, act_col, act_row) {
+				if (
+					game_board[i][j] != NULL
+					&& game_board[i][j]->player == player_state
+					&& of_same_type(j, i, CONSTRUCT)
+				) push_health_change(j, i, UPGRADE_POINT_HEAL, 0);
+			} ENDFOR
 			break;
 		case SOULCRUSHERS:
 			int destroy_col = act_col + (player_state == P1 ? 1 : -1);
@@ -256,16 +265,16 @@ void start_turn_action(int act_row, int act_col) {
 			break;
 		case VENOMFALL_SPIRE:
 			int cur_rows[20], cur_cols[20], list_num = 0;
-			for (int i = 0; i < 5; ++i) {
-				for (int j = 0; j < 4; ++j) {
-					if (game_board[i][j] != NULL
-					 && game_board[i][j]->player != player_state
-					 && game_board[i][j]->type == UNIT) {
-						cur_rows[list_num] = j;
-						cur_cols[list_num++] = i;
-					}
+			FOR_EACH_TILE(i, j) {
+				if (
+					game_board[i][j] != NULL
+					&& game_board[i][j]->player != player_state
+					&& game_board[i][j]->type == UNIT
+				) {
+					cur_rows[list_num] = j;
+					cur_cols[list_num++] = i;
 				}
-			}
+			} ENDFOR
 			if (list_num > 0) {
 				int idx = rand_num(0, list_num - 1);
 				push_status_change(
@@ -308,13 +317,15 @@ static void take_tile(int r, int c) {
 
 bool attack_forward(void) {
 	if ((col == 4 && player_state == P1) || (col == 0 && player_state == P2)) {
-		base_health[player_state] = base_health[player_state] <= game_board[col][row]->health ?
-			0 : base_health[player_state] - game_board[col][row]->health;
+		base_health[player_state] -= game_board[col][row]->health;
+		if (base_health[player_state] < 0) base_health[player_state] = 0;
 		free(game_board[col][row]);
 		game_board[col][row] = NULL;
 		return true;
-	} else if (game_board[col + 1 - player_state * 2][row] != NULL
-	 && game_board[col + 1 - player_state * 2][row]->player != player_state) {
+	} else if (
+		game_board[col + 1 - player_state * 2][row] != NULL
+		&& game_board[col + 1 - player_state * 2][row]->player != player_state
+	) {
 		take_tile(col + 1 - player_state * 2, row);
 		enable_intval_timer_interrupt();
 		return true;
@@ -324,16 +335,20 @@ bool attack_forward(void) {
 
 bool attack_sideways(void) {
 	int r = row + (row < 2 ? 1 : -1);
-	if (game_board[col][r] != NULL
-	 && game_board[col][r]->player != player_state) {
+	if (
+		game_board[col][r] != NULL
+		&& game_board[col][r]->player != player_state
+	) {
 		take_tile(col, r);
 		enable_intval_timer_interrupt();
 		return true;
 	}
 	r = row + (row < 2 ? -1 : 1);
-	if (r >= 0 && r < ROW
-	 && game_board[col][r] != NULL
-	 && game_board[col][r]->player != player_state) {
+	if (
+		r >= 0 && r < ROW
+		&& game_board[col][r] != NULL
+		&& game_board[col][r]->player != player_state
+	) {
 		take_tile(col, r);
 		enable_intval_timer_interrupt();
 		return true;
@@ -356,9 +371,11 @@ void move_tode_the_elevated(void) {
 		int jump_col = i - 1 + player_state*2;
 		if (jump_col < 0 || jump_col > 4) continue;
 		for (int j = 0; j < 4; ++j) {
-			if (game_board[i][j] != NULL
-			&& game_board[i][j]->player != player_state
-			&& game_board[jump_col][j] == NULL) {
+			if (
+				game_board[i][j] != NULL
+				&& game_board[i][j]->player != player_state
+				&& game_board[jump_col][j] == NULL
+			) {
 				cur_rows[list_num] = j;
 				cur_cols[list_num++] = jump_col;
 			}
