@@ -4,6 +4,7 @@
 #include "assets.h"
 #include "image_data.h"
 #include "events.h"
+#include "states.h"
 
 #define NUM_CARDS 30
 #define COL 5
@@ -12,51 +13,10 @@
 /**** Structs and Enums ****/
 
 /**
- * @brief Info of card
- *
- * @param name String name of the card
- * @param faction Faction the card belongs to
- * @param img Image of the card
- * @param desc Description of the card
- * @param cost Mana cost of the card
- * @param init_health Initial health of the card
- * @param init_move Initial number of tiles the card moves
- */
-struct card {
-	char name[20];
-	int faction;
-	const struct image* img;
-	const char* desc;
-	int cost;
-	int init_health;
-	int init_move;
-};
-
-/**
- * @brief Info of troop
- *
- * @param card_id ID of the card, based on card_name
- * @param type Whether it's UNIT or BUILDING
- * @param player Owner of the troop
- * @param health Current health of the troop
- * @param status Current status effect of the troop
- * @param img Image of the troop on tile
- */
-struct troop {
-	int card_id;
-	int type;
-	int player;
-	int health;
-	bool frozen;
-	bool poisoned;
-	const struct image* img;
-};
-
-/**
  * @brief Enum of card IDs
  */
 enum card_name {
-	LAWLESS_HERD,
+	LAWLESS_HERD = 0,
 	FELFLARES,
 	HEROIC_SOLDIERS,
 	VICTORS_OF_THE_MELEE,
@@ -119,6 +79,46 @@ enum status_type {
 	NO_STATUS,
 	FROZEN,
 	POISONED
+};
+
+/**
+ * @brief Card data for the deck or hand.
+ */
+struct card {
+	// String name
+	char name[20];
+	// Faction the card belongs to
+	enum card_faction faction;
+	// Card image to render
+	const struct image* img;
+	// Card description to display
+	const char* desc;
+	// Mana cost
+	int cost;
+	// Health on play
+	int init_health;
+	// Number of tiles to move on play
+	int init_move;
+};
+
+/**
+ * @brief Troop data for the board.
+ */
+struct troop {
+	// Which card does this troop relate to?
+	enum card_name card_id;
+	// Is this troop a unit or a building?
+	enum troop_type type;
+	// Which player does this troop belong to?
+	enum player_state player;
+	// Current health
+	int health;
+	// Is this troop frozen?
+	bool frozen;
+	// Is this troop poisoned?
+	bool poisoned;
+	// Tile image to render
+	const struct image* img;
 };
 
 /**** Global Constants ****/
@@ -201,24 +201,31 @@ const int bordering_col[4] = {1, 0, 0, -1};
  * @brief Current state of the board, filled with troops
  */
 extern struct troop* game_board[COL][ROW];
+
 /**
  * @brief Currently selected row/col
  */
 extern int row, col;
+
 /**
- * @brief Current front of each player
+ * @brief Current frontmost column each player has units/buildings on.
  */
 extern int front_columns[2];
 
+/**
+ * @brief Current round number. Determines starting mana.
+ * Counts up from 0 after the ending of each P1 turn.
+ */
 extern int cur_round;
 
 /**
- * @brief Current amount of mana left
+ * @brief Mana remaining for current player.
+ * Reset to cur_round + 3 at beginning of each turn.
  */
 extern int mana;
 
 /**
- * @brief Deck of both players, in order of appearance in hand
+ * @brief Deck of both players, in order of appearance in hand.
  */
 extern int deck[2][10];
 /**
@@ -242,23 +249,57 @@ int rand_num(int a, int b);
  */
 void swap_int(int* a, int* b);
 
+/**
+ * @brief Convert a tile column to a pixel x-coordinate.
+ * The pixel coordinate corresponds to the top-left of the tile.
+ *
+ * @param c The tile column, 0-4 left to right.
+ * @return Pixel x-coordinate.
+ */
 int col2x(int c);
 
+/**
+ * @brief Convert a tile row to a pixel y-coordinate.
+ * The pixel coordinate corresponds to the top-left of the tile.
+ *
+ * @param r The tile row, 0-3 top to bottom.
+ * @return Pixel y-coordinate.
+ */
 int row2y(int r);
 
+/**
+ * @brief Convert a pixel x-coordinate to a tile column.
+ * Any pixel coordinate inside the tile will return the same result.
+ *
+ * @param x Pixel x-coordinate.
+ * @return The tile column, 0-4 left to right.
+ */
 int x2col(int x);
 
+/**
+ * @brief Convert a pixel y-coordinate to a tile row.
+ * Any pixel coordinate inside the tile will return the same result.
+ *
+ * @param y Pixel y-coordinate.
+ * @return The tile row, 0-3 top to bottom.
+ */
 int y2row(int y);
 
+/**
+ * @brief Common event handlers unspecific to any context.
+ * This should be called in the event loop in addition to other event handling.
+ *
+ * @param event The event to handle.
+ */
 void default_event_handlers(struct event_t event);
 
 /**
- * @brief Initialize game states
+ * @brief Initialize game states.
  */
 void init_game(void);
 
 /**
- * @brief Game engine for handling logic
+ * @brief Run one frame of the game.
  */
 void run_game(void);
 
