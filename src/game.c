@@ -65,11 +65,7 @@ void default_event_handlers(struct event_t event) {
 		printf("Mouse plugged in\n");
 		break;
 	case E_MOUSE_BUTTON_DOWN:
-		if (event.data.mouse_button_down.left) printf("Left button pressed\n");
-		break;
 	case E_MOUSE_BUTTON_UP:
-		if (event.data.mouse_button_up.left) printf("Left button released\n");
-		break;
 	case E_MOUSE_MOVE:
 		break;
 	case E_TIMER_ENABLE:
