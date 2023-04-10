@@ -1,6 +1,7 @@
 #ifndef TURN_H
 #define TURN_H
 
+#include <stdbool.h>
 #include "game.h"
 
 enum board_sprites {
@@ -16,17 +17,19 @@ enum board_sprites {
 extern bool cur_cards_played[4];
 extern int cur_card_selected;
 
-struct surface tile_base_surfs[COL][ROW];
-struct surface tile_overlay_surfs[COL][ROW][4];
-int tile_overlay_surf_num[COL][ROW];
+extern struct surface tile_base_surfs[COL][ROW];
+extern struct surface tile_overlay_surfs[COL][ROW][4];
+extern int tile_overlay_surf_num[COL][ROW];
 
 /**
  * @brief Surface objects of the board.
  * In order: P1 base, P2 base, tiles, P1 front, P2 front
  */
-struct surface board_base_surfs[5];
+extern struct surface board_base_surfs[5];
 
-struct surface cur_card_deck_surfs[4];
+extern struct surface cur_card_deck_surfs[4];
+
+extern struct surface new_turn_surf;
 
 /**** Exported Functions ****/
 

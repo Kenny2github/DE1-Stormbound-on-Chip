@@ -23,6 +23,13 @@ bool cur_card_displaying;
 int moves_left;
 int next_mov_row, next_mov_col;
 
+struct surface tile_base_surfs[COL][ROW];
+struct surface tile_overlay_surfs[COL][ROW][4];
+int tile_overlay_surf_num[COL][ROW];
+struct surface board_base_surfs[5];
+struct surface cur_card_deck_surfs[4];
+struct surface new_turn_surf = {200, 200, &end_turn};
+
 /* change mana to new_mana, and display mana value on HEX3-0 */
 void update_mana(int new_mana) {
 	int seg7[] = {0x3f, 0x06, 0x5b, 0x4f, 0x66, 0x6d, 0x7d, 0x07, 0x7f, 0x67, 0x063f};
