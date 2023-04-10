@@ -352,7 +352,6 @@ bool valid_play_card(void) {
 			 && game_board[col][row]->poisoned);
 			break;
 
-		case DARK_HARVEST:
 		case MOMENTS_PEACE:
 			return (game_board[col][row] != NULL
 			 && game_board[col][row]->player == player_state);
@@ -361,6 +360,7 @@ bool valid_play_card(void) {
 		case SUMMON_MILITIA:
 		case BLADE_STORM:
 		case HEAD_START:
+		case DARK_HARVEST:
 			return true;
 			break;
 
@@ -708,20 +708,33 @@ void play_card(void) {
 			break;
 
 		case DARK_HARVEST:
-			for (int i = col - 1; i <= col + 1; ++i) {
-				if (i < 0 || i > 4) continue;
-				for (int j = row - 1; j <= row + 1; ++j) {
-					if (j < 0 || j > 3 || (i == col && j == row)) continue;
-					if (game_board[i][j] != NULL && game_board[i][j]->player != player_state) {
-						health_change_list[++health_change_num] = (struct health_change){
-							j,
-							i,
-							DH_DMG,
-							0
-						};
+			for (int i = 0; i < COL; ++i) {
+				for (int j = 0; j < ROW; ++j) {
+					if (game_board[i][j] == NULL
+					 || game_board[i][j]->player == player_state) continue;
+					for (int k = i - 1; k <= i + 1; ++k) {
+						int is_dmged = false;
+						if (k < 0 || k > 4) continue;
+						for (int l = j - 1; l <= j + 1; ++l) {
+							if (l < 0 || l > 3 || (l == i && l == j)) continue;
+							if (game_board[k][l] != NULL
+							 && game_board[k][l]->player == player_state
+							 && game_board[k][l]->type == UNIT) {
+								health_change_list[++health_change_num] = (struct health_change){
+									j,
+									i,
+									DH_DMG,
+									0
+								};
+								is_dmged = true;
+								break;
+							}
+						}
+						if (is_dmged) break;
 					}
 				}
 			}
+
 			break;
 
 		case FROSTHEXERS:
