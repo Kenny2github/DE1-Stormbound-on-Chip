@@ -10,7 +10,7 @@
  * @param player The player who owns the card.
  * @return The image to render on the board.
  */
-struct image* get_troop_img(enum card_name card, enum player_state player);
+const struct image* get_troop_img(enum card_name card, enum player_state player);
 
 void place_new_tile_asset(int r, int c, struct troop* new_troop);
 
