@@ -286,7 +286,7 @@ void start_turn_action(int act_row, int act_col, int new_row, int new_col) {
 
 	switch (game_board[act_col][act_row]->card_id) {
 		case VICTORS_OF_THE_MELEE:
-			if (game_board[new_col][new_row] != NULL && game_board[new_col][new_row]->player != player_state) {
+			if (new_col == -1 || new_col == 5 || (game_board[new_col][new_row] != NULL && game_board[new_col][new_row]->player != player_state)) {
 				for (int i = act_col - 1; i <= act_col + 1; ++i) {
 					if (i < 0 || i > 4) continue;
 					for (int j = act_row - 1; j <= act_row + 1; ++j) {
