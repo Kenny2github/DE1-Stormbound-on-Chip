@@ -82,6 +82,7 @@ void change_healths() {
 				remove_tile_asset(cur_change.row, cur_change.col);
 			} else {
 				game_board[cur_change.col][cur_change.row]->health += cur_change.change;
+				write_tile_health(cur_change.row, cur_change.col);
 			}
 			push_image(
 				col2x(cur_change.col),
@@ -92,6 +93,8 @@ void change_healths() {
 			if (cur_change.change + game_board[cur_change.col][cur_change.row]->health > 99) {
 				cur_change.change = 99 - game_board[cur_change.col][cur_change.row]->health;
 			}
+			game_board[cur_change.col][cur_change.row]->health += cur_change.change;
+			write_tile_health(cur_change.row, cur_change.col);
 			push_image(
 				col2x(cur_change.col),
 				row2y(cur_change.row),
@@ -100,8 +103,6 @@ void change_healths() {
 		}
 		health_change_text[0] = abs(cur_change.change) / 10 + '0';
 		health_change_text[1] = abs(cur_change.change) % 10 + '0';
-		printf("change: %d\n", cur_change.change);
-		printf("text: %s\n", health_change_text);
 		write_string((col2x(cur_change.col) + 20) / 4, (row2y(cur_change.row) + 13) / 4, health_change_text);
 		affected_row = cur_change.row;
 		affected_col = cur_change.col;

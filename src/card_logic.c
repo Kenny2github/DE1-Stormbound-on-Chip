@@ -3,6 +3,7 @@
 #include "game.h"
 #include "states.h"
 #include "assets.h"
+#include "vga.h"
 #include "render.h"
 #include "timer.h"
 #include "card_logic.h"
@@ -112,6 +113,18 @@ const struct image* get_troop_img(enum card_name type, enum player_state player)
 	}
 }
 
+void write_tile_health(int r, int c) {
+	int health = game_board[c][r]->health;
+	char health_text[2];
+	health_text[0] = abs(health) / 10 + '0';
+	health_text[1] = abs(health) % 10 + '0';
+	write_string(col2x(c) / 4 + 1, (row2y(r) + 26) / 4 - 1, health_text);
+}
+
+void clear_tile_health(int r, int c) {
+	write_string(col2x(c) / 4 + 1, (row2y(r) + 26) / 4 - 1, "  ");
+}
+
 void place_new_tile_asset(int r, int c, struct troop* new_troop) {
 	game_board[c][r] = new_troop;
 	tile_base_surfs[c][r] = (struct surface){
@@ -120,6 +133,7 @@ void place_new_tile_asset(int r, int c, struct troop* new_troop) {
 		new_troop->img
 	};
 	r_stack_push(tile_base_surfs[c][r]);
+	write_tile_health(r, c);
 	tile_overlay_surf_num[c][r] = 0;
 }
 
@@ -141,6 +155,7 @@ void remove_tile_asset(int r, int c) {
 		&empty_tile
 	};
 	r_stack_push(tile_base_surfs[c][r]);
+	clear_tile_health(r, c);
 	tile_overlay_surf_num[c][r] = 0;
 }
 
@@ -160,7 +175,9 @@ void move_tile_asset(int prev_r, int prev_c, int new_r, int new_c) {
 
 	if (game_board[new_c][new_r] != NULL) free(game_board[new_c][new_r]);
 	game_board[new_c][new_r] = game_board[prev_c][prev_r];
-	game_board[prev_c][prev_r] = 0;
+	game_board[prev_c][prev_r] = NULL;
+	write_tile_health(new_r, new_c);
+	clear_tile_health(prev_r, prev_c);
 }
 
 /* determine whether card at location has same type as card_id */

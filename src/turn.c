@@ -139,6 +139,8 @@ static void init_select_card(void) {
 		cur_card_deck_surfs[i] = (struct surface){i * 46 + 10, 166, card_data[deck[player_state][i]].img};
 		r_stack_push(cur_card_deck_surfs[i]);
 	}
+	for (int i = 0; i < 10; ++i) printf("%d ", deck[player_state][i]);
+	printf("\n");
 	cur_card_selected = 100;
 	cur_card_displayed = 100;
 	cur_card_displaying = false;
@@ -165,7 +167,7 @@ static void init_card_moving(void) {
 
 void new_turn(void) {
 	disable_timer();
-	for (int i = 0; i < 4; ++i) push_image(i * 46 + 10, 166, &clear_card);
+	for (int i = 0; i < 4; ++i) push_image(i * 46 + 10, 146, &clear_card);
 	if (player_state == P1) ++cur_round;
 	player_state = player_state == P1 ? P2 : P1;
 	write_string(1, 1, player_state == P1 ? "P1 turn" : "P2 turn");
@@ -212,6 +214,7 @@ static void run_preturn_building(void) {
 				}
 			}
 			if (turn_state == PRETURN_BUILDING) {
+				rerender_affected_tile();
 				if (status_change_num == 0) {
 					if (health_change_num == 0) {
 						move_state = CARD_MOVE;
@@ -272,6 +275,7 @@ static void run_preturn_unit(void) {
 				}
 			}
 			if (turn_state == PRETURN_UNIT) {
+				rerender_affected_tile();
 				if (status_change_num == 0) {
 					if (health_change_num == 0) {
 						move_state = CARD_MOVE;
