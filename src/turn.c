@@ -305,28 +305,30 @@ static void run_preturn_unit(void) {
 			break;
 
 		case CARD_MOVE:
-			if (game_board[col][row]->frozen) {
-				push_status_change(row, col, CLEAR_FROZEN);
-				change_statuses();
-			} else {
-				if (!move_waived[col][row]
-				 && move_to_tile(&row, &col, next_mov_row, next_mov_col)
-				 && game_board[next_mov_col][next_mov_row] != NULL
-				 && game_board[next_mov_col][next_mov_row]->card_id == TODE_THE_ELEVATED
-				 && game_board[next_mov_col][next_mov_row]->player == player_state) {
-					find_tode_the_elevated_jump(next_mov_row, next_mov_col, &tte_row, &tte_col);
-					move_to_tile(&next_mov_row, &next_mov_col, tte_row, tte_col);
-					move_waived[tte_col][tte_row] = true;
-				}
-			}
-			move_state = CARD_EFFECT;
-			if ((player_state == P1) ? (++row == 4) : (--row == -1)) {
-				if (player_state == P1) {
-					--col;
-					row = 0;
+			if (game_board[col][row] != NULL) {
+				if (game_board[col][row]->frozen) {
+					push_status_change(row, col, CLEAR_FROZEN);
+					change_statuses();
 				} else {
-					++col;
-					row = 3;
+					if (!move_waived[col][row]
+					&& move_to_tile(&row, &col, next_mov_row, next_mov_col)
+					&& game_board[next_mov_col][next_mov_row] != NULL
+					&& game_board[next_mov_col][next_mov_row]->card_id == TODE_THE_ELEVATED
+					&& game_board[next_mov_col][next_mov_row]->player == player_state) {
+						find_tode_the_elevated_jump(next_mov_row, next_mov_col, &tte_row, &tte_col);
+						move_to_tile(&next_mov_row, &next_mov_col, tte_row, tte_col);
+						move_waived[tte_col][tte_row] = true;
+					}
+				}
+				move_state = CARD_EFFECT;
+				if ((player_state == P1) ? (++row == 4) : (--row == -1)) {
+					if (player_state == P1) {
+						--col;
+						row = 0;
+					} else {
+						++col;
+						row = 3;
+					}
 				}
 			}
 			redraw_fronts();
