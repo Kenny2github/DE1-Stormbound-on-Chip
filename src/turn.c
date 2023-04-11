@@ -315,6 +315,7 @@ static void run_preturn_unit(void) {
 				if (game_board[col][row]->frozen) {
 					push_status_change(row, col, CLEAR_FROZEN);
 					change_statuses();
+					status_change_num = 0;
 				} else {
 					if (!move_waived[col][row]
 					&& move_to_tile(&row, &col, next_mov_row, next_mov_col)
