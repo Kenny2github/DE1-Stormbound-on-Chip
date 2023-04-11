@@ -139,8 +139,6 @@ static void init_select_card(void) {
 		cur_card_deck_surfs[i] = (struct surface){i * 46 + 10, 166, card_data[deck[player_state][i]].img};
 		r_stack_push(cur_card_deck_surfs[i]);
 	}
-	for (int i = 0; i < 10; ++i) printf("%d ", deck[player_state][i]);
-	printf("\n");
 	cur_card_selected = 100;
 	cur_card_displayed = 100;
 	cur_card_displaying = false;

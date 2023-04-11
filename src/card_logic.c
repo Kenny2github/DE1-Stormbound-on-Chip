@@ -283,7 +283,7 @@ void start_turn_action(int act_row, int act_col) {
 			}
 			break;
 		case EMERALD_TOWERS:
-			for (int i = 1; i < 5-act_col; ++i) {
+			for (int i = 1; i < (player_state == P1) ? 5-act_col : act_col+1; ++i) {
 				int cur_col = act_col + (player_state == P1 ? i : -i);
 				if (game_board[cur_col][act_row] != NULL
 				 && game_board[cur_col][act_row]->player == player_state
@@ -625,7 +625,7 @@ void play_card(void) {
 
 		case DANGEROUS_SUITORS:
 			place_new_tile_asset(row, col, new_troop);
-			int heal = 0;
+			int heal = -1; // so that it doesn't count itself
 			for (int i = 0; i < 5; ++i) {
 				for (int j = 0; j < 4; ++j) {
 					if (game_board[i][j] != NULL

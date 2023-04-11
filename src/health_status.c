@@ -72,7 +72,7 @@ void change_healths() {
 		};
 		place_new_tile_asset(cur_change.row, cur_change.col, new_troop);
 		rerender_needed = false;
-	} else {
+	} else if (cur_change.change != 0) {
 		char health_change_text[2];
 		if (cur_change.change < 0) {
 			if (cur_change.change + game_board[cur_change.col][cur_change.row]->health < 0) {

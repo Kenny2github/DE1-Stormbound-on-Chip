@@ -37,9 +37,9 @@ int rand_num(int a, int b) {
 }
 
 void swap_int(int* a, int* b) {
-	*a = *a + *b;
-	*b = *a - *b;
-	*a = *a - *b;
+	int temp = *a;
+	*a = *b;
+	*b = temp;
 }
 
 int col2x(int c) {
@@ -98,6 +98,7 @@ void init_game() {
 	animation_waiting = false;
 	draw_intro();
 	render_stack();
+	srand(time(NULL));
 }
 
 void run_game() {
