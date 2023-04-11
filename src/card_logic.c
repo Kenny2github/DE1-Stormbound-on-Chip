@@ -286,7 +286,7 @@ void start_turn_action(int act_row, int act_col, int new_row, int new_col) {
 
 	switch (game_board[act_col][act_row]->card_id) {
 		case VICTORS_OF_THE_MELEE:
-			if (game_board[new_col][new_row] != NULL && game_board[new_col][new_row]->player != player_state) {
+			if (new_col == -1 || new_col == 5 || (game_board[new_col][new_row] != NULL && game_board[new_col][new_row]->player != player_state)) {
 				for (int i = act_col - 1; i <= act_col + 1; ++i) {
 					if (i < 0 || i > 4) continue;
 					for (int j = act_row - 1; j <= act_row + 1; ++j) {
@@ -705,6 +705,7 @@ void play_card(void) {
 				for (int i = 0; i < 4; ++i) {
 					int cur_col = col+bordering_col[i];
 					int cur_row = row+bordering_row[i];
+					if (cur_row < 0 || cur_row > 3 || cur_col < 0 || cur_col > 4) continue;
 					if (game_board[cur_col][cur_row] == NULL) push_health_change(
 						cur_row,
 						cur_col,
@@ -712,8 +713,11 @@ void play_card(void) {
 						LUDIC_MATRIARCHS_SPAWN,
 						DRAGON
 					);
-					cur_col = adj_col+bordering_col[i];
-					cur_row = adj_row+bordering_row[i];
+				}
+				for (int i = 0; i < 4; ++i) {
+					int cur_col = adj_col+bordering_col[i];
+					int cur_row = adj_row+bordering_row[i];
+					if (cur_row < 0 || cur_row > 3 || cur_col < 0 || cur_col > 4) continue;
 					if (game_board[cur_col][cur_row] == NULL) push_health_change(
 						cur_row,
 						cur_col,
