@@ -449,10 +449,13 @@ bool move_to_tile(int* r, int* c, int new_r, int new_c) {
 
 	} else if (game_board[new_c][new_r] != NULL
 	 && game_board[new_c][new_r]->player != player_state) {	// attacking enemy
-		if (game_board[new_c][new_r]->health <= game_board[*c][*r]->health) {	// attacking eliminates defending
+	 	int enemy_health = game_board[new_c][new_r]->health;
+		if (enemy_health <= game_board[*c][*r]->health) {	// attacking eliminates defending
 			if ((game_board[new_c][new_r]->health -= game_board[*c][*r]->health) >= 0) { // attacking gets eliminated
 				write_tile_health(new_r, new_c);
 				remove_tile_asset(*r, *c);
+			} else {	// attacking doesn't get eliminated, change health
+				game_board[*c][*r]->health -= enemy_health;
 			}
 			remove_tile_asset(new_r, new_c);
 			if (game_board[*c][*r] != NULL) {	// attacking not eliminated, move to tile
