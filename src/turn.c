@@ -172,6 +172,12 @@ static void init_card_moving(void) {
 }
 
 static void init_game_end() {
+	for (int i = 0; i < 5; ++i) {
+		for (int j = 0; j < 4; ++j) {
+			free(game_board[i][j]);
+			game_board[i][j] = NULL;
+		}
+	}
 	fill_screen(BACKGROUND);
 	clear_char_screen();
 	if (base_health[P1] == 0) write_string(37, 30, "P2 Win");
