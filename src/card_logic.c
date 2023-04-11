@@ -705,6 +705,7 @@ void play_card(void) {
 				for (int i = 0; i < 4; ++i) {
 					int cur_col = col+bordering_col[i];
 					int cur_row = row+bordering_row[i];
+					if (cur_row < 0 || cur_row > 3 || cur_col < 0 || cur_col > 4) continue;
 					if (game_board[cur_col][cur_row] == NULL) push_health_change(
 						cur_row,
 						cur_col,
@@ -712,8 +713,11 @@ void play_card(void) {
 						LUDIC_MATRIARCHS_SPAWN,
 						DRAGON
 					);
-					cur_col = adj_col+bordering_col[i];
-					cur_row = adj_row+bordering_row[i];
+				}
+				for (int i = 0; i < 4; ++i) {
+					int cur_col = adj_col+bordering_col[i];
+					int cur_row = adj_row+bordering_row[i];
+					if (cur_row < 0 || cur_row > 3 || cur_col < 0 || cur_col > 4) continue;
 					if (game_board[cur_col][cur_row] == NULL) push_health_change(
 						cur_row,
 						cur_col,
