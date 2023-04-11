@@ -8,9 +8,9 @@
 
 static const struct surface intro_surfs[] = {
 	{64, 5, &stormbound},
-	{38, 120, &felflares},
-	{148, 120, &emerald_towers},
-	{248, 120, &summon_militia},
+	{38, 150, &felflares},
+	{148, 150, &emerald_towers},
+	{248, 150, &summon_militia},
 };
 #define NUM_INTRO_SURFS (sizeof(intro_surfs) / sizeof(intro_surfs[0]))
 
