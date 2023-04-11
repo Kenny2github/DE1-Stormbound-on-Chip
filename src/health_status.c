@@ -37,6 +37,7 @@ void rerender_affected_tile() {
 	for (int i = 0; i < tile_overlay_surf_num[affected_col][affected_row]; ++i) {
 		r_stack_push(tile_overlay_surfs[affected_col][affected_row][i]);
 	}
+	write_string((col2x(affected_col) + 20) / 4, (row2y(affected_row) + 13) / 4, "  ");
 
 	rerender_needed = false;
 }
@@ -72,33 +73,36 @@ void change_healths() {
 		place_new_tile_asset(cur_change.row, cur_change.col, new_troop);
 		rerender_needed = false;
 	} else {
-		char health_change_text[1];
+		char health_change_text[2];
 		if (cur_change.change < 0) {
+			if (cur_change.change + game_board[cur_change.col][cur_change.row]->health < 0) {
+				cur_change.change = -game_board[cur_change.col][cur_change.row]->health;
+			}
+			if (game_board[cur_change.col][cur_change.row]->health + cur_change.change <= 0) {
+				remove_tile_asset(cur_change.row, cur_change.col);
+			} else {
+				game_board[cur_change.col][cur_change.row]->health += cur_change.change;
+			}
 			push_image(
 				col2x(cur_change.col),
 				row2y(cur_change.row),
 				&damage
 			);
-			if (cur_change.change + game_board[cur_change.col][cur_change.row]->health < 0) {
-				cur_change.change = -game_board[col][cur_change.row]->health;
-			}
 		} else {
+			if (cur_change.change + game_board[cur_change.col][cur_change.row]->health > 99) {
+				cur_change.change = 99 - game_board[cur_change.col][cur_change.row]->health;
+			}
 			push_image(
 				col2x(cur_change.col),
 				row2y(cur_change.row),
 				&heal
 			);
-			if (cur_change.change + game_board[cur_change.col][cur_change.row]->health > 99) {
-				cur_change.change = 99 - game_board[col][cur_change.row]->health;
-			}
 		}
-		if (game_board[cur_change.col][cur_change.row]->health + cur_change.change <= 0) {
-			remove_tile_asset(cur_change.row, cur_change.col);
-		} else {
-			game_board[cur_change.col][cur_change.row]->health += cur_change.change;
-		}
-		health_change_text[0] = abs(cur_change.change) + '0';
-		write_string((col2x(cur_change.col) + 40) / 4, (row2y(cur_change.row) + 26) / 4, health_change_text);
+		health_change_text[0] = abs(cur_change.change) / 10 + '0';
+		health_change_text[1] = abs(cur_change.change) % 10 + '0';
+		printf("change: %d\n", cur_change.change);
+		printf("text: %s\n", health_change_text);
+		write_string((col2x(cur_change.col) + 20) / 4, (row2y(cur_change.row) + 13) / 4, health_change_text);
 		affected_row = cur_change.row;
 		affected_col = cur_change.col;
 		rerender_needed = true;
@@ -128,7 +132,9 @@ void change_statuses() {
 		}
 		--tile_overlay_surf_num[cur_change.col][cur_change.row];
 		game_board[cur_change.col][cur_change.row]->frozen = false;
-		break;
+		affected_row = cur_change.row;
+		affected_col = cur_change.col;
+		rerender_needed = true;
 	case POISON:
 		add_new_tile_overlay_asset(cur_change.row, cur_change.col, &poisoned);
 		game_board[cur_change.col][cur_change.row]->poisoned = true;

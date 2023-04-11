@@ -596,8 +596,8 @@ void play_card(void) {
 				for (int j = 0; j < 4; ++j) {
 					if (game_board[i][j] != NULL && game_board[i][j]->player != player_state) {
 						push_health_change(
-							row,
-							col,
+							j,
+							i,
 							BLADESTORM_DAMAGE,
 							0
 						);

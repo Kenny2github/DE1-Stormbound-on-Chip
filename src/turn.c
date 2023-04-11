@@ -206,10 +206,9 @@ static void run_preturn_building(void) {
 						break;
 					}
 				}
+				reset_health_status_changes();
 				if (turn_state == PRETURN_BUILDING) {
 					start_turn_action(row, col);
-					health_change_idx = 0;
-					status_change_idx = 0;
 				}
 			}
 			if (turn_state == PRETURN_BUILDING) {
@@ -219,6 +218,7 @@ static void run_preturn_building(void) {
 					} else {
 						change_healths();
 						redraw_fronts();
+						if (health_change_num == 0 && status_change_num == 0) move_state = CARD_MOVE;
 					}
 				} else {
 					change_statuses();
@@ -278,6 +278,7 @@ static void run_preturn_unit(void) {
 					} else {
 						change_healths();
 						redraw_fronts();
+						if (health_change_num == 0 && status_change_num == 0) move_state = CARD_MOVE;
 					}
 				} else {
 					change_statuses();
