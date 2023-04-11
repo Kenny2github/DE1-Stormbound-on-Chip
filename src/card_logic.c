@@ -319,8 +319,8 @@ void start_turn_action(int act_row, int act_col, int new_row, int new_col) {
 				 && game_board[cur_col][act_row]->player == player_state
 				 && game_board[cur_col][act_row]->type == UNIT) {
 					push_health_change(
-						cur_col,
 						act_row,
+						cur_col,
 						player_state,
 						EMERALD_TOWERS_HEAL,
 						0
