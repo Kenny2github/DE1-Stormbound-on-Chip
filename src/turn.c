@@ -34,7 +34,7 @@ struct surface tile_overlay_surfs[COL][ROW][4];
 int tile_overlay_surf_num[COL][ROW];
 struct surface board_base_surfs[5];
 struct surface cur_card_deck_surfs[4];
-struct surface new_turn_surf = {200, 200, &end_turn};
+struct surface new_turn_surf = {200, 207, &end_turn};
 
 /* change mana to new_mana, and display mana value on HEX3-0 */
 void update_mana(int new_mana) {
