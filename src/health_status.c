@@ -149,6 +149,7 @@ void change_statuses() {
 		affected_row = cur_change.row;
 		affected_col = cur_change.col;
 		rerender_needed = true;
+		break;
 	case POISON:
 		add_new_tile_overlay_asset(cur_change.row, cur_change.col, &poisoned);
 		game_board[cur_change.col][cur_change.row]->poisoned = true;
