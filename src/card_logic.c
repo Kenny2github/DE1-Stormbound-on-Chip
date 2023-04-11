@@ -125,7 +125,7 @@ void write_tile_health(int r, int c) {
 }
 
 void clear_tile_health(int r, int c) {
-	write_string(col2x(c) / 4 + 1, (row2y(r) + 26) / 4 - 1, "  ");
+	write_string(col2x(c) / 4 + 1, (row2y(r) + 26) / 4 - 1, "   ");
 }
 
 void place_new_tile_asset(int r, int c, struct troop* new_troop) {
