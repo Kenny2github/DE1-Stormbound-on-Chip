@@ -164,6 +164,8 @@ static void init_card_moving(void) {
 }
 
 void new_turn(void) {
+	disable_timer();
+	for (int i = 0; i < 4; ++i) push_image(i * 46 + 10, 166, &clear_card);
 	if (player_state == P1) ++cur_round;
 	player_state = player_state == P1 ? P2 : P1;
 	write_string(1, 1, player_state == P1 ? "P1 turn" : "P2 turn");
@@ -174,6 +176,7 @@ void new_turn(void) {
 	move_state = CARD_EFFECT;
 	row = (player_state == P1) ? 0 : 3;
 	col = (player_state == P1) ? 4 : 0;
+	enable_timer_interrupt();
 }
 
 static void run_preturn_building(void) {
@@ -186,10 +189,8 @@ static void run_preturn_building(void) {
 	switch (move_state) {
 		case CARD_EFFECT:
 			if (health_change_num == 0 && status_change_num == 0) {
-				while (1) {
-					printf("col %d, row %d\n", col, row);
-					if (!(game_board[col][row] == NULL || game_board[col][row]->type != BUILDING)) break;
-					if ((player_state == P1) ? (++row == 4) : (--row == 0)) {
+				while (col == -1 || col == 5 || game_board[col][row] == NULL || game_board[col][row]->player != player_state || game_board[col][row]->type != BUILDING) {
+					if ((player_state == P1) ? (++row == 4) : (--row == -1)) {
 						if (player_state == P1) {
 							--col;
 							row = 0;
@@ -228,6 +229,15 @@ static void run_preturn_building(void) {
 
 		case CARD_MOVE:
 			move_state = CARD_EFFECT;
+			if ((player_state == P1) ? (++row == 4) : (--row == -1)) {
+				if (player_state == P1) {
+					--col;
+					row = 0;
+				} else {
+					++col;
+					row = 3;
+				}
+			}
 	}
 }
 
@@ -241,8 +251,8 @@ static void run_preturn_unit(void) {
 	switch (move_state) {
 		case CARD_EFFECT:
 			if (health_change_num == 0 && status_change_num == 0) {
-				while (game_board[col][row] == NULL || game_board[col][row]->type != UNIT || game_board[col][row]->frozen) {
-					if (((player_state == P1) ? ++row : --row) == 4) {
+				while (col == -1 || col == 5 || game_board[col][row] == NULL || game_board[col][row]->player != player_state || game_board[col][row]->type != UNIT) {
+					if ((player_state == P1) ? (++row == 4) : (--row == -1)) {
 						if (player_state == P1) {
 							--col;
 							row = 0;
@@ -256,10 +266,9 @@ static void run_preturn_unit(void) {
 						break;
 					}
 				}
-				if (turn_state == PRETURN_UNIT) {
+				reset_health_status_changes();
+				if (turn_state == PRETURN_UNIT && !game_board[col][row]->frozen) {
 					start_turn_action(row, col);
-					health_change_idx = 0;
-					status_change_idx = 0;
 				}
 			}
 			if (turn_state == PRETURN_UNIT) {
@@ -285,6 +294,16 @@ static void run_preturn_unit(void) {
 				move_to_tile(&row, &col, row, col+1-player_state*2);
 			}
 			redraw_fronts();
+			move_state = CARD_EFFECT;
+			if ((player_state == P1) ? (++row == 4) : (--row == -1)) {
+				if (player_state == P1) {
+					--col;
+					row = 0;
+				} else {
+					++col;
+					row = 3;
+				}
+			}
 	}
 }
 
@@ -298,7 +317,7 @@ static void select_card_click(void) {
 					 && cur_card_selected >= 0 && cur_card_selected < 4) {
 						// clear card image
 						push_image(cur_card_selected * 46 + 10, 146, &clear_card);
-						// redraw but slightly higher
+						// redraw but slightly lower
 						cur_card_deck_surfs[cur_card_selected].y = 166;
 						r_stack_push(cur_card_deck_surfs[cur_card_selected]);
 					}

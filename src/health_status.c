@@ -92,6 +92,11 @@ void change_healths() {
 				cur_change.change = 99 - game_board[col][cur_change.row]->health;
 			}
 		}
+		if (game_board[cur_change.col][cur_change.row]->health + cur_change.change <= 0) {
+			remove_tile_asset(cur_change.row, cur_change.col);
+		} else {
+			game_board[cur_change.col][cur_change.row]->health += cur_change.change;
+		}
 		health_change_text[0] = abs(cur_change.change) + '0';
 		write_string((col2x(cur_change.col) + 40) / 4, (row2y(cur_change.row) + 26) / 4, health_change_text);
 		affected_row = cur_change.row;

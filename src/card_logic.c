@@ -134,6 +134,7 @@ void add_new_tile_overlay_asset(int r, int c, const struct image* img) {
 
 void remove_tile_asset(int r, int c) {
 	free(game_board[c][r]);
+	game_board[c][r] = NULL;
 	tile_base_surfs[c][r] = (struct surface){
 		col2x(c),
 		row2y(r),
@@ -418,7 +419,6 @@ bool move_to_tile(int* r, int* c, int new_r, int new_c) {
 					*c = new_c;
 				}
 			}
-			tile_base_surfs[new_c][new_r].data = game_board[new_c][new_r]->img;
 		} else {
 			game_board[new_c][new_r]->health -= game_board[*c][*r]->health;
 			remove_tile_asset(*r, *c);
@@ -562,10 +562,10 @@ void play_card(void) {
 			break;
 
 		case SUMMON_MILITIA:
-			for (int i = 0; i <= (player_state == P1 ? front_columns[P1] : 5-front_columns[P2]); ++i) {
-				int cur_col = player_state == P1 ? i : 5-i;
+			for (int i = 0; i <= (player_state == P1 ? front_columns[P1] : 4-front_columns[P2]); ++i) {
+				int cur_col = player_state == P1 ? i : 4-i;
 				for (int j = 0; j < 4; ++j) {
-					if (game_board[cur_col][j] != NULL && game_board[cur_col][j]->player != player_state) {
+					if (game_board[cur_col][j] == NULL) {
 						cur_rows[list_num] = j;
 						cur_cols[list_num++] = cur_col;
 					}
