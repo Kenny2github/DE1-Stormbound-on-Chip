@@ -326,15 +326,15 @@ static void run_preturn_unit(void) {
 						move_waived[tte_col][tte_row] = true;
 					}
 				}
-				move_state = CARD_EFFECT;
-				if ((player_state == P1) ? (++row == 4) : (--row == -1)) {
-					if (player_state == P1) {
-						--col;
-						row = 0;
-					} else {
-						++col;
-						row = 3;
-					}
+			}
+			move_state = CARD_EFFECT;
+			if ((player_state == P1) ? (++row == 4) : (--row == -1)) {
+				if (player_state == P1) {
+					--col;
+					row = 0;
+				} else {
+					++col;
+					row = 3;
 				}
 			}
 			redraw_fronts();
