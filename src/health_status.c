@@ -133,8 +133,10 @@ void change_statuses() {
 	struct status_change cur_change = status_change_list[status_change_idx];
 	switch(cur_change.change) {
 	case FREEZE:
-		add_new_tile_overlay_asset(cur_change.row, cur_change.col, &frozen);
-		game_board[cur_change.col][cur_change.row]->frozen = true;
+		if (!game_board[cur_change.col][cur_change.row]->frozen) {
+			add_new_tile_overlay_asset(cur_change.row, cur_change.col, &frozen);
+			game_board[cur_change.col][cur_change.row]->frozen = true;
+		}
 		break;
 	case CLEAR_FROZEN: ;	// assumes already frozen
 		int i;
@@ -151,8 +153,10 @@ void change_statuses() {
 		rerender_needed = true;
 		break;
 	case POISON:
-		add_new_tile_overlay_asset(cur_change.row, cur_change.col, &poisoned);
-		game_board[cur_change.col][cur_change.row]->poisoned = true;
+		if (!game_board[cur_change.col][cur_change.row]->poisoned) {
+			add_new_tile_overlay_asset(cur_change.row, cur_change.col, &poisoned);
+			game_board[cur_change.col][cur_change.row]->poisoned = true;
+		}
 		break;
 	}
 	++status_change_idx;
