@@ -19,7 +19,8 @@ enum turn_state {
 	SELECT_CARD,
 	PLACE_CARD,
 	CARD_MOVING,
-	TURN_END
+	TURN_END,
+	GAME_END
 };
 
 /**

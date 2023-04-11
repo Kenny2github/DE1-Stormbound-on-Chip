@@ -80,6 +80,7 @@ extern struct status_change status_change_list[20];
  */
 void reset_health_status_changes(void);
 
+void display_base_health(void);
 /**
  * @brief Rerender an tile that had the health change sprite covering it
  *

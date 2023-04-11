@@ -27,6 +27,8 @@ bool await_next_move;
 int tte_row, tte_col;
 bool move_waived[COL][ROW];
 
+int game_end_animation_timer;
+
 struct surface tile_base_surfs[COL][ROW];
 struct surface tile_overlay_surfs[COL][ROW][4];
 int tile_overlay_surf_num[COL][ROW];
@@ -107,6 +109,7 @@ void init_turn() {
 	front_columns[P2] = 4;
 	base_health[P1] = 10;
 	base_health[P2] = 10;
+	display_base_health();
 	// shuffle both decks
 	for (int i = 0; i < 10; ++i) {
 		swap_int(&deck[P1][i], &deck[P1][rand_num(0, 9)]);
@@ -168,25 +171,14 @@ static void init_card_moving(void) {
 	write_string(CARD_DESC_POS, empty_desc_data);
 }
 
-void new_turn(void) {
-	disable_timer();
-	for (int i = 0; i < 4; ++i) push_image(i * 46 + 10, 146, &clear_card);
-	if (player_state == P1) ++cur_round;
-	player_state = player_state == P1 ? P2 : P1;
-	write_string(1, 1, player_state == P1 ? "P1 turn" : "P2 turn");
-	update_mana(cur_round + 3);
-	init_select_card();
-	reset_health_status_changes();
-	turn_state = PRETURN_BUILDING;
-	move_state = CARD_EFFECT;
-	row = (player_state == P1) ? 0 : 3;
-	col = (player_state == P1) ? 4 : 0;
-	for (int i = 0; i < COL; ++i) {
-		for (int j = 0; j < ROW; ++j) {
-			move_waived[i][j] = false;
-		}
-	}
-	enable_timer_interrupt();
+static void init_game_end() {
+	fill_screen(BACKGROUND);
+	clear_char_screen();
+	if (base_health[P1] == 0) write_string(37, 30, "P1 Win");
+	else write_string(37, 30, "P2 Win");
+	game_end_animation_timer = 10;
+	turn_state = GAME_END;
+	enable_intval_timer_interrupt();
 }
 
 static void run_preturn_building(void) {
@@ -484,6 +476,10 @@ static void select_card_rerendering(void) {
 }
 
 static void run_select_card(void) {
+	if (base_health[P1] == 0 || base_health[P2] == 0) {
+		init_game_end();
+		return;
+	}
 	bool mouse_moved = false;
 	while (!event_queue_empty()) {
 		struct event_t event = event_queue_pop();
@@ -629,6 +625,40 @@ static void run_card_moving(void) {
 	}
 }
 
+static void run_turn_end(void) {
+	disable_timer();
+	for (int i = 0; i < 4; ++i) push_image(i * 46 + 10, 146, &clear_card);
+	if (player_state == P1) ++cur_round;
+	player_state = player_state == P1 ? P2 : P1;
+	write_string(1, 1, player_state == P1 ? "P1 turn" : "P2 turn");
+	update_mana(cur_round + 3);
+	init_select_card();
+	reset_health_status_changes();
+	turn_state = PRETURN_BUILDING;
+	move_state = CARD_EFFECT;
+	row = (player_state == P1) ? 0 : 3;
+	col = (player_state == P1) ? 4 : 0;
+	for (int i = 0; i < COL; ++i) {
+		for (int j = 0; j < ROW; ++j) {
+			move_waived[i][j] = false;
+		}
+	}
+	enable_timer_interrupt();
+}
+
+static void run_game_end(void) {
+	while (!event_queue_empty()) {
+		struct event_t event = event_queue_pop();
+		default_event_handlers(event);
+	}
+	if (animation_waiting) return;
+	if (--game_end_animation_timer == 0) {
+		init_game();
+	} else {
+		enable_intval_timer_interrupt();
+	}
+}
+
 void run_turn(void) {
 	switch(turn_state) {
 		case PRETURN_BUILDING:
@@ -652,7 +682,11 @@ void run_turn(void) {
 			break;
 
 		case TURN_END:
-			new_turn();
+			run_turn_end();
+			break;
+
+		case GAME_END:
+			run_game_end();
 			break;
 	}
 }

@@ -285,7 +285,7 @@ void start_turn_action(int act_row, int act_col, int new_row, int new_col) {
 
 	switch (game_board[act_col][act_row]->card_id) {
 		case VICTORS_OF_THE_MELEE:
-			if ((act_col == 4 && player_state == P1) || (act_col == 0 && player_state == P2)) {
+			if ((new_col == 5 && player_state == P1) || (new_col == -1 && player_state == P2)) {
 				push_health_change(
 					0,
 					(player_state == P1 ? 5 : -1),
@@ -451,6 +451,7 @@ bool move_to_tile(int* r, int* c, int new_r, int new_c) {
 		int base_player = new_c == -1 ? P1 : P2;
 		base_health[base_player] -= game_board[*c][*r]->health;
 		if (base_health[base_player] < 0) base_health[base_player] = 0;
+		display_base_health();
 		remove_tile_asset(*r, *c);
 		return true;
 
