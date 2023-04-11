@@ -17,6 +17,12 @@ enum board_sprites {
 extern bool cur_cards_played[4];
 extern int cur_card_selected;
 
+/**
+ * @brief Determines whether an intial move is waived or not
+ * Needed for TTE / SG logic
+ */
+extern bool move_waived[COL][ROW];
+
 extern struct surface tile_base_surfs[COL][ROW];
 extern struct surface tile_overlay_surfs[COL][ROW][4];
 extern int tile_overlay_surf_num[COL][ROW];

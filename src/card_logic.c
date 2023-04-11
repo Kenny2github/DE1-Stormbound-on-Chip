@@ -170,6 +170,7 @@ void remove_tile_asset(int r, int c) {
 				SHADY_GHOUL_SPAWN,
 				SATYR
 			);
+			move_waived[cur_cols[idx]][cur_rows[idx]] = true;
 		}
 	}
 	free(game_board[c][r]);

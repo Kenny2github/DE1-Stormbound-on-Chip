@@ -25,7 +25,7 @@ int next_mov_row, next_mov_col;
 bool await_next_move;
 
 int tte_row, tte_col;
-bool tte_jumped[COL][ROW];
+bool move_waived[COL][ROW];
 
 struct surface tile_base_surfs[COL][ROW];
 struct surface tile_overlay_surfs[COL][ROW][4];
@@ -115,7 +115,7 @@ void init_turn() {
 	for (int i = 0; i < 5; ++i) {
 		for (int j = 0; j < 4; ++j) {
 			game_board[i][j] = NULL;
-			tte_jumped[i][j] = false;
+			move_waived[i][j] = false;
 		}
 	}
 	cur_round = 0;
@@ -183,7 +183,7 @@ void new_turn(void) {
 	col = (player_state == P1) ? 4 : 0;
 	for (int i = 0; i < COL; ++i) {
 		for (int j = 0; j < ROW; ++j) {
-			tte_jumped[i][j] = false;
+			move_waived[i][j] = false;
 		}
 	}
 	enable_timer_interrupt();
@@ -316,14 +316,14 @@ static void run_preturn_unit(void) {
 				push_status_change(row, col, CLEAR_FROZEN);
 				change_statuses();
 			} else {
-				if (!tte_jumped[col][row]
+				if (!move_waived[col][row]
 				 && move_to_tile(&row, &col, next_mov_row, next_mov_col)
 				 && game_board[next_mov_col][next_mov_row] != NULL
 				 && game_board[next_mov_col][next_mov_row]->card_id == TODE_THE_ELEVATED
 				 && game_board[next_mov_col][next_mov_row]->player == player_state) {
 					find_tode_the_elevated_jump(next_mov_row, next_mov_col, &tte_row, &tte_col);
 					move_to_tile(&next_mov_row, &next_mov_col, tte_row, tte_col);
-					tte_jumped[tte_col][tte_row] = true;
+					move_waived[tte_col][tte_row] = true;
 				}
 			}
 			move_state = CARD_EFFECT;
