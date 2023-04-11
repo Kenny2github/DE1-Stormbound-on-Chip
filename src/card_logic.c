@@ -692,7 +692,7 @@ void play_card(void) {
 			for (int i = 0; i < 4; ++i) {
 				int check_row = row + bordering_row[player_state == P1 ? i : 3-i];
 				int check_col = col + bordering_col[player_state == P1 ? i : 3-i];
-				if (of_same_type(check_col, check_row, DRAGON)
+				if (of_same_type(check_row, check_col, DRAGON)
 				 && game_board[check_col][check_row]->player == player_state) {
 					adj_row = check_row;
 					adj_col = check_col;
