@@ -304,6 +304,7 @@ static void run_preturn_unit(void) {
 					row = 3;
 				}
 			}
+			enable_intval_timer_interrupt();
 	}
 }
 
