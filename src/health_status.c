@@ -34,12 +34,12 @@ void display_base_health(void) {
 	char base_health_text[3];
 	base_health_text[0] = abs(base_health[P1]) / 10 + '0';
 	base_health_text[1] = abs(base_health[P1]) % 10 + '0';
-	base_health_text[2] = ' ';	// im not sure why
-	write_string(5, 14, base_health_text);
+	base_health_text[2] = '\0';
+	write_string(5, 17, base_health_text);
 	base_health_text[0] = abs(base_health[P2]) / 10 + '0';
 	base_health_text[1] = abs(base_health[P2]) % 10 + '0';
-	base_health_text[2] = ' ';	// im not sure why
-	write_string(73, 14, base_health_text);
+	base_health_text[2] = '\0';
+	write_string(73, 17, base_health_text);
 }
 
 void rerender_affected_tile() {
@@ -52,7 +52,7 @@ void rerender_affected_tile() {
 		for (int i = 0; i < tile_overlay_surf_num[affected_col][affected_row]; ++i) {
 			r_stack_push(tile_overlay_surfs[affected_col][affected_row][i]);
 		}
-		write_string((col2x(affected_col) + 20) / 4, (row2y(affected_row) + 13) / 4, "   ");
+		write_string((col2x(affected_col) + 20) / 4, (row2y(affected_row) + 13) / 4, "  \0");
 	}
 
 	rerender_needed = false;
@@ -82,7 +82,7 @@ void change_healths() {
 		base_health[(cur_change.col + 1) / 6] += cur_change.change;
 		health_change_text[0] = abs(cur_change.change) / 10 + '0';
 		health_change_text[1] = abs(cur_change.change) % 10 + '0';
-		health_change_text[2] = ' ';	// im not sure why
+		health_change_text[2] = '\0';
 		push_image(
 			(cur_change.col == -1) ? 4 : 276,
 			45,
@@ -90,7 +90,7 @@ void change_healths() {
 		);
 		write_string(
 			(cur_change.col == -1) ? 5 : 73,
-			14,
+			17,
 			health_change_text
 		);
 		affected_row = cur_change.row;
@@ -138,7 +138,7 @@ void change_healths() {
 		}
 		health_change_text[0] = abs(cur_change.change) / 10 + '0';
 		health_change_text[1] = abs(cur_change.change) % 10 + '0';
-		health_change_text[2] = ' ';	// im not sure why
+		health_change_text[2] = '\0';
 		write_string((col2x(cur_change.col) + 20) / 4, (row2y(cur_change.row) + 13) / 4, health_change_text);
 		affected_row = cur_change.row;
 		affected_col = cur_change.col;
