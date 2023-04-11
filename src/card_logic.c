@@ -118,14 +118,15 @@ const struct image* get_troop_img(enum card_name type, enum player_state player)
 
 void write_tile_health(int r, int c) {
 	int health = game_board[c][r]->health;
-	char health_text[2];
+	char health_text[3];
 	health_text[0] = abs(health) / 10 + '0';
 	health_text[1] = abs(health) % 10 + '0';
+	health_text[2] = '\0';
 	write_string(col2x(c) / 4 + 1, (row2y(r) + 26) / 4 - 1, health_text);
 }
 
 void clear_tile_health(int r, int c) {
-	write_string(col2x(c) / 4 + 1, (row2y(r) + 26) / 4 - 1, "   ");
+	write_string(col2x(c) / 4 + 1, (row2y(r) + 26) / 4 - 1, "  \0");
 }
 
 void place_new_tile_asset(int r, int c, struct troop* new_troop) {
@@ -285,15 +286,6 @@ void start_turn_action(int act_row, int act_col, int new_row, int new_col) {
 
 	switch (game_board[act_col][act_row]->card_id) {
 		case VICTORS_OF_THE_MELEE:
-			if ((new_col == 5 && player_state == P1) || (new_col == -1 && player_state == P2)) {
-				push_health_change(
-					0,
-					(player_state == P1 ? 5 : -1),
-					player_state,
-					1 - VICTORS_OF_THE_MELEE_DAMAGE,
-					0
-				);
-			}
 			if (game_board[new_col][new_row] != NULL && game_board[new_col][new_row]->player != player_state) {
 				for (int i = act_col - 1; i <= act_col + 1; ++i) {
 					if (i < 0 || i > 4) continue;
@@ -313,7 +305,7 @@ void start_turn_action(int act_row, int act_col, int new_row, int new_col) {
 			}
 			break;
 		case EMERALD_TOWERS:
-			for (int i = 1; i < (player_state == P1) ? 5-act_col : act_col+1; ++i) {
+			for (int i = 1; i < ((player_state == P1) ? (5-act_col) : (act_col+1)); ++i) {
 				int cur_col = act_col + (player_state == P1 ? i : -i);
 				if (game_board[cur_col][act_row] != NULL
 				 && game_board[cur_col][act_row]->player == player_state

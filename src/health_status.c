@@ -38,22 +38,18 @@ void display_base_health(void) {
 	write_string(5, 17, base_health_text);
 	base_health_text[0] = abs(base_health[P2]) / 10 + '0';
 	base_health_text[1] = abs(base_health[P2]) % 10 + '0';
-	base_health_text[2] = '\0';
 	write_string(73, 17, base_health_text);
 }
 
 void rerender_affected_tile() {
 	if (!rerender_needed) return;
 
-	if (affected_col == -1 || affected_col == 5) {
-		display_base_health();
-	} else {
-		r_stack_push(tile_base_surfs[affected_col][affected_row]);
-		for (int i = 0; i < tile_overlay_surf_num[affected_col][affected_row]; ++i) {
-			r_stack_push(tile_overlay_surfs[affected_col][affected_row][i]);
-		}
-		write_string((col2x(affected_col) + 20) / 4, (row2y(affected_row) + 13) / 4, "  \0");
+	r_stack_push(tile_base_surfs[affected_col][affected_row]);
+	for (int i = 0; i < tile_overlay_surf_num[affected_col][affected_row]; ++i) {
+		r_stack_push(tile_overlay_surfs[affected_col][affected_row][i]);
 	}
+	write_string((col2x(affected_col) + 20) / 4, (row2y(affected_row) + 13) / 4, "  \0");
+
 
 	rerender_needed = false;
 }
@@ -77,26 +73,7 @@ void change_healths() {
 	}
 	char health_change_text[3];
 	struct health_change cur_change = health_change_list[health_change_idx];
-	if (cur_change.col == -1 || cur_change.col == 5) {
-		if (cur_change.change + base_health[(cur_change.col + 1) / 6] < 0) cur_change.change = -base_health[(cur_change.col + 1) / 6];
-		base_health[(cur_change.col + 1) / 6] += cur_change.change;
-		health_change_text[0] = abs(cur_change.change) / 10 + '0';
-		health_change_text[1] = abs(cur_change.change) % 10 + '0';
-		health_change_text[2] = '\0';
-		push_image(
-			(cur_change.col == -1) ? 4 : 276,
-			45,
-			&damage
-		);
-		write_string(
-			(cur_change.col == -1) ? 5 : 73,
-			17,
-			health_change_text
-		);
-		affected_row = cur_change.row;
-		affected_col = cur_change.col;
-		rerender_needed = true;
-	} else if (cur_change.spawn_type >= KNIGHT) {
+	if (cur_change.spawn_type >= KNIGHT) {
 		struct troop* new_troop = (struct troop*) malloc(sizeof(struct troop));
 		*new_troop = (struct troop){
 			// spawn new unit of given type belonging to player

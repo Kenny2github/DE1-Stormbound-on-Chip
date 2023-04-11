@@ -174,8 +174,8 @@ static void init_card_moving(void) {
 static void init_game_end() {
 	fill_screen(BACKGROUND);
 	clear_char_screen();
-	if (base_health[P1] == 0) write_string(37, 30, "P1 Win");
-	else write_string(37, 30, "P2 Win");
+	if (base_health[P1] == 0) write_string(37, 30, "P2 Win");
+	else write_string(37, 30, "P1 Win");
 	game_end_animation_timer = 10;
 	turn_state = GAME_END;
 	enable_intval_timer_interrupt();
@@ -211,6 +211,7 @@ static void run_preturn_building(void) {
 				reset_health_status_changes();
 				if (turn_state == PRETURN_BUILDING) {
 					start_turn_action(row, col, row, col);
+					if (health_change_num == 0 && status_change_num == 0) move_state = CARD_MOVE;
 				}
 			}
 			if (turn_state == PRETURN_BUILDING) {

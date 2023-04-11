@@ -16,6 +16,7 @@ static const struct surface intro_surfs[] = {
 
 void draw_intro(void) {
 	fill_screen(BACKGROUND);
+	clear_char_screen();
 	// write instructions
 	write_string(0, 6, instructions_data);
 	// draw logo and example cards
