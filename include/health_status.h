@@ -18,6 +18,8 @@ enum status_change_types {
 struct health_change {
 	// Position where health change occurs.
 	int row, col;
+	// owner of the affected unit
+	int player;
 	// Amount by which to change health.
 	int change;
 	// If there is no troop at that location,
@@ -84,7 +86,7 @@ void reset_health_status_changes(void);
  */
 void rerender_affected_tile(void);
 
-void push_health_change(int row, int col, int change, enum card_name spawn_type);
+void push_health_change(int row, int col, int player, int change, enum card_name spawn_type);
 
 void push_status_change(int row, int col, enum status_type change);
 

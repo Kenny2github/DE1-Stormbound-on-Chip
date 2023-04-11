@@ -42,9 +42,9 @@ void rerender_affected_tile() {
 	rerender_needed = false;
 }
 
-void push_health_change(int row, int col, int change, enum card_name spawn_type) {
+void push_health_change(int row, int col, int player, int change, enum card_name spawn_type) {
 	health_change_list[health_change_num++] = (struct health_change) {
-		row, col, change, spawn_type
+		row, col, player, change, spawn_type
 	};
 }
 
@@ -61,14 +61,15 @@ void change_healths() {
 	}
 	struct health_change cur_change = health_change_list[health_change_idx];
 	if (cur_change.spawn_type >= KNIGHT) {
+		printf("%d\n", cur_change.player);
 		struct troop* new_troop = (struct troop*) malloc(sizeof(struct troop));
 		*new_troop = (struct troop){
-			// spawn new unit of given type belonging to current player
-			cur_change.spawn_type, UNIT, player_state,
+			// spawn new unit of given type belonging to player
+			cur_change.spawn_type, UNIT, cur_change.player,
 			// give it health equal to the change in health
 			cur_change.change,
 			// it is not frozen or poisoned; get its image by type and player
-			false, false, get_troop_img(cur_change.spawn_type, player_state)
+			false, false, get_troop_img(cur_change.spawn_type, cur_change.player)
 		};
 		place_new_tile_asset(cur_change.row, cur_change.col, new_troop);
 		rerender_needed = false;

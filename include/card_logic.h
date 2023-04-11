@@ -27,8 +27,10 @@ void remove_tile_asset(int r, int c);
  *
  * @param act_row Row where troop is located
  * @param act_col Column where troop is located
+ * @param new_row Row where troop will act on
+ * @param new_col Column where troop will act on
  */
-void start_turn_action(int act_row, int act_col);
+void start_turn_action(int act_row, int act_col, int new_row, int new_col);
 
 /**
  * @brief Determine next tile troop moves to based on FIO

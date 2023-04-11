@@ -18,6 +18,7 @@
 #define BLADESTORM_DAMAGE -1
 #define DANGEROUS_SUITORS_HEAL 2
 #define LUDIC_MATRIARCHS_SPAWN 1
+#define SHADY_GHOUL_SPAWN 1
 #define DOPPELBOCKS_SPAWN 1
 #define MOONLIT_AERIE_HEAL 1
 #define HEAD_START_SPAWN 3
@@ -43,8 +44,10 @@
  * @param __col Column variable name
  * @param __row Row variable name
  */
-#define FOR_EACH_TILE(__col, __row) for (int __col = 0; __col < 5; ++__col) { \
-	for (int __row = 0; __row < 4; ++__row) {
+#define FOR_EACH_TILE(__col, __row) \
+	for (int __col = 0; __col < 5; ++__col) { \
+		for (int __row = 0; __row < 4; ++__row) {
+#define ENDFOR }}
 
 /**
  * @brief Hacky macro to loop over every tile surrounding a tile,
@@ -147,6 +150,28 @@ void add_new_tile_overlay_asset(int r, int c, const struct image* img) {
 }
 
 void remove_tile_asset(int r, int c) {
+	if (game_board[c][r]->card_id == SHADY_GHOUL) {
+		int cur_rows[4], cur_cols[4], list_num = 0;
+		for (int i = 0; i < 4; ++i) {
+			int check_row = r + bordering_row[i];
+			int check_col = c + bordering_col[i];
+			if (check_row < 0 || check_row > 3 || check_col < 0 || check_col > 4) continue;
+			if (game_board[check_col][check_row] == NULL) {
+				cur_rows[list_num] = check_row;
+				cur_cols[list_num++] = check_col;
+			}
+		}
+		if (list_num > 0) {
+			int idx = rand_num(0, list_num - 1);
+			push_health_change(
+				cur_rows[idx],
+				cur_cols[idx],
+				game_board[c][r]->player,
+				SHADY_GHOUL_SPAWN,
+				SATYR
+			);
+		}
+	}
 	free(game_board[c][r]);
 	game_board[c][r] = NULL;
 	tile_base_surfs[c][r] = (struct surface){
@@ -251,9 +276,9 @@ static bool of_same_type(int row, int col, int card_id) {
 	}
 }
 
-void start_turn_action(int act_row, int act_col) {
+void start_turn_action(int act_row, int act_col, int new_row, int new_col) {
 	if (game_board[act_col][act_row]->poisoned) {
-		push_health_change(act_row, act_col, POISON_DAMAGE, 0);
+		push_health_change(act_row, act_col, player_state, POISON_DAMAGE, 0);
 		if (game_board[act_col][act_row]->health + POISON_DAMAGE <= 0) return;
 	}
 
@@ -263,21 +288,25 @@ void start_turn_action(int act_row, int act_col) {
 				push_health_change(
 					0,
 					(player_state == P1 ? 5 : -1),
-					VICTORS_OF_THE_MELEE_DAMAGE,
+					player_state,
+					1 - VICTORS_OF_THE_MELEE_DAMAGE,
 					0
 				);
 			}
-			for (int i = act_col - 1; i <= act_col + 1; ++i) {
-				if (i < 0 || i > 4) continue;
-				for (int j = act_row - 1; j <= act_row + 1; ++j) {
-					if (j < 0 || j > 3 || (i == act_col && j == act_row)) continue;
-					if (game_board[i][j] != NULL && game_board[i][j]->player != player_state) {
-						push_health_change(
-							j,
-							i,
-							VICTORS_OF_THE_MELEE_DAMAGE,
-							0
-						);
+			if (game_board[new_col][new_row] != NULL && game_board[new_col][new_row]->player != player_state) {
+				for (int i = act_col - 1; i <= act_col + 1; ++i) {
+					if (i < 0 || i > 4) continue;
+					for (int j = act_row - 1; j <= act_row + 1; ++j) {
+						if (j < 0 || j > 3 || (i == act_col && j == act_row)) continue;
+						if (game_board[i][j] != NULL && game_board[i][j]->player != player_state) {
+							push_health_change(
+								j,
+								i,
+								1 - player_state,
+								VICTORS_OF_THE_MELEE_DAMAGE,
+								0
+							);
+						}
 					}
 				}
 			}
@@ -291,6 +320,7 @@ void start_turn_action(int act_row, int act_col) {
 					push_health_change(
 						cur_col,
 						act_row,
+						player_state,
 						EMERALD_TOWERS_HEAL,
 						0
 					);
@@ -303,14 +333,14 @@ void start_turn_action(int act_row, int act_col) {
 					game_board[i][j] != NULL
 					&& game_board[i][j]->player == player_state
 					&& of_same_type(j, i, SATYR)
-				) push_health_change(j, i, MOONLIT_AERIE_HEAL, 0);
+				) push_health_change(j, i, player_state, MOONLIT_AERIE_HEAL, 0);
 			} ENDFOR
 			break;
 		case WISP_CLOUD:
-			if (game_board[act_col+1-player_state*2][act_row]->frozen) {
+			if (game_board[new_col][new_row] != NULL && game_board[new_col][new_row]->player != player_state && game_board[new_col][new_row]->frozen) {
 				FOR_EACH_SURROUNDING_TILE(i, j, act_col, act_row) {
 					if (game_board[i][j] != NULL && game_board[i][j]->frozen) {
-						push_health_change(j, i, WISP_CLOUD_DAMAGE, 0);
+						push_health_change(j, i, 1 - player_state, WISP_CLOUD_DAMAGE, 0);
 					}
 				} ENDFOR
 			}
@@ -321,6 +351,7 @@ void start_turn_action(int act_row, int act_col) {
 				push_health_change(
 					act_row,
 					spawn_col,
+					player_state,
 					MECH_WORKSHOP_SPAWN,
 					CONSTRUCT
 				);
@@ -332,21 +363,21 @@ void start_turn_action(int act_row, int act_col) {
 					game_board[i][j] != NULL
 					&& game_board[i][j]->player == player_state
 					&& of_same_type(j, i, CONSTRUCT)
-				) push_health_change(j, i, UPGRADE_POINT_HEAL, 0);
+				) push_health_change(j, i, player_state, UPGRADE_POINT_HEAL, 0);
 			} ENDFOR
 			break;
-		case SOULCRUSHERS: ;
-			int destroy_col = act_col + (player_state == P1 ? 1 : -1);
-			if (destroy_col >= 0
-			 && destroy_col <= 4
-			 && game_board[destroy_col][act_row] != NULL
-			 && game_board[destroy_col][act_row]->player != player_state
-			 && game_board[destroy_col][act_row]->type == UNIT
-			 && game_board[destroy_col][act_row]->health < game_board[act_col][act_row]->health) {
+		case SOULCRUSHERS:
+			if (new_col >= 0
+			 && new_col <= 4
+			 && game_board[new_col][new_row] != NULL
+			 && game_board[new_col][new_row]->player != player_state
+			 && game_board[new_col][new_row]->type == UNIT
+			 && game_board[new_col][new_row]->health < game_board[act_col][act_row]->health) {
 				push_health_change(
-					act_row,
-					destroy_col,
-					-game_board[destroy_col][act_row]->health,
+					new_row,
+					new_col,
+					1 - player_state,
+					-game_board[new_col][new_row]->health,
 					0
 				);
 			}
@@ -409,7 +440,7 @@ void find_next_move(int r, int c, int* next_r, int* next_c) {
 		if (game_board[c][r]->card_id == VICTORS_OF_THE_MELEE
 		 || game_board[c][r]->card_id == WISP_CLOUD
 		 || game_board[c][r]->card_id == SOULCRUSHERS) {
-			start_turn_action(r, c);
+			start_turn_action(r, c, *next_r, *next_c);
 		}
 	}
 }
@@ -426,6 +457,7 @@ bool move_to_tile(int* r, int* c, int new_r, int new_c) {
 	 && game_board[new_c][new_r]->player != player_state) {	// attacking enemy
 		if (game_board[new_c][new_r]->health <= game_board[*c][*r]->health) {	// attacking eliminates defending
 			if ((game_board[new_c][new_r]->health -= game_board[*c][*r]->health) >= 0) { // attacking gets eliminated
+				write_tile_health(new_r, new_c);
 				remove_tile_asset(*r, *c);
 			}
 			remove_tile_asset(new_r, new_c);
@@ -438,6 +470,7 @@ bool move_to_tile(int* r, int* c, int new_r, int new_c) {
 			}
 		} else {
 			game_board[new_c][new_r]->health -= game_board[*c][*r]->health;
+			write_tile_health(new_r, new_c);
 			remove_tile_asset(*r, *c);
 		}
 		return true;
@@ -475,6 +508,9 @@ void find_tode_the_elevated_jump(int r, int c, int* next_r, int* next_c) {
 		game_board[c][r]->health += TODE_THE_ELEVATED_HEAL;
 		*next_r = cur_rows[idx];
 		*next_c = cur_cols[idx];
+	} else {
+		*next_r = r;
+		*next_c = c;
 	}
 }
 
@@ -508,7 +544,8 @@ bool valid_play_card(void) {
 			break;
 
 		default:
-			return (game_board[col][row] == NULL);
+			return (game_board[col][row] == NULL
+			 && (player_state == P1 ? col <= front_columns[P1] : col >= front_columns[P2]));
 	}
 }
 
@@ -551,6 +588,7 @@ void play_card(void) {
 		case VICTORS_OF_THE_MELEE:
 		case WISP_CLOUD:
 		case SOULCRUSHERS:
+		case TODE_THE_ELEVATED:
 			place_new_tile_asset(row, col, new_troop);
 			add_new_tile_overlay_asset(row, col, &on_attack);
 			break;
@@ -572,6 +610,7 @@ void play_card(void) {
 				push_health_change(
 					cur_rows[idx],
 					cur_cols[idx],
+					1 - player_state,
 					FELFLARES_DAMAGE,
 					0
 				);
@@ -593,6 +632,7 @@ void play_card(void) {
 				push_health_change(
 					cur_rows[idx],
 					cur_cols[idx],
+					player_state,
 					SUMMON_MILITIA_SPAWN,
 					KNIGHT
 				);
@@ -603,6 +643,7 @@ void play_card(void) {
 			push_health_change(
 				row,
 				col,
+				1 - player_state,
 				EXECUTION_DAMAGE,
 				0
 			);
@@ -615,6 +656,7 @@ void play_card(void) {
 						push_health_change(
 							j,
 							i,
+							1 - player_state,
 							BLADESTORM_DAMAGE,
 							0
 						);
@@ -638,6 +680,7 @@ void play_card(void) {
 				push_health_change(
 					row,
 					col,
+					player_state,
 					DANGEROUS_SUITORS_HEAL * heal,
 					0
 				);
@@ -668,6 +711,7 @@ void play_card(void) {
 					if (game_board[cur_col][cur_row] == NULL) push_health_change(
 						cur_row,
 						cur_col,
+						player_state,
 						LUDIC_MATRIARCHS_SPAWN,
 						DRAGON
 					);
@@ -676,6 +720,7 @@ void play_card(void) {
 					if (game_board[cur_col][cur_row] == NULL) push_health_change(
 						cur_row,
 						cur_col,
+						player_state,
 						LUDIC_MATRIARCHS_SPAWN,
 						DRAGON
 					);
@@ -696,6 +741,7 @@ void play_card(void) {
 				push_health_change(
 					row,
 					check_col,
+					player_state,
 					DOPPELBOCKS_SPAWN,
 					SATYR
 				);
@@ -713,6 +759,7 @@ void play_card(void) {
 				push_health_change(
 					cur_rows[idx],
 					front_columns[player_state],
+					player_state,
 					HEAD_START_SPAWN,
 					SATYR
 				);
@@ -735,6 +782,7 @@ void play_card(void) {
 								push_health_change(
 									j,
 									i,
+									1 - player_state,
 									DARK_HARVEST_DAMAGE,
 									0
 								);
@@ -784,6 +832,7 @@ void play_card(void) {
 				push_health_change(
 					cur_rows[idx],
 					cur_cols[idx],
+					player_state,
 					FLESHMENDERS_HEAL,
 					0
 				);
@@ -794,6 +843,7 @@ void play_card(void) {
 			push_health_change(
 				row,
 				col,
+				player_state,
 				MOMENTS_PEACE_HEAL,
 				0
 			);
@@ -825,6 +875,7 @@ void play_card(void) {
 				push_health_change(
 					row,
 					col,
+					1 - player_state,
 					ICICLE_BURST_DAMAGE,
 					0
 				);
@@ -841,7 +892,7 @@ void play_card(void) {
 				 && game_board[check_col][check_row]->player == player_state
 				 && game_board[check_col][check_row]->type == BUILDING) {
 					// all buildings have a start of turn effect
-					start_turn_action(check_row, check_col);
+					start_turn_action(check_row, check_col, check_row, check_col);
 				}
 			}
 			break;
@@ -872,6 +923,7 @@ void play_card(void) {
 			push_health_change(
 				row,
 				col,
+				1 - player_state,
 				MARKED_AS_PREY_DAMAGE,
 				0
 			);
@@ -879,6 +931,7 @@ void play_card(void) {
 				push_health_change(
 					row,
 					col,
+					player_state,
 					MARKED_AS_PREY_SPAWN,
 					TOAD
 				);
